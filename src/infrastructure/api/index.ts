@@ -1,4 +1,12 @@
-import express from 'express';
+import AWS from 'aws-sdk';
+import express, { Request } from 'express';
+import mysql from 'mysql2/promise';
+import queryFunctionFactory from '../../app/queryFunctionFactory';
+import { getVehicleDetails } from '../../domain/enquiryService';
+import ResultsEvent from '../../interfaces/ResultsEvent';
+import VehicleEvent from '../../interfaces/VehicleEvent';
+import DatabaseService from '../databaseService';
+import SecretsManagerService from '../secretsManagerService';
 
 const app = express();
 
@@ -43,5 +51,31 @@ app.get('/', (_request, res) => {
 app.get('/version', (_request, res) => {
   res.send({ version: API_VERSION });
 });
+
+app.get(
+  '/enquiry/vehicle',
+  (
+    request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, VehicleEvent>,
+    res,
+  ) => {
+    const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    const dbService = new DatabaseService(secretsManager, mysql);
+    getVehicleDetails(request.query, queryFunctionFactory, dbService)
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((e: Error) => {
+        res.send(e.message);
+      });
+  },
+);
+
+app.get(
+  '/enquiry/results',
+  (
+    _request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
+    _res,
+  ) => {},
+);
 
 export { app };

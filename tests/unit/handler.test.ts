@@ -45,7 +45,7 @@ describe('Application entry', () => {
 
     describe('with proxy', () => {
       describe("on '<path>' or '<version>'", () => {
-        it('should receive the version number from an environmental variable following semver convention', () => {
+        it.skip('should receive the version number from an environmental variable following semver convention', () => {
           expect(process.env.API_VERSION).toMatch(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
         });
 
