@@ -2,8 +2,18 @@ import mysqlp from 'mysql2/promise';
 import DatabaseService from '../../../src/infrastructure/databaseService';
 
 describe('Database Service', () => {
+  const connectionDetails = {
+    username: 'username',
+    password: 'password',
+    engine: 'mysql',
+    host: 'host',
+    port: 1234,
+    dbname: 'dbname',
+    dbClusterIdentifier: 'cluster',
+  };
+
   it('should get the connection secret from the secrets manager', async () => {
-    const mockSecretsManager = { getSecret: jest.fn().mockResolvedValue('secret') };
+    const mockSecretsManager = { getSecret: jest.fn().mockResolvedValue(JSON.stringify(connectionDetails)) };
     const mockMysql = ({
       createConnection: jest.fn().mockResolvedValue({ execute: jest.fn() }),
     } as unknown) as typeof mysqlp;
@@ -16,7 +26,7 @@ describe('Database Service', () => {
   });
 
   it('returns the response from executing the DB query', async () => {
-    const mockSecretsManager = { getSecret: jest.fn().mockResolvedValue('secret') };
+    const mockSecretsManager = { getSecret: jest.fn().mockResolvedValue(JSON.stringify(connectionDetails)) };
     const mockMysql = ({
       createConnection: jest.fn().mockResolvedValue({ execute: jest.fn().mockReturnValue('Success') }),
     } as unknown) as typeof mysqlp;

@@ -1,5 +1,5 @@
-describe("Enquiry function", () => {
-    it("should return true", () => {
-        expect(true).toBe(true);
-    });
+describe('Enquiry function', () => {
+  it('should return true', () => {
+    expect(true).toBe(true);
+  });
 });

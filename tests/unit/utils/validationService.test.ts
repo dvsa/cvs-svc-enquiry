@@ -7,9 +7,36 @@ describe('Validation Service', () => {
       expect(() => validateVehicleEvent({})).toThrow(Error);
     });
 
-    it('throws an error if there are too many identifiers', () => {
+    it('throws an error if there are too many identifiers (VRM and VIN)', () => {
       expect(() => validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567' })).toThrow(Error);
     });
+
+    it('throws an error if there are too many identifiers (VRM and Trailer ID)', () => {
+      expect(() => validateVehicleEvent({ VehicleRegMark: 'GL10RFE', trailerId: '123534567' })).toThrow(Error);
+    });
+
+    it('throws an error if there are too many identifiers (Trailer ID and VIN)', () => {
+      expect(() => validateVehicleEvent({ trailerId: '123456789', vinNumber: '123534567' })).toThrow(Error);
+    });
+
+    it('throws an error if there are too many identifiers (all)', () => {
+      expect(() =>
+        validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '123456789' }),
+      ).toThrow(Error);
+    });
+
+    it('returns true if there are no problems(VRM)', () => {
+      expect(validateVehicleEvent({ VehicleRegMark: 'AA9' })).toEqual(true);
+    });
+
+    it('returns true if there are no problems(VIN)', () => {
+      expect(validateVehicleEvent({ vinNumber: '123456798' })).toEqual(true);
+    });
+
+    it('returns true if there are no problems(Trailer ID)', () => {
+      expect(validateVehicleEvent({ trailerId: '123456789' })).toEqual(true);
+    });
+
     describe('VRM validation', () => {
       it('validates a pre-1932 plate with one number', () => {
         const plate = 'AA9';

@@ -1,5 +1,4 @@
 import VehicleEvent from '../interfaces/VehicleEvent';
-// import getVehicleDetails from '../app/databaseService';
 import { validateVehicleEvent, validateResultsEvent } from '../utils/validationService';
 import queryFunctionFactory from '../app/queryFunctionFactory';
 import DatabaseService from '../interfaces/DatabaseService';
