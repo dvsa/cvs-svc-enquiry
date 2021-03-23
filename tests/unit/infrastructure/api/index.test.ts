@@ -1,4 +1,5 @@
 import supertest from 'supertest';
+import { FieldPacket } from 'mysql2/promise';
 import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
 import VehicleDetails from '../../../../src/interfaces/queryResults/vehicleDetails';
@@ -80,12 +81,13 @@ describe('API', () => {
           vehicle_class_id: 7,
           test_type_id: 8,
           testStatus: 9,
-        };
-        jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue(resultDetails as TestRecord);
+        } as TestRecord;
+        const fieldPacket = {} as FieldPacket;
+        jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([[resultDetails], [fieldPacket]]);
         const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
-        const resultContent = JSON.parse(result.text) as TestRecord;
+        const resultContent = JSON.parse(result.text) as [TestRecord];
 
-        expect(resultContent.technical_record_id).toEqual(1);
+        expect(resultContent[0].technical_record_id).toEqual(1);
       });
 
       it('returns the error message if there is an error', async () => {
