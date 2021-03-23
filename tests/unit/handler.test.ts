@@ -4,12 +4,15 @@ import * as Utils from '../../src/utils';
 import Version from '../../local/data/version.json';
 
 describe('Application entry', () => {
+  const OLD_ENV = process.env;
   let event;
   let context;
   let majorVersionNumber: string;
   let basePath: string;
 
   beforeEach(() => {
+    jest.resetModules(); // Most important - it clears the cache
+    process.env = { ...OLD_ENV }; // Make a copy
     event = {} as APIGatewayEvent;
     context = {} as Context;
     jest.spyOn(Utils, 'createMajorVersionNumber').mockReturnValue('1');
@@ -18,6 +21,7 @@ describe('Application entry', () => {
   });
 
   afterEach(() => {
+    process.env = OLD_ENV; // Restore old environment
     jest.resetAllMocks().restoreAllMocks();
   });
 

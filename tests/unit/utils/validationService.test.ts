@@ -20,9 +20,7 @@ describe('Validation Service', () => {
     });
 
     it('throws an error if there are too many identifiers (all)', () => {
-      expect(() =>
-        validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '123456789' }),
-      ).toThrow(Error);
+      expect(() => validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '123456789' })).toThrow(Error);
     });
 
     it('returns true if there are no problems(VRM)', () => {

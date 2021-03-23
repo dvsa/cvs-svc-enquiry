@@ -2,6 +2,8 @@ import supertest from 'supertest';
 import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
 import VehicleDetails from '../../../../src/interfaces/queryResults/vehicleDetails';
+import ParametersError from '../../../../src/errors/ParametersError';
+import TestRecord from '../../../../src/interfaces/queryResults/testRecord';
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -42,6 +44,69 @@ describe('API', () => {
         const resultContent = JSON.parse(result.text) as VehicleDetails;
 
         expect(resultContent.vin).toEqual('vin1');
+      });
+
+      it('returns the error message if there is an error', async () => {
+        jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(result.text).toEqual('This is an error');
+      });
+
+      it('sets the status to 400 for a parameters error', async () => {
+        jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new ParametersError('This is an error'));
+        const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(result.status).toEqual(400);
+      });
+
+      it('sets the status to 500 for a generic error', async () => {
+        jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(result.status).toEqual(500);
+      });
+    });
+
+    describe('Results enquiry', () => {
+      it('returns the db query result if there are no errors', async () => {
+        const resultDetails = {
+          technical_record_id: 1,
+          vehicle_id: 2,
+          fuel_emission_id: 3,
+          test_station_id: 4,
+          tester_id: 5,
+          preparer_id: 6,
+          vehicle_class_id: 7,
+          test_type_id: 8,
+          testStatus: 9,
+        };
+        jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue(resultDetails as TestRecord);
+        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+        const resultContent = JSON.parse(result.text) as TestRecord;
+
+        expect(resultContent.technical_record_id).toEqual(1);
+      });
+
+      it('returns the error message if there is an error', async () => {
+        jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+
+        expect(result.text).toEqual('This is an error');
+      });
+
+      it('sets the status to 400 for a parameters error', async () => {
+        jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new ParametersError('This is an error'));
+        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+
+        expect(result.status).toEqual(400);
+      });
+
+      it('sets the status to 500 for a generic error', async () => {
+        jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+
+        expect(result.status).toEqual(500);
       });
     });
   });

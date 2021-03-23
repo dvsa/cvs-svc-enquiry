@@ -1,4 +1,5 @@
 import InvalidNumberplateError from '../errors/InvalidNumberplateError';
+import ParametersError from '../errors/ParametersError';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import VehicleEvent from '../interfaces/VehicleEvent';
 
@@ -16,16 +17,16 @@ function validateVrm(vrm: string) {
 
 const validateVehicleEvent = (event: VehicleEvent): boolean => {
   if (!event.VehicleRegMark && !event.vinNumber && !event.trailerId) {
-    throw new Error('No parameter defined');
+    throw new ParametersError('No parameter defined');
   }
 
   if (
-    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined)
-    || (event.VehicleRegMark !== undefined && event.trailerId !== undefined)
-    || (event.vinNumber !== undefined && event.trailerId !== undefined)
-    || (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.trailerId !== undefined)
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.trailerId !== undefined) ||
+    (event.vinNumber !== undefined && event.trailerId !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.trailerId !== undefined)
   ) {
-    throw new Error('Too many parameters defined');
+    throw new ParametersError('Too many parameters defined');
   }
 
   if (event.VehicleRegMark) {
@@ -37,7 +38,7 @@ const validateVehicleEvent = (event: VehicleEvent): boolean => {
 
 const validateResultsEvent = (event: ResultsEvent): boolean => {
   if (!event.vehicle) {
-    throw new Error('No vehicle parameter');
+    throw new ParametersError('No vehicle parameter');
   }
 
   return true;

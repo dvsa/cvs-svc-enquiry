@@ -2,15 +2,14 @@ import AWS from 'aws-sdk';
 import express, { Request } from 'express';
 import mysql from 'mysql2/promise';
 import queryFunctionFactory from '../../app/queryFunctionFactory';
-import { getVehicleDetails } from '../../domain/enquiryService';
+import { getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
+import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
 import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
 
 const app = express();
-
-const router = express.Router();
 
 const { API_VERSION } = process.env;
 
@@ -35,14 +34,6 @@ app.use((req, _response, next) => {
   next();
 });
 
-/**
- * Define routing and route level middleware if necessary from ./routes
- */
-router.post('/', (_request, res, next) => {
-  res.send('Hello World!');
-  next();
-});
-
 // Debug router before we start proxying  requests from /v<x> psth
 app.get('/', (_request, res) => {
   res.send({ ok: true });
@@ -62,9 +53,15 @@ app.get(
     const dbService = new DatabaseService(secretsManager, mysql);
     getVehicleDetails(request.query, queryFunctionFactory, dbService)
       .then((result) => {
-        res.send(result);
+        res.contentType('json').send(result);
       })
       .catch((e: Error) => {
+        if (e instanceof ParametersError) {
+          res.status(400);
+        } else {
+          res.status(500);
+        }
+
         res.send(e.message);
       });
   },
@@ -73,9 +70,25 @@ app.get(
 app.get(
   '/enquiry/results',
   (
-    _request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
-    _res,
-  ) => {},
+    request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
+    res,
+  ) => {
+    const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    const dbService = new DatabaseService(secretsManager, mysql);
+    getResultsDetails(request.query, dbService)
+      .then((result) => {
+        res.contentType('json').send(result);
+      })
+      .catch((e: Error) => {
+        if (e instanceof ParametersError) {
+          res.status(400);
+        } else {
+          res.status(500);
+        }
+
+        res.send(e.message);
+      });
+  },
 );
 
 export { app };
