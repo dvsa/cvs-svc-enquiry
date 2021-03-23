@@ -1,3 +1,4 @@
+import { FieldPacket } from 'mysql2';
 import VehicleEvent from '../interfaces/VehicleEvent';
 import { validateVehicleEvent, validateResultsEvent } from '../utils/validationService';
 import queryFunctionFactory from '../app/queryFunctionFactory';
@@ -24,7 +25,10 @@ const getVehicleDetails = async (
   // return result;
 };
 
-const getResultsDetails = async (event: ResultsEvent, dbService: DatabaseService): Promise<TestRecord> => {
+const getResultsDetails = async (
+  event: ResultsEvent,
+  dbService: DatabaseService,
+): Promise<[[TestRecord], [FieldPacket]]> => {
   // Validate incoming event
   validateResultsEvent(event);
   // Choose appropriate function to call for the event
@@ -35,7 +39,7 @@ const getResultsDetails = async (event: ResultsEvent, dbService: DatabaseService
   // Convert results into JSON
   // Return results
   // return result;
-  return JSON.parse(JSON.stringify(result)) as TestRecord;
+  return JSON.parse(JSON.stringify(result)) as [[TestRecord], [FieldPacket]];
 };
 
 export { getVehicleDetails, getResultsDetails };
