@@ -1,5 +1,5 @@
 # https://github.com/serverless/serverless/blob/master/docs/providers/aws/guide/functions.md
-service: cvs-svc-template
+service: cvs-svc-enquiry
 useDotenv: true
 
 # Create an optimized package for our functions

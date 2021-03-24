@@ -1,6 +1,6 @@
 {
-  "name": "cvs-svc-template",
-  "version": "1.1.1",
+  "name": "cvs-svc-enquiry",
+  "version": "1.1.0",
   "description": "",
   "main": "src/index.ts",
   "engines": {
@@ -102,18 +102,18 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dvsa/cvs-svc-template/issues"
+    "url": "https://github.com/dvsa/cvs-svc-enquiry/issues"
   },
-  "homepage": "https://github.com/dvsa/cvs-svc-template#readme",
+  "homepage": "https://github.com/dvsa/cvs-svc-enquiry#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dvsa/cvs-svc-template.git"
+    "url": "https://github.com/dvsa/cvs-svc-enquiry.git"
   },
   "keywords": [
     "DVLA",
     "DVSA",
     "CVS",
-    "Template",
+    "enquiry",
     "TRL",
     "VRM",
     "MOT"

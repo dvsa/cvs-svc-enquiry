@@ -1,6 +1,6 @@
-# cvs-svc-template
+# cvs-svc-enquiry
 
-The template for CVS lambda services
+Lambda service to retrieve vehicle and test information for commerical vehicles
 
 ## Dependencies
 
