@@ -20,15 +20,12 @@ const getVehicleDetails = async (
   // Make DB request
   const result = await query(dbService, event);
   // Convert results into JSON
-  return JSON.parse(JSON.stringify(result)) as VehicleDetails;
+  return result[0][0];
   // Return results
   // return result;
 };
 
-const getResultsDetails = async (
-  event: ResultsEvent,
-  dbService: DatabaseService,
-): Promise<[[TestRecord], [FieldPacket]]> => {
+const getResultsDetails = async (event: ResultsEvent, dbService: DatabaseService): Promise<TestRecord[]> => {
   // Validate incoming event
   validateResultsEvent(event);
   // Choose appropriate function to call for the event
@@ -39,7 +36,7 @@ const getResultsDetails = async (
   // Convert results into JSON
   // Return results
   // return result;
-  return JSON.parse(JSON.stringify(result)) as [[TestRecord], [FieldPacket]];
+  return result[0];
 };
 
 export { getVehicleDetails, getResultsDetails };
