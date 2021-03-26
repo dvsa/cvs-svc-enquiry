@@ -1,5 +1,4 @@
 import { RowDataPacket } from 'mysql2';
-import Defect from './defect';
 import FuelEmission from './fuelEmission';
 import TestDefect from './testDefect';
 import Tester from './tester';
