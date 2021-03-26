@@ -1,4 +1,3 @@
-import { FieldPacket } from 'mysql2';
 import VehicleEvent from '../interfaces/VehicleEvent';
 import { validateVehicleEvent, validateResultsEvent } from '../utils/validationService';
 import queryFunctionFactory from '../app/queryFunctionFactory';

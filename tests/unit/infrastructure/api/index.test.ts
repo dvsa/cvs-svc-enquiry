@@ -1,5 +1,4 @@
 import supertest from 'supertest';
-import { FieldPacket } from 'mysql2/promise';
 import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
 import VehicleDetails from '../../../../src/interfaces/queryResults/vehicleDetails';
@@ -72,22 +71,13 @@ describe('API', () => {
     describe('Results enquiry', () => {
       it('returns the db query result if there are no errors', async () => {
         const resultDetails = {
-          technical_record_id: 1,
-          vehicle_id: 2,
-          fuel_emission_id: 3,
-          test_station_id: 4,
-          tester_id: 5,
-          preparer_id: 6,
-          vehicle_class_id: 7,
-          test_type_id: 8,
-          testStatus: 9,
+          testStatus: 'Success',
         } as TestRecord;
-        const fieldPacket = {} as FieldPacket;
-        jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([[resultDetails], [fieldPacket]]);
+        jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([resultDetails]);
         const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as [TestRecord];
 
-        expect(resultContent[0].technical_record_id).toEqual(1);
+        expect(resultContent[0].testStatus).toEqual('Success');
       });
 
       it('returns the error message if there is an error', async () => {

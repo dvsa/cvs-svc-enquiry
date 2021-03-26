@@ -77,7 +77,7 @@ app.get(
     const dbService = new DatabaseService(secretsManager, mysql);
     getResultsDetails(request.query, dbService)
       .then((result) => {
-        res.contentType('json').send(JSON.stringify(result[0]));
+        res.contentType('json').send(JSON.stringify(result));
       })
       .catch((e: Error) => {
         if (e instanceof ParametersError) {
