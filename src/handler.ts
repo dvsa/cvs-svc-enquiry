@@ -6,9 +6,7 @@ import { app } from './infrastructure/api';
 
 import { createMajorVersionNumber, createHandlerBasePath } from './utils';
 
-const {
-  NODE_ENV, API_VERSION, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE,
-} = process.env;
+const { NODE_ENV, API_VERSION, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE } = process.env;
 
 console.log(
   `\nRunning Service\n version: '${API_VERSION}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,
@@ -18,9 +16,9 @@ const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGat
   console.log('event');
   console.log(JSON.stringify(event, null, 2));
 
-  if (!API_VERSION) {
-    throw new Error('API_VERSION not specified');
-  }
+  // if (!API_VERSION) {
+  //   throw new Error('API_VERSION not specified');
+  // }
 
   return serverless(app, {
     /**
@@ -47,7 +45,7 @@ const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGat
      * We use express Router to proxy redirect requests from /v<x>/
      */
     // basePath: `${AWS_PROVIDER_STAGE}/${MAJOR_VERSION}`,
-    basePath: createHandlerBasePath(createMajorVersionNumber(API_VERSION)),
+    basePath: createHandlerBasePath(createMajorVersionNumber(API_VERSION || '1.0.0')),
   })(event, context);
 };
 
