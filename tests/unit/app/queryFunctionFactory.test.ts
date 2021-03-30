@@ -24,7 +24,7 @@ describe('Query Function Factory', () => {
 
     expect(func(dbServiceMock, { VehicleRegMark: '1234' })).toEqual('Success');
   });
-  it('returns the correct function when passed a vin', () => {
+  it('returns the correct function when passed a trailer ID', () => {
     dbFunctionsMock.getVehicleDetailsByTrailerId = jest.fn().mockReturnValue('Success');
 
     const func = queryFunctionFactory({ trailerId: '1234' });
