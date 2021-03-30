@@ -1,4 +1,5 @@
 import { RowDataPacket } from 'mysql2';
+import CustomDefect from './customDefect';
 import FuelEmission from './fuelEmission';
 import TestDefect from './testDefect';
 import Tester from './tester';
@@ -39,12 +40,13 @@ interface TestRecord extends RowDataPacket {
   smokeTestKLimitApplied?: string;
   createdBy_Id?: number;
   lastUpdatedBy_Id?: number;
-  fuel_emission_id?: FuelEmission;
-  test_station_id?: TestStation;
-  tester_id?: Tester;
-  vehicle_class_id?: VehicleClass;
-  test_type_id?: TestType;
+  fuelEmission?: FuelEmission;
+  testStationId?: TestStation;
+  testerId?: Tester;
+  vehicleClassId?: VehicleClass;
+  testTypeId?: TestType;
   defects?: TestDefect[];
+  customDefect?: CustomDefect;
 }
 
 export default TestRecord;

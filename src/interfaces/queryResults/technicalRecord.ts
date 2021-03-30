@@ -29,6 +29,9 @@ interface TechnicalRecord {
   ntaNumber?: string;
   coifSerialNumber?: string;
   coifCertifierName?: string;
+  approvalType?: string;
+  approvalTypeNumber?: string;
+  variantNumber?: string;
   conversionRefNo?: string;
   seatsLowerDeck?: number;
   seatsUpperDeck?: number;
@@ -72,17 +75,14 @@ interface TechnicalRecord {
   couplingCenterToRearTrlMax?: number;
   centreOfRearmostAxleToRearOfTrl?: number;
   notes?: string;
+  purchaserNotes?: string;
+  manufacturerNotes?: string;
   noOfAxles?: number;
   brakeCode?: string;
   numberOfSeatbelts?: string;
   seatbeltInstallationApprovalDate?: string;
-  approvalType?: string;
-  approvalTypeNumber?: string | null;
-  variantNumber?: string;
-  purchaserNotes?: string;
-  manufacturerNotes?: string;
   axles?: Axles[];
-  brakes?: Brakes;
+  brakes?: Brakes[];
   makeModel?: MakeModel;
   vehicleClass?: VehicleClass;
 }
