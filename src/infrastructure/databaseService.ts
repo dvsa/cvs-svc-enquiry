@@ -14,13 +14,14 @@ export default class DatabaseService implements DatabaseServiceInterface {
 
   async get(query: string, params: string[] | undefined): Promise<[RowDataPacket[], FieldPacket[]]> {
     const dbConnectionDetailsString = await this.secretsManager.getSecret(process.env.SECRET);
+    const dbName = await this.secretsManager.getSecret(process.env.SCHEMA_NAME);
     const dbConnectionDetails = JSON.parse(dbConnectionDetailsString) as StoredConnectionDetails;
     const connection = await this.mysql.createConnection({
       user: dbConnectionDetails.username,
       password: dbConnectionDetails.password,
       host: dbConnectionDetails.host,
       port: dbConnectionDetails.port,
-      database: dbConnectionDetails.dbname,
+      database: dbName,
     });
 
     const result = await connection.execute<RowDataPacket[]>(query, params);

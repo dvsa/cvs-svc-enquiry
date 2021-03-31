@@ -13,7 +13,9 @@ describe('Database Service', () => {
   };
 
   it('should get the connection secret from the secrets manager', async () => {
-    const mockSecretsManager = { getSecret: jest.fn().mockResolvedValue(JSON.stringify(connectionDetails)) };
+    const mockSecretsManager = {
+      getSecret: jest.fn().mockResolvedValueOnce(JSON.stringify(connectionDetails)).mockResolvedValue('dbName'),
+    };
     const mockMysql = ({
       createConnection: jest.fn().mockResolvedValue({ execute: jest.fn() }),
     } as unknown) as typeof mysqlp;
@@ -22,7 +24,7 @@ describe('Database Service', () => {
 
     await dbService.get('sdfsdf', ['']);
 
-    expect(mockSecretsManager.getSecret).toHaveBeenCalledTimes(1);
+    expect(mockSecretsManager.getSecret).toHaveBeenCalledTimes(2);
   });
 
   it('returns the response from executing the DB query', async () => {
