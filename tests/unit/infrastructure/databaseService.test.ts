@@ -24,7 +24,7 @@ describe('Database Service', () => {
 
     await dbService.get('sdfsdf', ['']);
 
-    expect(mockSecretsManager.getSecret).toHaveBeenCalledTimes(2);
+    expect(mockSecretsManager.getSecret).toHaveBeenCalledTimes(1);
   });
 
   it('returns the response from executing the DB query', async () => {
