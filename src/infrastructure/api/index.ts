@@ -49,6 +49,7 @@ app.get(
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, VehicleEvent>,
     res,
   ) => {
+    console.info('Handling vehicle request');
     const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
     const dbService = new DatabaseService(secretsManager, mysql);
     getVehicleDetails(request.query, queryFunctionFactory, dbService)
