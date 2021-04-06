@@ -82,7 +82,7 @@ interface TechnicalRecord {
   numberOfSeatbelts?: string;
   seatbeltInstallationApprovalDate?: string;
   axles?: Axles[];
-  brakes?: Brakes[];
+  brakes?: Brakes;
   makeModel?: MakeModel;
   vehicleClass?: VehicleClass;
 }

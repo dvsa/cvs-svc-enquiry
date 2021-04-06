@@ -38,13 +38,15 @@ interface TestRecord extends RowDataPacket {
   particulateTrapSerialNumber?: string;
   modificationDateUsed?: string;
   smokeTestKLimitApplied?: string;
-  createdBy_Id?: number;
-  lastUpdatedBy_Id?: number;
+  createdById?: string;
+  createdByName?: string;
+  lastUpdatedById?: string;
+  lastUpdatedByName?: string;
   fuelEmission?: FuelEmission;
-  testStationId?: TestStation;
-  testerId?: Tester;
-  vehicleClassId?: VehicleClass;
-  testTypeId?: TestType;
+  testStation?: TestStation;
+  tester?: Tester;
+  vehicleClass?: VehicleClass;
+  testType?: TestType;
   defects?: TestDefect[];
   customDefect?: CustomDefect;
 }

@@ -6,7 +6,8 @@ import { getVehicleDetailsByVrm, getVehicleDetailsByVin, getVehicleDetailsByTrai
 
 export default (
   event: VehicleEvent,
-): ((databaseService: DatabaseService, event: VehicleEvent) => Promise<[VehicleDetails[], FieldPacket[]]>) => {
+): ((databaseService: DatabaseService, event: VehicleEvent) => Promise<[VehicleDetails[], FieldPacket[]]>
+  ) => {
   if (event.vinNumber) {
     console.info('Using getVehicleDetailsByVin');
 

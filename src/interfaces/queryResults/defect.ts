@@ -8,7 +8,7 @@ interface Defect {
   deficiencySubId?: string;
   deficiencyCategory?: string;
   deficiencyText?: string;
-  stdForProhibition?: number;
+  stdForProhibition?: boolean;
 }
 
 export default Defect;

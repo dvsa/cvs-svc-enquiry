@@ -5,7 +5,6 @@ module.exports = {
   plugins: ['@typescript-eslint', 'jest'],
   extends: [
     'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
     'prettier',
     'prettier/@typescript-eslint',
     '@dvsa/eslint-config-ts',
