@@ -100,4 +100,8 @@ app.get(
   },
 );
 
+app.all('/enquiry/*', (_request, res) => {
+  res.status(405).send();
+});
+
 export { app };

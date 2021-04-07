@@ -30,6 +30,24 @@ describe('API', () => {
       expect(resultContent.version).toEqual(process.env.API_VERSION);
     });
 
+    it('returns a 405 if the method is not supported', async () => {
+      const resultPost = await supertest(app).post('/enquiry/vehicle?vinNumber=123456789');
+
+      expect(resultPost.status).toEqual(405);
+
+      const resultPut = await supertest(app).put('/enquiry/vehicle?vinNumber=123456789');
+
+      expect(resultPut.status).toEqual(405);
+
+      const resultPatch = await supertest(app).patch('/enquiry/vehicle?vinNumber=123456789');
+
+      expect(resultPatch.status).toEqual(405);
+
+      const resultDelete = await supertest(app).delete('/enquiry/vehicle?vinNumber=123456789');
+
+      expect(resultDelete.status).toEqual(405);
+    });
+
     describe('Vehicle enquiry', () => {
       it('returns the db query result if there are no errors', async () => {
         const vehicleDetails = {
@@ -66,6 +84,24 @@ describe('API', () => {
 
         expect(result.status).toEqual(500);
       });
+
+      it('returns a 405 if the method is not supported', async () => {
+        const resultPost = await supertest(app).post('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(resultPost.status).toEqual(405);
+
+        const resultPut = await supertest(app).put('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(resultPut.status).toEqual(405);
+
+        const resultPatch = await supertest(app).patch('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(resultPatch.status).toEqual(405);
+
+        const resultDelete = await supertest(app).delete('/enquiry/vehicle?vinNumber=123456789');
+
+        expect(resultDelete.status).toEqual(405);
+      });
     });
 
     describe('Results enquiry', () => {
@@ -99,6 +135,24 @@ describe('API', () => {
         const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
 
         expect(result.status).toEqual(500);
+      });
+
+      it('returns a 405 if the method is not supported', async () => {
+        const resultPost = await supertest(app).post('/enquiry/results?vinNumber=123456789');
+
+        expect(resultPost.status).toEqual(405);
+
+        const resultPut = await supertest(app).put('/enquiry/results?vinNumber=123456789');
+
+        expect(resultPut.status).toEqual(405);
+
+        const resultPatch = await supertest(app).patch('/enquiry/results?vinNumber=123456789');
+
+        expect(resultPatch.status).toEqual(405);
+
+        const resultDelete = await supertest(app).delete('/enquiry/results?vinNumber=123456789');
+
+        expect(resultDelete.status).toEqual(405);
       });
     });
   });
