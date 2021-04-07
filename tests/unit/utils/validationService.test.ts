@@ -1,4 +1,4 @@
-import InvalidNumberplateError from '../../../src/errors/InvalidNumberplateError';
+import InvalidIdentifierError from '../../../src/errors/InvalidIdentifierError';
 import { validateVehicleEvent, validateResultsEvent } from '../../../src/utils/validationService';
 
 describe('Validation Service', () => {
@@ -91,45 +91,9 @@ describe('Validation Service', () => {
       });
 
       it('rejects a invalid plate', () => {
-        const plate = 'This is not a numberplate';
+        const plate = 'A!11AAA';
 
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects a suffix Q plate', () => {
-        const plate = 'AAA123Q';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects an I in the prefix of a current plate', () => {
-        const plate = 'IA56AAA';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects an Q in the prefix of a current plate', () => {
-        const plate = 'QA56AAA';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects an I in the prefix of a prefix plate', () => {
-        const plate = 'I356AAA';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects an O in the prefix of a prefix plate', () => {
-        const plate = 'O356AAA';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
-      });
-
-      it('rejects an U in the prefix of a prefix plate', () => {
-        const plate = 'U356AAA';
-
-        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidNumberplateError);
+        expect(() => validateVehicleEvent({ VehicleRegMark: plate })).toThrow(InvalidIdentifierError);
       });
     });
   });
@@ -137,6 +101,10 @@ describe('Validation Service', () => {
   describe('validateResultsEvent', () => {
     it('throws an error if there is vehicle parameter is empty', () => {
       expect(() => validateResultsEvent({ vehicle: '' })).toThrow();
+    });
+
+    it('rejects a invalid identifier', () => {
+      expect(() => validateResultsEvent({ vehicle: 'sdfsd78879!' })).toThrow(InvalidIdentifierError);
     });
   });
 });

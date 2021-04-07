@@ -1,19 +1,9 @@
-import InvalidNumberplateError from '../errors/InvalidNumberplateError';
+import InvalidIdentifierError from '../errors/InvalidIdentifierError';
 import ParametersError from '../errors/ParametersError';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import VehicleEvent from '../interfaces/VehicleEvent';
 
-const allPeriodsRegex = /(^[A-HJ-PR-Z]{2}[0-9]{2}\s?[A-HJ-PR-Z]{3}$)|(^[A-HJ-NP-TV-Y][0-9]{1,3}[A-Z]{3}$)|(^[A-Z]{3}[0-9]{1,3}[A-HJ-NPR-TV-Y]$)|(^[0-9]{1,4}[A-Z]{1,2}$)|(^[0-9]{1,3}[A-Z]{1,3}$)|(^[A-Z]{1,2}[0-9]{1,4}$)|(^[A-Z]{1,3}[0-9]{1,3}$)|(^[A-Z]{1,3}[0-9]{1,4}$)|(^[0-9]{3}[DX]{1}[0-9]{3}$)/;
-
-function validateVrm(vrm: string) {
-  const plateToTest = vrm.replace(/\s+/g, '').toUpperCase();
-
-  if (allPeriodsRegex.exec(plateToTest) !== null) {
-    return true;
-  }
-
-  throw new InvalidNumberplateError();
-}
+const basicRegex = /^[a-zA-Z0-9]+$/;
 
 const validateVehicleEvent = (event: VehicleEvent): boolean => {
   if (!event.VehicleRegMark && !event.vinNumber && !event.trailerId) {
@@ -29,11 +19,15 @@ const validateVehicleEvent = (event: VehicleEvent): boolean => {
     throw new ParametersError('Too many parameters defined');
   }
 
-  if (event.VehicleRegMark) {
-    validateVrm(event.VehicleRegMark);
+  if (
+    basicRegex.exec(event.VehicleRegMark) !== null
+    && basicRegex.exec(event.vinNumber) !== null
+    && basicRegex.exec(event.trailerId) !== null
+  ) {
+    return true;
   }
 
-  return true;
+  throw new InvalidIdentifierError();
 };
 
 const validateResultsEvent = (event: ResultsEvent): boolean => {
@@ -41,7 +35,11 @@ const validateResultsEvent = (event: ResultsEvent): boolean => {
     throw new ParametersError('No vehicle parameter');
   }
 
-  return true;
+  if (basicRegex.exec(event.vehicle) !== null) {
+    return true;
+  }
+
+  throw new InvalidIdentifierError();
 };
 
 export { validateVehicleEvent, validateResultsEvent };
