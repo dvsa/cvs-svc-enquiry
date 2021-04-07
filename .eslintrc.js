@@ -3,12 +3,7 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'jest'],
-  extends: [
-    'eslint:recommended',
-    'prettier',
-    'prettier/@typescript-eslint',
-    '@dvsa/eslint-config-ts',
-  ],
+  extends: ['eslint:recommended', 'prettier', 'prettier/@typescript-eslint', '@dvsa/eslint-config-ts'],
   rules: {
     'jest/no-disabled-tests': 'warn',
     'jest/no-commented-out-tests': 'warn',

@@ -50,7 +50,15 @@ app.get(
     res,
   ) => {
     console.info('Handling vehicle request');
-    const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    let secretsManager;
+    try {
+      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    } catch (e) {
+      if (e instanceof Error) {
+        res.status(500).send(e.message);
+      }
+    }
+
     const dbService = new DatabaseService(secretsManager, mysql);
     getVehicleDetails(request.query, queryFunctionFactory, dbService)
       .then((result) => {

@@ -2,4 +2,5 @@
 src/errors/MissingSecretError.ts
 src/infrastructure/secretsManagerService.ts
 src/interfaces/SecretsManagerService.ts
+tests/unit/infrastructure/secretsService.test.ts
 tests/unit/infrastructure/secretsManagerService.test.ts
