@@ -3,6 +3,15 @@ import MissingSecretError from '../../../src/errors/MissingSecretError';
 import SecretsManagerService from '../../../src/infrastructure/secretsManagerService';
 
 describe('Secrets service', () => {
+  it('throws an error if getSecretValue fails', async () => {
+    const mockSecretsManager = ({} as unknown) as SecretsManager;
+    const service = new SecretsManagerService(mockSecretsManager);
+
+    mockSecretsManager.getSecretValue = jest.fn().mockRejectedValue(new Error());
+
+    await expect(service.getSecret(undefined)).rejects.toThrow(Error);
+  });
+
   it('throws an error when the secretName is undefined', async () => {
     const mockSecretsManager = ({} as unknown) as SecretsManager;
     const service = new SecretsManagerService(mockSecretsManager);
