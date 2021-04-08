@@ -27,7 +27,7 @@ function getVehicleDetailsByVrm(
 ): Promise<[VehicleDetails[], FieldPacket[]]> {
   console.info('Using get by VRM');
   return databaseService.get(technicalQueries.VEHICLE_DETAILS_VRM_QUERY, [event.VehicleRegMark]) as Promise<
-    [VehicleDetails[], FieldPacket[]]
+  [VehicleDetails[], FieldPacket[]]
   >;
 }
 
@@ -37,7 +37,7 @@ function getVehicleDetailsByVin(
 ): Promise<[VehicleDetails[], FieldPacket[]]> {
   console.info('Using get by VIN');
   return databaseService.get(technicalQueries.VEHICLE_DETAILS_VIN_QUERY, [event.vinNumber]) as Promise<
-    [VehicleDetails[], FieldPacket[]]
+  [VehicleDetails[], FieldPacket[]]
   >;
 }
 
@@ -47,7 +47,7 @@ function getVehicleDetailsByTrailerId(
 ): Promise<[VehicleDetails[], FieldPacket[]]> {
   console.info('Using get by Trailer ID');
   return databaseService.get(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY, [event.trailerId]) as Promise<
-    [VehicleDetails[], FieldPacket[]]
+  [VehicleDetails[], FieldPacket[]]
   >;
 }
 

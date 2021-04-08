@@ -5,7 +5,8 @@ import { getResultsByVrm, getResultsByVin, getResultsByTestId } from './database
 
 export default (
   event: ResultsEvent,
-): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<[RowDataPacket[], FieldPacket[]]>) => {
+): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<[RowDataPacket[], FieldPacket[]]>
+  ) => {
   if (event.vin) {
     console.info('Using getResultsByVin');
 
