@@ -3,6 +3,7 @@ import { getVehicleDetails, getResultsDetails } from '../../../src/domain/enquir
 import DatabaseService from '../../../src/interfaces/DatabaseService';
 import * as databaseService from '../../../src/app/databaseService';
 import TestRecord from '../../../src/interfaces/queryResults/testRecord';
+import testQueryFunctionFactory from '../../../src/app/testQueryFunctionFactory';
 
 jest.mock('../../../src/app/databaseService');
 
@@ -20,41 +21,41 @@ describe('Enquiry Service', () => {
 
   describe('getResultsDetails', () => {
     it('returns the result of a query', async () => {
-      const event = { vehicle: '1234' };
+      const event = { vrm: '1234' };
       const testRecord = {
         testStatus: 'Success',
       } as TestRecord;
       const fieldPacket = {} as FieldPacket;
-      jest.spyOn(databaseService, 'getResultsByVehicleId').mockResolvedValue([[testRecord], [fieldPacket]]);
+      jest.spyOn(databaseService, 'getResultsByVrm').mockResolvedValue([[testRecord], [fieldPacket]]);
       const mockDbService = {} as DatabaseService;
 
-      const result = await getResultsDetails(event, mockDbService);
+      const result = await getResultsDetails(event, testQueryFunctionFactory, mockDbService);
 
       expect(result[0].testStatus).toEqual('Success');
     });
 
-    it('uses the vehicle only query if only a vehicle Id is passed', async () => {
-      const event = { vehicle: '1234' };
+    it('uses the VIN query if only a VIN is passed', async () => {
+      const event = { vin: '1234' };
       const rowDataPacket = { result: 'Success' } as RowDataPacket;
       const fieldPacket = {} as FieldPacket;
-      jest.spyOn(databaseService, 'getResultsByVehicleId').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
+      jest.spyOn(databaseService, 'getResultsByVin').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
       const mockDbService = {} as DatabaseService;
 
-      await getResultsDetails(event, mockDbService);
+      await getResultsDetails(event, testQueryFunctionFactory, mockDbService);
 
-      expect(databaseService.getResultsByVehicleId).toHaveBeenCalled();
+      expect(databaseService.getResultsByVin).toHaveBeenCalled();
     });
 
     it('uses the vehicle and test query if a vehicle Id and a test id are passed', async () => {
-      const event = { vehicle: '1234', test_id: '123165446' };
+      const event = { test_id: '123165446' };
       const rowDataPacket = { result: 'Success' } as RowDataPacket;
       const fieldPacket = {} as FieldPacket;
-      jest.spyOn(databaseService, 'getResultsByVehicleIdAndTestId').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
+      jest.spyOn(databaseService, 'getResultsByTestId').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
       const mockDbService = {} as DatabaseService;
 
-      await getResultsDetails(event, mockDbService);
+      await getResultsDetails(event, testQueryFunctionFactory, mockDbService);
 
-      expect(databaseService.getResultsByVehicleIdAndTestId).toHaveBeenCalled();
+      expect(databaseService.getResultsByTestId).toHaveBeenCalled();
     });
   });
 });

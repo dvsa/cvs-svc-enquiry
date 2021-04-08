@@ -1,12 +1,14 @@
 import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import {
-  getResultsByVehicleId,
-  getResultsByVehicleIdAndTestId,
+  getResultsByVin,
+  getResultsByTestId,
+  getResultsByVrm,
   getVehicleDetailsByTrailerId,
   getVehicleDetailsByVin,
   getVehicleDetailsByVrm,
 } from '../../../src/app/databaseService';
-import * as queries from '../../../src/contants';
+import * as technicalQueries from '../../../src/app/queries/technicalRecord';
+import * as testQueries from '../../../src/app/queries/testRecords';
 
 describe('Database Service', () => {
   describe('getVehicleDetailsByVrm', () => {
@@ -19,7 +21,7 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByVrm(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(queries.VEHICLE_DETAILS_VRM_QUERY);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_VRM_QUERY);
     });
   });
   describe('getVehicleDetailsByVin', () => {
@@ -32,7 +34,7 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByVin(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(queries.VEHICLE_DETAILS_VIN_QUERY);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_VIN_QUERY);
     });
   });
   describe('getVehicleDetailsByTrailerId', () => {
@@ -45,33 +47,47 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByTrailerId(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(queries.VEHICLE_DETAILS_TRAILER_ID_QUERY);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY);
     });
   });
-  describe('getResultsByVehicleId', () => {
+
+  describe('getResultsByVrm', () => {
     it('passes the expected SQL query to the infrastructure DB service', async () => {
       const mockDbService = {
         get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
       };
 
-      const event = { vehicle: '123478' };
+      const event = { vrm: '123478' };
 
-      await getResultsByVehicleId(mockDbService, event);
+      await getResultsByVrm(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(queries.RESULTS_QUERY);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VRM);
     });
   });
-  describe('getResultsByVehicleIdAndTestId', () => {
+  describe('getResultsByVin', () => {
     it('passes the expected SQL query to the infrastructure DB service', async () => {
       const mockDbService = {
         get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
       };
 
-      const event = { vehicle: '123478', test_id: '23343423423' };
+      const event = { vin: '123478', test_id: '23343423423' };
 
-      await getResultsByVehicleIdAndTestId(mockDbService, event);
+      await getResultsByVin(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(queries.RESULTS_QUERY);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VIN);
+    });
+  });
+  describe('getResultsByTestId', () => {
+    it('passes the expected SQL query to the infrastructure DB service', async () => {
+      const mockDbService = {
+        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
+      };
+
+      const event = { test_id: '23343423423' };
+
+      await getResultsByTestId(mockDbService, event);
+
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_TEST_NUMBER);
     });
   });
 });

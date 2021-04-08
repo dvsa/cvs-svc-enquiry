@@ -1,7 +1,8 @@
 import AWS from 'aws-sdk';
 import express, { Request } from 'express';
 import mysql from 'mysql2/promise';
-import queryFunctionFactory from '../../app/queryFunctionFactory';
+import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
+import testQueryFunctionFactory from '../../app/testQueryFunctionFactory';
 import { getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
@@ -60,7 +61,7 @@ app.get(
     }
 
     const dbService = new DatabaseService(secretsManager, mysql);
-    getVehicleDetails(request.query, queryFunctionFactory, dbService)
+    getVehicleDetails(request.query, vehicleQueryFunctionFactory, dbService)
       .then((result) => {
         res.contentType('json').send(result);
       })
@@ -84,7 +85,7 @@ app.get(
   ) => {
     const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
     const dbService = new DatabaseService(secretsManager, mysql);
-    getResultsDetails(request.query, dbService)
+    getResultsDetails(request.query, testQueryFunctionFactory, dbService)
       .then((result) => {
         res.contentType('json').send(JSON.stringify(result));
       })

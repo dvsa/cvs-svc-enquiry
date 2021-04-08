@@ -1,0 +1,21 @@
+import {
+  VEHICLE_DETAILS_VRM_QUERY,
+  VEHICLE_DETAILS_VIN_QUERY,
+  VEHICLE_DETAILS_TRAILER_ID_QUERY,
+} from './vehicleDetailsQuery';
+import TECHNICAL_RECORD_QUERY from './technicalRecordQuery';
+import BRAKE_QUERY from './brakeQuery';
+import AXLE_SPACING_QUERY from './axleSpacingQuery';
+import AXLE_QUERY from './axleQuery';
+import PLATING_QUERY from './platingQuery';
+
+export {
+  VEHICLE_DETAILS_VRM_QUERY,
+  VEHICLE_DETAILS_VIN_QUERY,
+  VEHICLE_DETAILS_TRAILER_ID_QUERY,
+  TECHNICAL_RECORD_QUERY,
+  BRAKE_QUERY,
+  AXLE_QUERY,
+  AXLE_SPACING_QUERY,
+  PLATING_QUERY,
+};
