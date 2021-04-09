@@ -89,7 +89,7 @@ describe('Database Service', () => {
         get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
       };
 
-      const event = { vrm: '123478' };
+      const event = { VehicleRegMark: '123478' };
 
       await getResultsByVrm(mockDbService, event);
 
@@ -102,7 +102,7 @@ describe('Database Service', () => {
         get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
       };
 
-      const event = { vin: '123478', test_id: '23343423423' };
+      const event = { vinNumber: '123478' };
 
       await getResultsByVin(mockDbService, event);
 
@@ -115,7 +115,7 @@ describe('Database Service', () => {
         get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
       };
 
-      const event = { test_id: '23343423423' };
+      const event = { testnumber: '23343423423' };
 
       await getResultsByTestId(mockDbService, event);
 

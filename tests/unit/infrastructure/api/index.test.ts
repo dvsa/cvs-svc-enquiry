@@ -110,7 +110,7 @@ describe('API', () => {
           testStatus: 'Success',
         } as TestRecord;
         jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([resultDetails]);
-        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+        const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as [TestRecord];
 
         expect(resultContent[0].testStatus).toEqual('Success');
@@ -118,39 +118,39 @@ describe('API', () => {
 
       it('returns the error message if there is an error', async () => {
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+        const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
         expect(result.text).toEqual('This is an error');
       });
 
       it('sets the status to 400 for a parameters error', async () => {
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new ParametersError('This is an error'));
-        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+        const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
         expect(result.status).toEqual(400);
       });
 
       it('sets the status to 500 for a generic error', async () => {
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/enquiry/results?vinNumber=123456789');
+        const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
         expect(result.status).toEqual(500);
       });
 
       it('returns a 405 if the method is not supported', async () => {
-        const resultPost = await supertest(app).post('/enquiry/results?vinNumber=123456789');
+        const resultPost = await supertest(app).post('/enquiry/testResults?vinNumber=123456789');
 
         expect(resultPost.status).toEqual(405);
 
-        const resultPut = await supertest(app).put('/enquiry/results?vinNumber=123456789');
+        const resultPut = await supertest(app).put('/enquiry/testResults?vinNumber=123456789');
 
         expect(resultPut.status).toEqual(405);
 
-        const resultPatch = await supertest(app).patch('/enquiry/results?vinNumber=123456789');
+        const resultPatch = await supertest(app).patch('/enquiry/testResults?vinNumber=123456789');
 
         expect(resultPatch.status).toEqual(405);
 
-        const resultDelete = await supertest(app).delete('/enquiry/results?vinNumber=123456789');
+        const resultDelete = await supertest(app).delete('/enquiry/testResults?vinNumber=123456789');
 
         expect(resultDelete.status).toEqual(405);
       });

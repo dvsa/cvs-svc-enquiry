@@ -21,7 +21,7 @@ describe('Enquiry Service', () => {
 
   describe('getResultsDetails', () => {
     it('returns the result of a query', async () => {
-      const event = { vrm: '1234' };
+      const event = { VehicleRegMark: '1234' };
       const testRecord = {
         testStatus: 'Success',
       } as TestRecord;
@@ -35,7 +35,7 @@ describe('Enquiry Service', () => {
     });
 
     it('uses the VIN query if only a VIN is passed', async () => {
-      const event = { vin: '1234' };
+      const event = { vinNumber: '1234' };
       const rowDataPacket = { result: 'Success' } as RowDataPacket;
       const fieldPacket = {} as FieldPacket;
       jest.spyOn(databaseService, 'getResultsByVin').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
@@ -47,7 +47,7 @@ describe('Enquiry Service', () => {
     });
 
     it('uses the vehicle and test query if a vehicle Id and a test id are passed', async () => {
-      const event = { test_id: '123165446' };
+      const event = { testnumber: '123165446' };
       const rowDataPacket = { result: 'Success' } as RowDataPacket;
       const fieldPacket = {} as FieldPacket;
       jest.spyOn(databaseService, 'getResultsByTestId').mockResolvedValue([[rowDataPacket], [fieldPacket]]);
