@@ -11,18 +11,18 @@ const validateVehicleEvent = (event: VehicleEvent): boolean => {
   }
 
   if (
-    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined)
-    || (event.VehicleRegMark !== undefined && event.trailerId !== undefined)
-    || (event.vinNumber !== undefined && event.trailerId !== undefined)
-    || (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.trailerId !== undefined)
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.trailerId !== undefined) ||
+    (event.vinNumber !== undefined && event.trailerId !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.trailerId !== undefined)
   ) {
     throw new ParametersError('Too many parameters defined');
   }
 
   if (
-    basicRegex.exec(event.VehicleRegMark) !== null
-    && basicRegex.exec(event.vinNumber) !== null
-    && basicRegex.exec(event.trailerId) !== null
+    basicRegex.exec(event.VehicleRegMark) !== null &&
+    basicRegex.exec(event.vinNumber) !== null &&
+    basicRegex.exec(event.trailerId) !== null
   ) {
     return true;
   }
@@ -31,23 +31,23 @@ const validateVehicleEvent = (event: VehicleEvent): boolean => {
 };
 
 const validateResultsEvent = (event: ResultsEvent): boolean => {
-  if (!event.vrm && !event.vin && !event.test_id) {
+  if (!event.VehicleRegMark && !event.vinNumber && !event.testnumber) {
     throw new ParametersError('No parameter defined');
   }
 
   if (
-    (event.vrm !== undefined && event.vin !== undefined)
-    || (event.vrm !== undefined && event.test_id !== undefined)
-    || (event.vin !== undefined && event.test_id !== undefined)
-    || (event.vrm !== undefined && event.vin !== undefined && event.test_id !== undefined)
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.testnumber !== undefined) ||
+    (event.vinNumber !== undefined && event.testnumber !== undefined) ||
+    (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.testnumber !== undefined)
   ) {
     throw new ParametersError('Too many parameters defined');
   }
 
   if (
-    basicRegex.exec(event.vrm) !== null
-    && basicRegex.exec(event.vin) !== null
-    && basicRegex.exec(event.test_id) !== null
+    basicRegex.exec(event.VehicleRegMark) !== null &&
+    basicRegex.exec(event.vinNumber) !== null &&
+    basicRegex.exec(event.testnumber) !== null
   ) {
     return true;
   }

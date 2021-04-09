@@ -90,7 +90,7 @@ function getTestResultsByVrm(
   event: ResultsEvent,
 ): Promise<[RowDataPacket[], FieldPacket[]]> {
   console.info('Using get by VRM');
-  return databaseService.get(testQueries.TEST_RECORD_BY_VRM, [event.vrm]);
+  return databaseService.get(testQueries.TEST_RECORD_BY_VRM, [event.VehicleRegMark]);
 }
 
 function getTestResultsByVin(
@@ -98,7 +98,7 @@ function getTestResultsByVin(
   event: ResultsEvent,
 ): Promise<[RowDataPacket[], FieldPacket[]]> {
   console.info('Using get by VIN');
-  return databaseService.get(testQueries.TEST_RECORD_BY_VIN, [event.vin]);
+  return databaseService.get(testQueries.TEST_RECORD_BY_VIN, [event.vinNumber]);
 }
 
 function getTestResultsByTestId(
@@ -106,7 +106,7 @@ function getTestResultsByTestId(
   event: ResultsEvent,
 ): Promise<[RowDataPacket[], FieldPacket[]]> {
   console.info('Using get by Test ID');
-  return databaseService.get(testQueries.TEST_RECORD_BY_TEST_NUMBER, [event.test_id]);
+  return databaseService.get(testQueries.TEST_RECORD_BY_TEST_NUMBER, [event.testnumber]);
 }
 
 export {

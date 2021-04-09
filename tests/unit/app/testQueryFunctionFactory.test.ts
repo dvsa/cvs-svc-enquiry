@@ -13,22 +13,22 @@ describe('Query Function Factory', () => {
   it('returns the correct function when passed a vin', () => {
     dbFunctionsMock.getResultsByVin = jest.fn().mockReturnValue('Success');
 
-    const func = queryFunctionFactory({ vin: '1234' });
+    const func = queryFunctionFactory({ vinNumber: '1234' });
 
-    expect(func(dbServiceMock, { vin: '1234' })).toEqual('Success');
+    expect(func(dbServiceMock, { vinNumber: '1234' })).toEqual('Success');
   });
   it('returns the correct function when passed a vrm', () => {
     dbFunctionsMock.getResultsByVrm = jest.fn().mockReturnValue('Success');
 
-    const func = queryFunctionFactory({ vrm: '1234' });
+    const func = queryFunctionFactory({ VehicleRegMark: '1234' });
 
-    expect(func(dbServiceMock, { vrm: '1234' })).toEqual('Success');
+    expect(func(dbServiceMock, { VehicleRegMark: '1234' })).toEqual('Success');
   });
   it('returns the correct function when passed a trailer ID', () => {
     dbFunctionsMock.getResultsByTestId = jest.fn().mockReturnValue('Success');
 
-    const func = queryFunctionFactory({ test_id: '1234' });
+    const func = queryFunctionFactory({ testnumber: '1234' });
 
-    expect(func(dbServiceMock, { test_id: '1234' })).toEqual('Success');
+    expect(func(dbServiceMock, { testnumber: '1234' })).toEqual('Success');
   });
 });

@@ -5,14 +5,13 @@ import { getResultsByVrm, getResultsByVin, getResultsByTestId } from './database
 
 export default (
   event: ResultsEvent,
-): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<[RowDataPacket[], FieldPacket[]]>
-  ) => {
-  if (event.vin) {
+): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<[RowDataPacket[], FieldPacket[]]>) => {
+  if (event.vinNumber) {
     console.info('Using getResultsByVin');
 
     return getResultsByVin;
   }
-  if (event.vrm) {
+  if (event.VehicleRegMark) {
     console.info('Using getResultsByVrm');
 
     return getResultsByVrm;

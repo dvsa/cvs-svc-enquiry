@@ -20,7 +20,9 @@ describe('Validation Service', () => {
     });
 
     it('throws an error if there are too many identifiers (all)', () => {
-      expect(() => validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '123456789' })).toThrow(Error);
+      expect(() =>
+        validateVehicleEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '123456789' }),
+      ).toThrow(Error);
     });
 
     it('returns true if there are no problems(VRM)', () => {
@@ -100,19 +102,19 @@ describe('Validation Service', () => {
 
   describe('validateResultsEvent', () => {
     it('throws an error if the vin parameter is empty', () => {
-      expect(() => validateResultsEvent({ vin: '' })).toThrow();
+      expect(() => validateResultsEvent({ vinNumber: '' })).toThrow();
     });
 
     it('throws an error if the vrm parameter is empty', () => {
-      expect(() => validateResultsEvent({ vrm: '' })).toThrow();
+      expect(() => validateResultsEvent({ VehicleRegMark: '' })).toThrow();
     });
 
     it('throws an error if the test_id parameter is empty', () => {
-      expect(() => validateResultsEvent({ test_id: '' })).toThrow();
+      expect(() => validateResultsEvent({ testnumber: '' })).toThrow();
     });
 
     it('rejects a invalid identifier', () => {
-      expect(() => validateResultsEvent({ vin: 'sdfsd78879!' })).toThrow(InvalidIdentifierError);
+      expect(() => validateResultsEvent({ vinNumber: 'sdfsd78879!' })).toThrow(InvalidIdentifierError);
     });
   });
 });

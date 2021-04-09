@@ -78,7 +78,7 @@ app.get(
 );
 
 app.get(
-  '/enquiry/results',
+  '/enquiry/testResults',
   (
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
     res,

@@ -1,5 +1,5 @@
 export default interface ResultsEvent {
-  vin?: string;
-  vrm?: string;
-  test_id?: string;
+  vinNumber?: string;
+  VehicleRegMark?: string;
+  testnumber?: string;
 }
