@@ -2,7 +2,7 @@ import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import { getVehicleDetails, getResultsDetails } from '../../../src/domain/enquiryService';
 import DatabaseService from '../../../src/interfaces/DatabaseService';
 import * as databaseService from '../../../src/app/databaseService';
-import TestRecord from '../../../src/interfaces/queryResults/testRecord';
+import TestRecord from '../../../src/interfaces/queryResults/test/testRecord';
 import testQueryFunctionFactory from '../../../src/app/testQueryFunctionFactory';
 
 jest.mock('../../../src/app/databaseService');
@@ -11,7 +11,7 @@ describe('Enquiry Service', () => {
   describe('getVehicleDetails', () => {
     it('returns the result of a query', async () => {
       const event = { trailerId: '1234' };
-      const mockQuery = jest.fn().mockResolvedValue([['Success']]);
+      const mockQuery = jest.fn().mockResolvedValue('Success');
       const mockFactory = jest.fn().mockReturnValue(mockQuery);
       const mockDbService = {} as DatabaseService;
 

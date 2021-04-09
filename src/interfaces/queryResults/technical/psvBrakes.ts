@@ -1,4 +1,4 @@
-interface Brakes {
+interface PSVBrakes {
   id?: number;
   brakeCodeOriginal?: string;
   brakeCode?: string;
@@ -15,4 +15,4 @@ interface Brakes {
   parkingBrakeForceB?: number;
 }
 
-export default Brakes;
+export default PSVBrakes;

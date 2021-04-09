@@ -1,9 +1,9 @@
 import supertest from 'supertest';
 import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
-import VehicleDetails from '../../../../src/interfaces/queryResults/vehicleDetails';
+import VehicleDetails from '../../../../src/interfaces/queryResults/technical/vehicleDetails';
 import ParametersError from '../../../../src/errors/ParametersError';
-import TestRecord from '../../../../src/interfaces/queryResults/testRecord';
+import TestRecord from '../../../../src/interfaces/queryResults/test/testRecord';
 
 // TODO Define Mock strategy
 describe('API', () => {

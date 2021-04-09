@@ -1,12 +1,11 @@
-import { FieldPacket } from 'mysql2/promise';
 import DatabaseService from '../interfaces/DatabaseService';
-import VehicleDetails from '../interfaces/queryResults/vehicleDetails';
+import VehicleDetails from '../interfaces/queryResults/technical/vehicleDetails';
 import VehicleEvent from '../interfaces/VehicleEvent';
 import { getVehicleDetailsByVrm, getVehicleDetailsByVin, getVehicleDetailsByTrailerId } from './databaseService';
 
 export default (
   event: VehicleEvent,
-): ((databaseService: DatabaseService, event: VehicleEvent) => Promise<[VehicleDetails[], FieldPacket[]]>
+): ((databaseService: DatabaseService, event: VehicleEvent) => Promise<VehicleDetails>
   ) => {
   if (event.vinNumber) {
     console.info('Using getVehicleDetailsByVin');

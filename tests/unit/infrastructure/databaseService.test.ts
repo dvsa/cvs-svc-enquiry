@@ -38,6 +38,19 @@ describe('Database Service', () => {
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrow(Error);
   });
 
+  it('adds the expected prefix to the error', async () => {
+    const mockSecretsManager = {
+      getSecret: jest.fn().mockResolvedValueOnce(JSON.stringify(connectionDetails)).mockResolvedValue('dbName'),
+    };
+    const mockMysql = ({
+      createConnection: jest.fn().mockResolvedValue({ execute: jest.fn().mockRejectedValue(new Error()) }),
+    } as unknown) as typeof mysqlp;
+
+    const dbService = new DatabaseService(mockSecretsManager, mockMysql);
+
+    await expect(dbService.get('sdfsdf', [''])).rejects.toThrowError('Database error: ');
+  });
+
   it('should get the connection secret from the secrets manager', async () => {
     const mockSecretsManager = {
       getSecret: jest.fn().mockResolvedValueOnce(JSON.stringify(connectionDetails)).mockResolvedValue('dbName'),

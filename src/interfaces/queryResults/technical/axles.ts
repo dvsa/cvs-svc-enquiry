@@ -1,5 +1,3 @@
-import AxleSpacing from './axleSpacing';
-import Plate from './plate';
 import Tyre from './tyre';
 
 interface Axles {
@@ -20,8 +18,6 @@ interface Axles {
   leverLength?: number;
   springBrakeParking?: boolean;
   tyres?: Tyre[];
-  axlespacing?: AxleSpacing[];
-  plates?: Plate[];
   dtpNumber?: string;
   loadSensingValve?: number;
   antilockBrakingSystem?: number;

@@ -1,7 +1,9 @@
 import Axles from './axles';
-import Brakes from './brakes';
+import PSVBrakes from './psvBrakes';
 import MakeModel from './makeModel';
-import VehicleClass from './vehicleClass';
+import VehicleClass from '../vehicleClass';
+import AxleSpacing from './axleSpacing';
+import Plate from './plate';
 
 enum RecordType {
   current = 'current',
@@ -82,7 +84,9 @@ interface TechnicalRecord {
   numberOfSeatbelts?: string;
   seatbeltInstallationApprovalDate?: string;
   axles?: Axles[];
-  brakes?: Brakes;
+  brakes?: PSVBrakes[];
+  axlespacing?: AxleSpacing[];
+  plates?: Plate[];
   makeModel?: MakeModel;
   vehicleClass?: VehicleClass;
 }

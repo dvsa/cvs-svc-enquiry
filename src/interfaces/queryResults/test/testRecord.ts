@@ -5,7 +5,7 @@ import TestDefect from './testDefect';
 import Tester from './tester';
 import TestStation from './testStation';
 import TestType from './testType';
-import VehicleClass from './vehicleClass';
+import VehicleClass from '../vehicleClass';
 
 interface TestRecord extends RowDataPacket {
   testStatus?: string;
