@@ -24,9 +24,8 @@ const getResultsDetails = async (
 ): Promise<TestRecord[]> => {
   validateResultsEvent(event);
   const query = queryFuncFactory(event);
-  const result = await query(dbService, event);
 
-  return result[0];
+  return query(dbService, event);
 };
 
 export { getVehicleDetails, getResultsDetails };

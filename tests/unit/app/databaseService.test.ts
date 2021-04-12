@@ -1,8 +1,8 @@
 import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import {
-  getResultsByVin,
-  getResultsByTestId,
-  getResultsByVrm,
+  getTestResultsByVin,
+  getTestResultsByTestId,
+  getTestResultsByVrm,
   getVehicleDetailsByTrailerId,
   getVehicleDetailsByVin,
   getVehicleDetailsByVrm,
@@ -83,41 +83,52 @@ describe('Database Service', () => {
     });
   });
 
-  describe('getResultsByVrm', () => {
+  describe('getTestResultsByVrm', () => {
     it('passes the expected SQL query to the infrastructure DB service', async () => {
+      const event = { VehicleRegMark: '123478' };
       const mockDbService = {
-        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[{ id: '1', result: { description: 'Test Record' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { defectName: 'Custom defect' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { imDescription: 'Test defect' } } as RowDataPacket], []]),
       };
 
-      const event = { VehicleRegMark: '123478' };
-
-      await getResultsByVrm(mockDbService, event);
+      await getTestResultsByVrm(mockDbService, event);
 
       expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VRM);
     });
   });
-  describe('getResultsByVin', () => {
+  describe('getTestResultsByVin', () => {
     it('passes the expected SQL query to the infrastructure DB service', async () => {
       const mockDbService = {
-        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[{ id: '1', result: { description: 'Test Record' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { defectName: 'Custom defect' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { imDescription: 'Test defect' } } as RowDataPacket], []]),
       };
 
       const event = { vinNumber: '123478' };
 
-      await getResultsByVin(mockDbService, event);
+      await getTestResultsByVin(mockDbService, event);
 
       expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VIN);
     });
   });
-  describe('getResultsByTestId', () => {
+  describe('getTestResultsByTestId', () => {
     it('passes the expected SQL query to the infrastructure DB service', async () => {
       const mockDbService = {
-        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>(),
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[{ id: '1', result: { description: 'Test Record' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { defectName: 'Custom defect' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { imDescription: 'Test defect' } } as RowDataPacket], []]),
       };
 
       const event = { testnumber: '23343423423' };
 
-      await getResultsByTestId(mockDbService, event);
+      await getTestResultsByTestId(mockDbService, event);
 
       expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_TEST_NUMBER);
     });

@@ -11,21 +11,21 @@ const dbServiceMock = (mocked(DatabaseService, true) as unknown) as DatabaseServ
 
 describe('Query Function Factory', () => {
   it('returns the correct function when passed a vin', () => {
-    dbFunctionsMock.getResultsByVin = jest.fn().mockReturnValue('Success');
+    dbFunctionsMock.getTestResultsByVin = jest.fn().mockReturnValue('Success');
 
     const func = queryFunctionFactory({ vinNumber: '1234' });
 
     expect(func(dbServiceMock, { vinNumber: '1234' })).toEqual('Success');
   });
   it('returns the correct function when passed a vrm', () => {
-    dbFunctionsMock.getResultsByVrm = jest.fn().mockReturnValue('Success');
+    dbFunctionsMock.getTestResultsByVrm = jest.fn().mockReturnValue('Success');
 
     const func = queryFunctionFactory({ VehicleRegMark: '1234' });
 
     expect(func(dbServiceMock, { VehicleRegMark: '1234' })).toEqual('Success');
   });
   it('returns the correct function when passed a trailer ID', () => {
-    dbFunctionsMock.getResultsByTestId = jest.fn().mockReturnValue('Success');
+    dbFunctionsMock.getTestResultsByTestId = jest.fn().mockReturnValue('Success');
 
     const func = queryFunctionFactory({ testnumber: '1234' });
 

@@ -1,23 +1,22 @@
-import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import DatabaseService from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
-import { getResultsByVrm, getResultsByVin, getResultsByTestId } from './databaseService';
+import { getTestResultsByVrm, getTestResultsByVin, getTestResultsByTestId } from './databaseService';
+import TestRecord from '../interfaces/queryResults/test/testRecord';
 
 export default (
   event: ResultsEvent,
-): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<[RowDataPacket[], FieldPacket[]]>
-  ) => {
+): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<TestRecord[]>) => {
   if (event.vinNumber) {
-    console.info('Using getResultsByVin');
+    console.info('Using getTestResultsByVin');
 
-    return getResultsByVin;
+    return getTestResultsByVin;
   }
   if (event.VehicleRegMark) {
-    console.info('Using getResultsByVrm');
+    console.info('Using getTestResultsByVrm');
 
-    return getResultsByVrm;
+    return getTestResultsByVrm;
   }
 
-  console.info('Using getResultsByTestId');
-  return getResultsByTestId;
+  console.info('Using getTestResultsByTestId');
+  return getTestResultsByTestId;
 };

@@ -10,6 +10,9 @@ import PSVBrakes from '../interfaces/queryResults/technical/psvBrakes';
 import Axles from '../interfaces/queryResults/technical/axles';
 import AxleSpacing from '../interfaces/queryResults/technical/axleSpacing';
 import Plate from '../interfaces/queryResults/technical/plate';
+import TestRecord from '../interfaces/queryResults/test/testRecord';
+import CustomDefect from '../interfaces/queryResults/test/customDefect';
+import TestDefect from '../interfaces/queryResults/test/testDefect';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -85,37 +88,85 @@ async function getVehicleDetailsByTrailerId(
   return getVehicleDetails(vehicleDetailsQueryResult, databaseService);
 }
 
-function getTestResultsByVrm(
+async function hydrateTestRecord(
+  id: string,
+  testRecord: TestRecord,
+  databaseService: DatabaseServiceInterface,
+): Promise<TestRecord> {
+  const [customDefects] = await databaseService.get(testQueries.CUSTOM_DEFECT_QUERY, [id]);
+  const [defects] = await databaseService.get(testQueries.TEST_DEFECT_QUERY, [id]);
+
+  testRecord.customDefect = customDefects[0].result as CustomDefect;
+  testRecord.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
+
+  return testRecord;
+}
+
+async function getTestRecordDetails(
+  queryResult: [RowDataPacket[], FieldPacket[]],
+  databaseService: DatabaseServiceInterface,
+): Promise<TestRecord> {
+  const testRecordResult = queryResult[0][0] as TestRecordQueryResult;
+  const testId = testRecordResult.id;
+  const testRecord = testRecordResult.result;
+
+  return hydrateTestRecord(testId, testRecord, databaseService);
+}
+
+async function getTestRecordsDetails(
+  queryResult: [RowDataPacket[], FieldPacket[]],
+  databaseService: DatabaseServiceInterface,
+): Promise<TestRecord[]> {
+  const testRecordResults = queryResult[0] as TestRecordQueryResult[];
+
+  return Promise.all(
+    testRecordResults.map((testRecordResult: TestRecordQueryResult) => {
+      const testId = testRecordResult.id;
+      const testRecord = testRecordResult.result;
+
+      return hydrateTestRecord(testId, testRecord, databaseService);
+    }),
+  );
+}
+
+async function getTestResultsByVrm(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<[RowDataPacket[], FieldPacket[]]> {
+): Promise<TestRecord[]> {
   console.info('Using get by VRM');
-  return databaseService.get(testQueries.TEST_RECORD_BY_VRM, [event.VehicleRegMark]);
+  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_VRM, [event.VehicleRegMark]);
+
+  return getTestRecordsDetails(queryResult, databaseService);
 }
 
-function getTestResultsByVin(
+async function getTestResultsByVin(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<[RowDataPacket[], FieldPacket[]]> {
+): Promise<TestRecord[]> {
   console.info('Using get by VIN');
-  return databaseService.get(testQueries.TEST_RECORD_BY_VIN, [event.vinNumber]);
+  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_VIN, [event.vinNumber]);
+
+  return getTestRecordsDetails(queryResult, databaseService);
 }
 
-function getTestResultsByTestId(
+async function getTestResultsByTestId(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<[RowDataPacket[], FieldPacket[]]> {
+): Promise<TestRecord[]> {
   console.info('Using get by Test ID');
-  return databaseService.get(testQueries.TEST_RECORD_BY_TEST_NUMBER, [event.testnumber]);
+  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_TEST_NUMBER, [event.testnumber]);
+  const result = await getTestRecordDetails(queryResult, databaseService);
+
+  return [result];
 }
 
 export {
   getVehicleDetailsByVrm,
   getVehicleDetailsByVin,
   getVehicleDetailsByTrailerId,
-  getTestResultsByVrm as getResultsByVrm,
-  getTestResultsByVin as getResultsByVin,
-  getTestResultsByTestId as getResultsByTestId,
+  getTestResultsByVrm,
+  getTestResultsByVin,
+  getTestResultsByTestId,
 };
 
 interface VehicleQueryResult extends RowDataPacket {
@@ -146,4 +197,24 @@ interface AxleSpacingQueryResult extends RowDataPacket {
 interface PlatesQueryResult extends RowDataPacket {
   id: string;
   result: Plate;
+}
+
+interface TestRecordQueryResult extends RowDataPacket {
+  id: string;
+  result: TestRecord;
+}
+
+interface TestRecordsQueryResult extends RowDataPacket {
+  id: string;
+  result: TestRecord[];
+}
+
+interface CustomDefectQueryResult extends RowDataPacket {
+  id: string;
+  result: CustomDefect[];
+}
+
+interface TestDefectQueryResult extends RowDataPacket {
+  id: string;
+  result: TestDefect;
 }
