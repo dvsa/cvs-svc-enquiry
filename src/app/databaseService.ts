@@ -96,8 +96,13 @@ async function hydrateTestRecord(
   const [customDefects] = await databaseService.get(testQueries.CUSTOM_DEFECT_QUERY, [id]);
   const [defects] = await databaseService.get(testQueries.TEST_DEFECT_QUERY, [id]);
 
-  testRecord.customDefect = customDefects[0].result as CustomDefect;
-  testRecord.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
+  if (customDefects.length > 0) {
+    testRecord.customDefect = customDefects[0].result as CustomDefect;
+  }
+
+  if (defects.length > 0) {
+    testRecord.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
+  }
 
   return testRecord;
 }
