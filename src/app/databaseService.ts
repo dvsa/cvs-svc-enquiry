@@ -204,16 +204,6 @@ interface TestRecordQueryResult extends RowDataPacket {
   result: TestRecord;
 }
 
-interface TestRecordsQueryResult extends RowDataPacket {
-  id: string;
-  result: TestRecord[];
-}
-
-interface CustomDefectQueryResult extends RowDataPacket {
-  id: string;
-  result: CustomDefect[];
-}
-
 interface TestDefectQueryResult extends RowDataPacket {
   id: string;
   result: TestDefect;
