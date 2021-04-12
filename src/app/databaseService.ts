@@ -19,10 +19,12 @@ async function getTechnicalRecordDetails(
   databaseService: DatabaseServiceInterface,
 ): Promise<TechnicalRecord> {
   const technicalRecord = technicalRecordQueryResult.result;
-  const [brakes] = await databaseService.get(technicalQueries.BRAKE_QUERY, [technicalRecordQueryResult.id]);
-  const [axles] = await databaseService.get(technicalQueries.AXLE_QUERY, [technicalRecordQueryResult.id]);
-  const [axleSpacing] = await databaseService.get(technicalQueries.AXLE_SPACING_QUERY, [technicalRecordQueryResult.id]);
-  const [plating] = await databaseService.get(technicalQueries.PLATING_QUERY, [technicalRecordQueryResult.id]);
+  const [[brakes], [axles], [axleSpacing], [plating]] = await Promise.all([
+    databaseService.get(technicalQueries.BRAKE_QUERY, [technicalRecordQueryResult.id]),
+    databaseService.get(technicalQueries.AXLE_QUERY, [technicalRecordQueryResult.id]),
+    databaseService.get(technicalQueries.AXLE_SPACING_QUERY, [technicalRecordQueryResult.id]),
+    databaseService.get(technicalQueries.PLATING_QUERY, [technicalRecordQueryResult.id]),
+  ]);
 
   technicalRecord.brakes = brakes.map((brake: BrakeQueryResult) => brake.result);
   technicalRecord.axles = axles.map((axle: AxlesQueryResult) => axle.result);
@@ -93,8 +95,10 @@ async function hydrateTestRecord(
   testRecord: TestRecord,
   databaseService: DatabaseServiceInterface,
 ): Promise<TestRecord> {
-  const [customDefects] = await databaseService.get(testQueries.CUSTOM_DEFECT_QUERY, [id]);
-  const [defects] = await databaseService.get(testQueries.TEST_DEFECT_QUERY, [id]);
+  const [[customDefects], [defects]] = await Promise.all([
+    databaseService.get(testQueries.CUSTOM_DEFECT_QUERY, [id]),
+    databaseService.get(testQueries.TEST_DEFECT_QUERY, [id]),
+  ]);
 
   if (customDefects.length > 0) {
     testRecord.customDefect = customDefects[0].result as CustomDefect;
