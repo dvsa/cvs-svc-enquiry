@@ -60,8 +60,8 @@ app.get(
       }
     }
 
-    const dbService = new DatabaseService(secretsManager, mysql);
-    getVehicleDetails(request.query, vehicleQueryFunctionFactory, dbService)
+    DatabaseService.build(secretsManager, mysql)
+      .then((dbService) => getVehicleDetails(request.query, vehicleQueryFunctionFactory, dbService))
       .then((result) => {
         res.contentType('json').send(result);
       })
@@ -84,8 +84,9 @@ app.get(
     res,
   ) => {
     const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
-    const dbService = new DatabaseService(secretsManager, mysql);
-    getResultsDetails(request.query, testQueryFunctionFactory, dbService)
+
+    DatabaseService.build(secretsManager, mysql)
+      .then((dbService) => getResultsDetails(request.query, testQueryFunctionFactory, dbService))
       .then((result) => {
         res.contentType('json').send(JSON.stringify(result));
       })

@@ -1,7 +1,9 @@
 import supertest from 'supertest';
 import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
+import DatabaseService from '../../../../src/infrastructure/databaseService';
 import VehicleDetails from '../../../../src/interfaces/queryResults/technical/vehicleDetails';
+import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService';
 import ParametersError from '../../../../src/errors/ParametersError';
 import TestRecord from '../../../../src/interfaces/queryResults/test/testRecord';
 
@@ -57,6 +59,7 @@ describe('API', () => {
           vin: 'vin1',
           technicalrecords: [],
         };
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockResolvedValue(vehicleDetails as VehicleDetails);
         const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as VehicleDetails;
@@ -65,6 +68,7 @@ describe('API', () => {
       });
 
       it('returns the error message if there is an error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
 
@@ -72,6 +76,7 @@ describe('API', () => {
       });
 
       it('sets the status to 400 for a parameters error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new ParametersError('This is an error'));
         const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
 
@@ -79,6 +84,7 @@ describe('API', () => {
       });
 
       it('sets the status to 500 for a generic error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/enquiry/vehicle?vinNumber=123456789');
 
@@ -109,6 +115,7 @@ describe('API', () => {
         const resultDetails = {
           testStatus: 'Success',
         } as TestRecord;
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([resultDetails]);
         const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as [TestRecord];
@@ -117,6 +124,7 @@ describe('API', () => {
       });
 
       it('returns the error message if there is an error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
@@ -124,6 +132,7 @@ describe('API', () => {
       });
 
       it('sets the status to 400 for a parameters error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new ParametersError('This is an error'));
         const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
@@ -131,6 +140,7 @@ describe('API', () => {
       });
 
       it('sets the status to 500 for a generic error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/enquiry/testResults?vinNumber=123456789');
 
