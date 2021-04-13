@@ -101,11 +101,15 @@ async function hydrateTestRecord(
   ]);
 
   if (customDefects.length > 0) {
-    testRecord.customDefect = customDefects[0].result as CustomDefect;
+    testRecord.customDefect = customDefects.map((customDefect: CustomDefectQueryResult) => customDefect.result);
+  } else {
+    testRecord.customDefect = [];
   }
 
   if (defects.length > 0) {
     testRecord.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
+  } else {
+    testRecord.defects = [];
   }
 
   return testRecord;
@@ -216,4 +220,9 @@ interface TestRecordQueryResult extends RowDataPacket {
 interface TestDefectQueryResult extends RowDataPacket {
   id: string;
   result: TestDefect;
+}
+
+interface CustomDefectQueryResult extends RowDataPacket {
+  id: string;
+  result: CustomDefect;
 }

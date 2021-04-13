@@ -48,7 +48,7 @@ interface TestRecord extends RowDataPacket {
   vehicleClass?: VehicleClass;
   testType?: TestType;
   defects?: TestDefect[];
-  customDefect?: CustomDefect;
+  customDefect?: CustomDefect[];
 }
 
 export default TestRecord;
