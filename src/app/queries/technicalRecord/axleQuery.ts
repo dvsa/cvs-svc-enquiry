@@ -17,7 +17,7 @@ const AXLE_QUERY =
   "'designWeight', `a`.`designWeight`, " +
   "'brakeActuator', `a`.`brakeActuator`, " +
   "'leverLength', `a`.`leverLength`, " +
-  "'springBrakeParking', IF(`a`.`springBrakeParking` = 1, cast(TRUE AS json), cast(FALSE AS json)), " +
+  "'springBrakeParking', IF(`a`.`springBrakeParking` = 1, cast(TRUE AS json), cast(FALSE AS json))" +
   ') result' +
   ' FROM `axles` `a`' +
   ' JOIN `tyre` t on `a`.`tyre_id` = `t`.`id`' +
