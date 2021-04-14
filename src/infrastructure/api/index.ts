@@ -11,6 +11,7 @@ import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
 
 const app = express();
+const router = express.Router();
 
 const { API_VERSION } = process.env;
 
@@ -28,7 +29,7 @@ const { API_VERSION } = process.env;
  * next()
  * })
  */
-app.use((req, _response, next) => {
+router.use((req, _response, next) => {
   // TODO Add logger lib like Winston or Morgan
   console.log('path');
   console.log(req.path);
@@ -36,16 +37,16 @@ app.use((req, _response, next) => {
 });
 
 // Debug router before we start proxying  requests from /v<x> psth
-app.get('/', (_request, res) => {
+router.get('/', (_request, res) => {
   res.send({ ok: true });
 });
 
-app.get('/version', (_request, res) => {
+router.get('/version', (_request, res) => {
   res.send({ version: API_VERSION });
 });
 
-app.get(
-  '/enquiry/vehicle',
+router.get(
+  '/vehicle',
   (
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, VehicleEvent>,
     res,
@@ -77,8 +78,8 @@ app.get(
   },
 );
 
-app.get(
-  '/enquiry/testResults',
+router.get(
+  '/testResults',
   (
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
     res,
@@ -102,8 +103,10 @@ app.get(
   },
 );
 
-app.all('/enquiry/*', (_request, res) => {
+router.all('*', (_request, res) => {
   res.status(405).send();
 });
+
+app.use('/*/enquiry/', router);
 
 export { app };

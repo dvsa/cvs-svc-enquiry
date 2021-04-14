@@ -8,7 +8,6 @@ describe('Application entry', () => {
   let event;
   let context;
   let majorVersionNumber: string;
-  let basePath: string;
 
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -17,7 +16,6 @@ describe('Application entry', () => {
     context = {} as Context;
     jest.spyOn(Utils, 'createMajorVersionNumber').mockReturnValue('1');
     majorVersionNumber = Utils.createMajorVersionNumber('1.0.0');
-    basePath = Utils.createHandlerBasePath(majorVersionNumber);
   });
 
   afterEach(() => {
@@ -27,7 +25,7 @@ describe('Application entry', () => {
 
   describe('Handler', () => {
     it('should call the express wrapper', async () => {
-      event = { body: 'Test Body' };
+      event = { body: 'Test Body', path: '/v1/enquiry/' };
 
       const response = await handler(event, context);
       expect(response.statusCode).toEqual(200);
@@ -37,7 +35,7 @@ describe('Application entry', () => {
     describe('when the service is running', () => {
       describe('without proxy', () => {
         it("should return a body response when the handler has event with the '/' as path", async () => {
-          event = { httpMethod: 'GET', path: '/' };
+          event = { httpMethod: 'GET', path: '/v1/enquiry/' };
 
           const response = await handler(event, context);
           const parsedBody = JSON.parse(response.body) as { ok: boolean };
@@ -63,7 +61,7 @@ describe('Application entry', () => {
         it("should call the service/lambda when the path contains '/version' and return the app version following the semver convention", async () => {
           event = {
             ...Version,
-            path: `stage/${basePath}/version`,
+            path: '/v1/enquiry/version',
           };
 
           const response = await handler(event, context);
