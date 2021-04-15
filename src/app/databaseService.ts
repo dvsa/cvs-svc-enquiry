@@ -26,7 +26,7 @@ async function getTechnicalRecordDetails(
     databaseService.get(technicalQueries.PLATING_QUERY, [technicalRecordQueryResult.id]),
   ]);
 
-  technicalRecord.brakes = brakes.map((brake: BrakeQueryResult) => brake.result);
+  technicalRecord.psvBrakes = brakes.map((brake: BrakeQueryResult) => brake.result);
   technicalRecord.axles = axles.map((axle: AxlesQueryResult) => axle.result);
   technicalRecord.axlespacing = axleSpacing.map((axlespacing: AxleSpacingQueryResult) => axlespacing.result);
   technicalRecord.plates = plating.map((plate: PlatesQueryResult) => plate.result);

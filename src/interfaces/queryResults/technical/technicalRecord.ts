@@ -84,7 +84,7 @@ interface TechnicalRecord {
   numberOfSeatbelts?: string;
   seatbeltInstallationApprovalDate?: string;
   axles?: Axles[];
-  brakes?: PSVBrakes[];
+  psvBrakes?: PSVBrakes[];
   axlespacing?: AxleSpacing[];
   plates?: Plate[];
   makeModel?: MakeModel;

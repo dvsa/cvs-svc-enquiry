@@ -96,8 +96,8 @@ describe('Database Service', () => {
       expect(result.vin).toEqual(event.vinNumber);
       expect(result.technicalrecords).toHaveLength(1);
       expect(result.technicalrecords[0].functionCode).toEqual('Test tech record');
-      expect(result.technicalrecords[0].brakes).toHaveLength(2);
-      expect(result.technicalrecords[0].brakes[0].brakeCode).toEqual('Test brakes');
+      expect(result.technicalrecords[0].psvBrakes).toHaveLength(2);
+      expect(result.technicalrecords[0].psvBrakes[0].brakeCode).toEqual('Test brakes');
       expect(result.technicalrecords[0].axles).toHaveLength(2);
       expect(result.technicalrecords[0].axles[0].axleNumber).toEqual(1);
       expect(result.technicalrecords[0].axlespacing).toHaveLength(2);
