@@ -105,6 +105,30 @@ describe('Database Service', () => {
       expect(result.technicalrecords[0].plates).toHaveLength(2);
       expect(result.technicalrecords[0].plates[0].plateSerialNumber).toEqual('Test plate');
     });
+
+    it('defaults to an empty array if nothing is returned by the subqueries', async () => {
+      const event = { vinNumber: '123478' };
+      const mockDbService = {
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[{ id: '1', result: { vin: event.vinNumber } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[{ id: '1', result: { functionCode: 'Test tech record' } } as RowDataPacket], []])
+          .mockResolvedValueOnce([[], []])
+          .mockResolvedValueOnce([[], []])
+          .mockResolvedValueOnce([[], []])
+          .mockResolvedValueOnce([[], []]),
+      };
+
+      const result = await getVehicleDetailsByVin(mockDbService, event);
+
+      expect(result.vin).toEqual(event.vinNumber);
+      expect(result.technicalrecords).toHaveLength(1);
+      expect(result.technicalrecords[0].functionCode).toEqual('Test tech record');
+      expect(result.technicalrecords[0].psvBrakes).toHaveLength(0);
+      expect(result.technicalrecords[0].axles).toHaveLength(0);
+      expect(result.technicalrecords[0].axlespacing).toHaveLength(0);
+      expect(result.technicalrecords[0].plates).toHaveLength(0);
+    });
   });
 
   describe('get Test Results', () => {
