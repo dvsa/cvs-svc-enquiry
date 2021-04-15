@@ -32,22 +32,10 @@ describe('API', () => {
       expect(resultContent.version).toEqual(process.env.API_VERSION);
     });
 
-    it('returns a 405 if the method is not supported', async () => {
-      const resultPost = await supertest(app).post('/v1/enquiry/vehicle?vinNumber=123456789');
+    it('returns a 404 if the method is not supported', async () => {
+      const resultPost = await supertest(app).post('/v1/enquiry/not-a-route');
 
-      expect(resultPost.status).toEqual(405);
-
-      const resultPut = await supertest(app).put('/v1/enquiry/vehicle?vinNumber=123456789');
-
-      expect(resultPut.status).toEqual(405);
-
-      const resultPatch = await supertest(app).patch('/v1/enquiry/vehicle?vinNumber=123456789');
-
-      expect(resultPatch.status).toEqual(405);
-
-      const resultDelete = await supertest(app).delete('/v1/enquiry/vehicle?vinNumber=123456789');
-
-      expect(resultDelete.status).toEqual(405);
+      expect(resultPost.status).toEqual(404);
     });
 
     describe('Vehicle enquiry', () => {

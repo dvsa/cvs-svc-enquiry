@@ -15,27 +15,6 @@ const router = express.Router();
 
 const { API_VERSION } = process.env;
 
-// Declare middlewares
-/**
- * bodyParser, error handling, logger, etc..
- * http://expressjs.com/en/starter/basic-routing.html
- * http://expressjs.com/en/guide/using-middleware.html
- */
-
-/**
- * app level middlewares
- * app.use('/path', (req, res, next) => {
- * chain middlewares
- * next()
- * })
- */
-router.use((req, _response, next) => {
-  // TODO Add logger lib like Winston or Morgan
-  console.log('path');
-  console.log(req.path);
-  next();
-});
-
 // Debug router before we start proxying  requests from /v<x> psth
 router.get('/', (_request, res) => {
   res.send({ ok: true });
@@ -103,8 +82,12 @@ router.get(
   },
 );
 
-router.all('*', (_request, res) => {
+router.all(/testResults|vehicle/, (_request, res) => {
   res.status(405).send();
+});
+
+router.all('*', (_request, res) => {
+  res.status(404).send();
 });
 
 app.use('/*/enquiry/', router);
