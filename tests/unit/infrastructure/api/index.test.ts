@@ -5,7 +5,7 @@ import DatabaseService from '../../../../src/infrastructure/databaseService';
 import VehicleDetails from '../../../../src/interfaces/queryResults/technical/vehicleDetails';
 import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService';
 import ParametersError from '../../../../src/errors/ParametersError';
-import TestRecord from '../../../../src/interfaces/queryResults/test/testRecord';
+import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -114,11 +114,11 @@ describe('API', () => {
       it('returns the db query result if there are no errors', async () => {
         const resultDetails = {
           testStatus: 'Success',
-        } as TestRecord;
+        } as TestResult;
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([resultDetails]);
         const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
-        const resultContent = JSON.parse(result.text) as [TestRecord];
+        const resultContent = JSON.parse(result.text) as [TestResult];
 
         expect(resultContent[0].testStatus).toEqual('Success');
       });

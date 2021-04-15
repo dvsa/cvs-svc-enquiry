@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import express, { Request } from 'express';
 import mysql from 'mysql2/promise';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
-import testQueryFunctionFactory from '../../app/testQueryFunctionFactory';
+import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
 import { getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
@@ -87,7 +87,7 @@ router.get(
     const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
 
     DatabaseService.build(secretsManager, mysql)
-      .then((dbService) => getResultsDetails(request.query, testQueryFunctionFactory, dbService))
+      .then((dbService) => getResultsDetails(request.query, testResultsQueryFunctionFactory, dbService))
       .then((result) => {
         res.contentType('json').send(JSON.stringify(result));
       })

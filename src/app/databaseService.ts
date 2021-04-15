@@ -1,6 +1,6 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import * as technicalQueries from './queries/technicalRecord';
-import * as testQueries from './queries/testRecords';
+import * as testResultsQueries from './queries/testResults';
 import DatabaseServiceInterface from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import VehicleEvent from '../interfaces/VehicleEvent';
@@ -10,7 +10,7 @@ import PSVBrakes from '../interfaces/queryResults/technical/psvBrakes';
 import Axles from '../interfaces/queryResults/technical/axles';
 import AxleSpacing from '../interfaces/queryResults/technical/axleSpacing';
 import Plate from '../interfaces/queryResults/technical/plate';
-import TestRecord from '../interfaces/queryResults/test/testRecord';
+import TestResult from '../interfaces/queryResults/test/testResult';
 import CustomDefect from '../interfaces/queryResults/test/customDefect';
 import TestDefect from '../interfaces/queryResults/test/testDefect';
 
@@ -90,54 +90,54 @@ async function getVehicleDetailsByTrailerId(
   return getVehicleDetails(vehicleDetailsQueryResult, databaseService);
 }
 
-async function hydrateTestRecord(
+async function hydrateTestResult(
   id: string,
-  testRecord: TestRecord,
+  testResult: TestResult,
   databaseService: DatabaseServiceInterface,
-): Promise<TestRecord> {
+): Promise<TestResult> {
   const [[customDefects], [defects]] = await Promise.all([
-    databaseService.get(testQueries.CUSTOM_DEFECT_QUERY, [id]),
-    databaseService.get(testQueries.TEST_DEFECT_QUERY, [id]),
+    databaseService.get(testResultsQueries.CUSTOM_DEFECT_QUERY, [id]),
+    databaseService.get(testResultsQueries.TEST_DEFECT_QUERY, [id]),
   ]);
 
   if (customDefects.length > 0) {
-    testRecord.customDefect = customDefects.map((customDefect: CustomDefectQueryResult) => customDefect.result);
+    testResult.customDefect = customDefects.map((customDefect: CustomDefectQueryResult) => customDefect.result);
   } else {
-    testRecord.customDefect = [];
+    testResult.customDefect = [];
   }
 
   if (defects.length > 0) {
-    testRecord.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
+    testResult.defects = defects.map((defect: TestDefectQueryResult) => defect.result);
   } else {
-    testRecord.defects = [];
+    testResult.defects = [];
   }
 
-  return testRecord;
+  return testResult;
 }
 
-async function getTestRecordDetails(
+async function getTestResultDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
   databaseService: DatabaseServiceInterface,
-): Promise<TestRecord> {
-  const testRecordResult = queryResult[0][0] as TestRecordQueryResult;
-  const testId = testRecordResult.id;
-  const testRecord = testRecordResult.result;
+): Promise<TestResult> {
+  const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
+  const testId = testResultQueryResult.id;
+  const testResult = testResultQueryResult.result;
 
-  return hydrateTestRecord(testId, testRecord, databaseService);
+  return hydrateTestResult(testId, testResult, databaseService);
 }
 
-async function getTestRecordsDetails(
+async function getTestResultsDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
   databaseService: DatabaseServiceInterface,
-): Promise<TestRecord[]> {
-  const testRecordResults = queryResult[0] as TestRecordQueryResult[];
+): Promise<TestResult[]> {
+  const testResultQueryResults = queryResult[0] as TestResultQueryResult[];
 
   return Promise.all(
-    testRecordResults.map((testRecordResult: TestRecordQueryResult) => {
-      const testId = testRecordResult.id;
-      const testRecord = testRecordResult.result;
+    testResultQueryResults.map((testResultQueryResult: TestResultQueryResult) => {
+      const testId = testResultQueryResult.id;
+      const testResult = testResultQueryResult.result;
 
-      return hydrateTestRecord(testId, testRecord, databaseService);
+      return hydrateTestResult(testId, testResult, databaseService);
     }),
   );
 }
@@ -145,30 +145,30 @@ async function getTestRecordsDetails(
 async function getTestResultsByVrm(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<TestRecord[]> {
+): Promise<TestResult[]> {
   console.info('Using get by VRM');
-  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_VRM, [event.VehicleRegMark]);
+  const queryResult = await databaseService.get(testResultsQueries.TEST_RESULTS_BY_VRM, [event.VehicleRegMark]);
 
-  return getTestRecordsDetails(queryResult, databaseService);
+  return getTestResultsDetails(queryResult, databaseService);
 }
 
 async function getTestResultsByVin(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<TestRecord[]> {
+): Promise<TestResult[]> {
   console.info('Using get by VIN');
-  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_VIN, [event.vinNumber]);
+  const queryResult = await databaseService.get(testResultsQueries.TEST_RESULTS_BY_VIN, [event.vinNumber]);
 
-  return getTestRecordsDetails(queryResult, databaseService);
+  return getTestResultsDetails(queryResult, databaseService);
 }
 
 async function getTestResultsByTestId(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
-): Promise<TestRecord[]> {
+): Promise<TestResult[]> {
   console.info('Using get by Test ID');
-  const queryResult = await databaseService.get(testQueries.TEST_RECORD_BY_TEST_NUMBER, [event.testnumber]);
-  const result = await getTestRecordDetails(queryResult, databaseService);
+  const queryResult = await databaseService.get(testResultsQueries.TEST_RESULTS_BY_TEST_NUMBER, [event.testnumber]);
+  const result = await getTestResultDetails(queryResult, databaseService);
 
   return [result];
 }
@@ -212,9 +212,9 @@ interface PlatesQueryResult extends RowDataPacket {
   result: Plate;
 }
 
-interface TestRecordQueryResult extends RowDataPacket {
+interface TestResultQueryResult extends RowDataPacket {
   id: string;
-  result: TestRecord;
+  result: TestResult;
 }
 
 interface TestDefectQueryResult extends RowDataPacket {

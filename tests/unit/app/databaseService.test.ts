@@ -8,7 +8,7 @@ import {
   getVehicleDetailsByVrm,
 } from '../../../src/app/databaseService';
 import * as technicalQueries from '../../../src/app/queries/technicalRecord';
-import * as testQueries from '../../../src/app/queries/testRecords';
+import * as testQueries from '../../../src/app/queries/testResults';
 
 describe('Database Service', () => {
   describe('Get vehicle details', () => {
@@ -120,7 +120,7 @@ describe('Database Service', () => {
 
       await getTestResultsByVrm(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VRM);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RESULTS_BY_VRM);
     });
 
     it('passes the expected SQL query to the infrastructure DB service for get by VIN', async () => {
@@ -136,7 +136,7 @@ describe('Database Service', () => {
 
       await getTestResultsByVin(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_VIN);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RESULTS_BY_VIN);
     });
 
     it('passes the expected SQL query to the infrastructure DB service for get by test ID', async () => {
@@ -152,7 +152,7 @@ describe('Database Service', () => {
 
       await getTestResultsByTestId(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RECORD_BY_TEST_NUMBER);
+      expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RESULTS_BY_TEST_NUMBER);
     });
 
     it('does not include customDefect in the response if nothing is returned', async () => {

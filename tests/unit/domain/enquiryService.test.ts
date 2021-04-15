@@ -2,8 +2,8 @@ import { RowDataPacket } from 'mysql2/promise';
 import { getVehicleDetails, getResultsDetails } from '../../../src/domain/enquiryService';
 import DatabaseService from '../../../src/interfaces/DatabaseService';
 import * as databaseService from '../../../src/app/databaseService';
-import TestRecord from '../../../src/interfaces/queryResults/test/testRecord';
-import testQueryFunctionFactory from '../../../src/app/testQueryFunctionFactory';
+import TestResult from '../../../src/interfaces/queryResults/test/testResult';
+import testQueryFunctionFactory from '../../../src/app/testResultsQueryFunctionFactory';
 
 jest.mock('../../../src/app/databaseService');
 
@@ -22,10 +22,10 @@ describe('Enquiry Service', () => {
   describe('getResultsDetails', () => {
     it('returns the result of a query', async () => {
       const event = { VehicleRegMark: '1234' };
-      const testRecord = {
+      const testResult = {
         testStatus: 'Success',
-      } as TestRecord;
-      jest.spyOn(databaseService, 'getTestResultsByVrm').mockResolvedValue([testRecord]);
+      } as TestResult;
+      jest.spyOn(databaseService, 'getTestResultsByVrm').mockResolvedValue([testResult]);
       const mockDbService = {} as DatabaseService;
 
       const result = await getResultsDetails(event, testQueryFunctionFactory, mockDbService);
@@ -35,7 +35,7 @@ describe('Enquiry Service', () => {
 
     it('uses the VIN query if only a VIN is passed', async () => {
       const event = { vinNumber: '1234' };
-      const rowDataPacket = { result: 'Success' } as TestRecord;
+      const rowDataPacket = { result: 'Success' } as TestResult;
       jest.spyOn(databaseService, 'getTestResultsByVin').mockResolvedValue([rowDataPacket]);
       const mockDbService = {} as DatabaseService;
 

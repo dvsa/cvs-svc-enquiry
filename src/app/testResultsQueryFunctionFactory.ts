@@ -1,12 +1,11 @@
 import DatabaseService from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import { getTestResultsByVrm, getTestResultsByVin, getTestResultsByTestId } from './databaseService';
-import TestRecord from '../interfaces/queryResults/test/testRecord';
+import TestResult from '../interfaces/queryResults/test/testResult';
 
 export default (
   event: ResultsEvent,
-): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<TestRecord[]>
-  ) => {
+): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<TestResult[]>) => {
   if (event.vinNumber) {
     console.info('Using getTestResultsByVin');
 

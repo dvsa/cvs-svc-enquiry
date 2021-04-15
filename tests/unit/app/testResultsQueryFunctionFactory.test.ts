@@ -1,5 +1,5 @@
 import { mocked } from 'ts-jest/utils';
-import queryFunctionFactory from '../../../src/app/testQueryFunctionFactory';
+import queryFunctionFactory from '../../../src/app/testResultsQueryFunctionFactory';
 import * as dbFunctions from '../../../src/app/databaseService';
 import DatabaseService from '../../../src/infrastructure/databaseService';
 

@@ -3,7 +3,9 @@ import serverless from 'serverless-http';
 import { Context, APIGatewayEvent, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { app } from './infrastructure/api';
 
-const { NODE_ENV, API_VERSION, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE } = process.env;
+const {
+  NODE_ENV, API_VERSION, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE,
+} = process.env;
 
 console.log(
   `\nRunning Service\n version: '${API_VERSION}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,

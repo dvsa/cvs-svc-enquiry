@@ -7,7 +7,7 @@ import TestStation from './testStation';
 import TestType from './testType';
 import VehicleClass from '../vehicleClass';
 
-interface TestRecord extends RowDataPacket {
+interface TestResult extends RowDataPacket {
   testStatus?: string;
   reasonForCancellation?: string;
   numberOfSeats?: number;
@@ -51,4 +51,4 @@ interface TestRecord extends RowDataPacket {
   customDefect?: CustomDefect[];
 }
 
-export default TestRecord;
+export default TestResult;
