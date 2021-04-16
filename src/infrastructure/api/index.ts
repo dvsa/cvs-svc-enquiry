@@ -76,6 +76,8 @@ router.get(
       .catch((e: Error) => {
         if (e instanceof ParametersError) {
           res.status(400);
+        } else if (e instanceof NotFoundError) {
+          res.status(404);
         } else {
           res.status(500);
         }

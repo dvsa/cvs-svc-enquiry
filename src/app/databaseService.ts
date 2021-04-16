@@ -51,7 +51,7 @@ async function getVehicleDetails(
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (!vehicleDetailsResult || !vehicleDetailsResult.id || !vehicleDetailsResult.result) {
-    throw new NotFoundError();
+    throw new NotFoundError('Vehicle was not found');
   }
 
   const vehicleId = vehicleDetailsResult.id;
@@ -126,6 +126,11 @@ async function getTestResultDetails(
   databaseService: DatabaseServiceInterface,
 ): Promise<TestResult> {
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
+
+  if (!testResultQueryResult || !testResultQueryResult.id || !testResultQueryResult.result) {
+    throw new NotFoundError('Test not found');
+  }
+
   const testId = testResultQueryResult.id;
   const testResult = testResultQueryResult.result;
 
@@ -137,6 +142,10 @@ async function getTestResultsDetails(
   databaseService: DatabaseServiceInterface,
 ): Promise<TestResult[]> {
   const testResultQueryResults = queryResult[0] as TestResultQueryResult[];
+
+  if (!testResultQueryResults || testResultQueryResults.length === 0) {
+    throw new NotFoundError('No tests found');
+  }
 
   return Promise.all(
     testResultQueryResults.map((testResultQueryResult: TestResultQueryResult) => {

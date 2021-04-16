@@ -136,6 +136,14 @@ describe('API', () => {
         expect(result.status).toEqual(400);
       });
 
+      it('sets the status to 404 for a not found error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new NotFoundError('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+
+        expect(result.status).toEqual(404);
+      });
+
       it('sets the status to 500 for a generic error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));

@@ -191,6 +191,42 @@ describe('Database Service', () => {
       expect(mockDbService.get.mock.calls[0][0]).toEqual(testQueries.TEST_RESULTS_BY_TEST_NUMBER);
     });
 
+    it('throws if there is no test record when getting by vin', async () => {
+      const mockDbService = {
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[], []]),
+      };
+
+      const event = { vinNumber: '123478' };
+
+      await expect(getTestResultsByVin(mockDbService, event)).rejects.toThrow();
+    });
+
+    it('throws if there is no test record when getting by vrm', async () => {
+      const mockDbService = {
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[], []]),
+      };
+
+      const event = { VehicleRegMark: '123478' };
+
+      await expect(getTestResultsByVin(mockDbService, event)).rejects.toThrow();
+    });
+
+    it('throws if there is no test record when getting by test ID', async () => {
+      const mockDbService = {
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[], []]),
+      };
+
+      const event = { testnumber: '123478' };
+
+      await expect(getTestResultsByVin(mockDbService, event)).rejects.toThrow();
+    });
+
     it('does not include customDefect in the response if nothing is returned', async () => {
       const mockDbService = {
         get: jest
