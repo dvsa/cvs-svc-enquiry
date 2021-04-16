@@ -6,6 +6,7 @@ import VehicleDetails from '../../../../src/interfaces/queryResults/technical/ve
 import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService';
 import ParametersError from '../../../../src/errors/ParametersError';
 import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
+import NotFoundError from '../../../../src/errors/NotFoundError';
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -69,6 +70,14 @@ describe('API', () => {
         const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
 
         expect(result.status).toEqual(400);
+      });
+
+      it('sets the status to 404 for a not found error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new NotFoundError());
+        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+
+        expect(result.status).toEqual(404);
       });
 
       it('sets the status to 500 for a generic error', async () => {

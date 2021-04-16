@@ -13,6 +13,7 @@ import Plate from '../interfaces/queryResults/technical/plate';
 import TestResult from '../interfaces/queryResults/test/testResult';
 import CustomDefect from '../interfaces/queryResults/test/customDefect';
 import TestDefect from '../interfaces/queryResults/test/testDefect';
+import NotFoundError from '../errors/NotFoundError';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -48,6 +49,11 @@ async function getVehicleDetails(
   databaseService: DatabaseServiceInterface,
 ) {
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
+
+  if (!vehicleDetailsResult || !vehicleDetailsResult.id || !vehicleDetailsResult.result) {
+    throw new NotFoundError();
+  }
+
   const vehicleId = vehicleDetailsResult.id;
   const vehicleDetails = vehicleDetailsResult.result;
 

@@ -9,6 +9,7 @@ import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
 import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
+import NotFoundError from '../../errors/NotFoundError';
 
 const app = express();
 const router = express.Router();
@@ -48,6 +49,8 @@ router.get(
       .catch((e: Error) => {
         if (e instanceof ParametersError) {
           res.status(400);
+        } else if (e instanceof NotFoundError) {
+          res.status(404);
         } else {
           res.status(500);
         }

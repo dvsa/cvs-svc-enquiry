@@ -16,7 +16,7 @@ describe('Database Service', () => {
       const mockDbService = {
         get: jest
           .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
-          .mockResolvedValue([[{ id: '', result: {} } as RowDataPacket], []]),
+          .mockResolvedValue([[{ id: '1', result: {} } as RowDataPacket], []]),
       };
 
       const event = { VehicleRegMark: 'aa11AAA' };
@@ -30,7 +30,7 @@ describe('Database Service', () => {
       const mockDbService = {
         get: jest
           .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
-          .mockResolvedValue([[{ id: '', result: {} } as RowDataPacket], []]),
+          .mockResolvedValue([[{ id: '1', result: {} } as RowDataPacket], []]),
       };
 
       const event = { vinNumber: '123478' };
@@ -44,7 +44,7 @@ describe('Database Service', () => {
       const mockDbService = {
         get: jest
           .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
-          .mockResolvedValue([[{ id: '', result: {} } as RowDataPacket], []]),
+          .mockResolvedValue([[{ id: '1', result: {} } as RowDataPacket], []]),
       };
 
       const event = { trailerId: '123478' };
@@ -52,6 +52,18 @@ describe('Database Service', () => {
       await getVehicleDetailsByTrailerId(mockDbService, event);
 
       expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY);
+    });
+
+    it('throws if there is no result from getting the vehicle', async () => {
+      const mockDbService = {
+        get: jest
+          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValue([[], []]),
+      };
+
+      const event = { vinNumber: '123478' };
+
+      await expect(getVehicleDetailsByTrailerId(mockDbService, event)).rejects.toThrow();
     });
 
     it('correctly fills out all subsections of a response', async () => {
