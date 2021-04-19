@@ -50,7 +50,11 @@ async function getVehicleDetails(
 ) {
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
-  if (!vehicleDetailsResult || !vehicleDetailsResult.id || !vehicleDetailsResult.result) {
+  if (
+    vehicleDetailsResult === undefined ||
+    vehicleDetailsResult.id === undefined ||
+    vehicleDetailsResult.result === undefined
+  ) {
     throw new NotFoundError('Vehicle was not found');
   }
 
@@ -127,7 +131,11 @@ async function getTestResultDetails(
 ): Promise<TestResult> {
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
-  if (!testResultQueryResult || !testResultQueryResult.id || !testResultQueryResult.result) {
+  if (
+    testResultQueryResult === undefined ||
+    testResultQueryResult.id === undefined ||
+    testResultQueryResult.result === undefined
+  ) {
     throw new NotFoundError('Test not found');
   }
 
@@ -143,7 +151,7 @@ async function getTestResultsDetails(
 ): Promise<TestResult[]> {
   const testResultQueryResults = queryResult[0] as TestResultQueryResult[];
 
-  if (!testResultQueryResults || testResultQueryResults.length === 0) {
+  if (testResultQueryResults === undefined || testResultQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 
