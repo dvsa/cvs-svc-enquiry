@@ -51,9 +51,9 @@ async function getVehicleDetails(
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined
-    || vehicleDetailsResult.id === undefined
-    || vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined ||
+    vehicleDetailsResult.id === undefined ||
+    vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -132,9 +132,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined
-    || testResultQueryResult.id === undefined
-    || testResultQueryResult.result === undefined
+    testResultQueryResult === undefined ||
+    testResultQueryResult.id === undefined ||
+    testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
