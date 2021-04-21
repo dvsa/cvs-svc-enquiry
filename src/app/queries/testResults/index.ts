@@ -1,0 +1,11 @@
+import { TEST_RESULTS_BY_VIN, TEST_RESULTS_BY_VRM, TEST_RESULTS_BY_TEST_NUMBER } from './testResultQuery';
+import TEST_DEFECT_QUERY from './testDefectQuery';
+import CUSTOM_DEFECT_QUERY from './customDefectQuery';
+
+export {
+  TEST_RESULTS_BY_VIN,
+  TEST_RESULTS_BY_VRM,
+  TEST_RESULTS_BY_TEST_NUMBER,
+  TEST_DEFECT_QUERY,
+  CUSTOM_DEFECT_QUERY,
+};
