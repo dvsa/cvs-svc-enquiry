@@ -10,6 +10,8 @@ import VehicleEvent from '../../interfaces/VehicleEvent';
 import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
 import NotFoundError from '../../errors/NotFoundError';
+import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
+import LocalSecretsManagerService from '../localSecretsManagerService';
 
 const app = express();
 const router = express.Router();
@@ -17,6 +19,8 @@ const router = express.Router();
 const { API_VERSION } = process.env;
 
 // Debug router before we start proxying  requests from /v<x> psth
+console.log('process.env.IS_OFFLINE');
+console.log(process.env.IS_OFFLINE);
 router.get('/', (_request, res) => {
   res.send({ ok: true });
 });
@@ -32,9 +36,13 @@ router.get(
     res,
   ) => {
     console.info('Handling vehicle request');
-    let secretsManager;
+    let secretsManager: SecretsManagerServiceInterface;
     try {
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      if (process.env.IS_OFFLINE === 'true') {
+        secretsManager = new LocalSecretsManagerService();
+      } else {
+        secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      }
     } catch (e) {
       if (e instanceof Error) {
         res.status(500).send(e.message);
@@ -66,7 +74,13 @@ router.get(
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, ResultsEvent>,
     res,
   ) => {
-    const secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    let secretsManager: SecretsManagerServiceInterface;
+
+    if (process.env.IS_OFFLINE === 'true') {
+      secretsManager = new LocalSecretsManagerService();
+    } else {
+      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    }
 
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getResultsDetails(request.query, testResultsQueryFunctionFactory, dbService))

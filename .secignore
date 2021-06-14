@@ -1,6 +1,10 @@
 .npmrc
 src/errors/MissingSecretError.ts
 src/infrastructure/secretsManagerService.ts
+src/infrastructure/localSecretsManagerService.ts
 src/interfaces/SecretsManagerService.ts
 tests/unit/infrastructure/secretsService.test.ts
 tests/unit/infrastructure/secretsManagerService.test.ts
+
+src/resources/mysql-connector-java-8.0.23.jar
+src/resources/data-seed.sql

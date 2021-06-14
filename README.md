@@ -13,6 +13,12 @@ Once the dependencies are installed, you will be required to rename the `/config
 
 The application runs on port `:3001` by default when no stage is provided.
 
+Serverless is used for local development, to get started after running `nvm use && npm i`.
+You will need to initialize the external dependencies loaded as submodules, please refer to the [External dependencies](#external-dependencies) section.
+Once the SQL database has been populated with liquibase, you can run `npm run start:dev`.
+
+Docker container might fail to boot, should it happen, delete the Docker container and rerun the `start:dev` script.
+
 ### Environments
 
 We use `NODE_ENV` environment variable to set multi-stage builds (region, stages) with the help of dotenv through npm scripts to load the relevant `.env.<NODE_ENV>` file from `./config` folder into the `serverless.yml` file as we don't rely on serverless for deployment.
@@ -46,9 +52,15 @@ All secrets the secrets are will stored in `AWS Secrets Manager`.
 The following scripts are available, for further information please refer to the project `package.json` file:
 
 - <b>start</b>: `npm start` - _launch serverless offline service_
+- <b>start:dev</b>: `npm run start:dev` - _launch serverless offline service with dockerised DB_
 - <b>dev</b>: `npm run dev` - _run in parallel the service and unit tests in_ `--watch` _mode with live reload_.
 - <b>test</b>: `npm t` - _execute the unit test suite_
 - <b>build</b>: `npm run build` - _bundle the project for production_
+
+### Local database
+
+The project needs a database available in order to run locally. The `npm run start:dev` command, and by extension `npm run dev` as well, will automatically set up a database running in a docker container in the background for you and populate it with sample data. The connection details for viewing the database can be found in `src/infrastructure/localSecretsManagerService.ts`. Running `npm run start:dev` repeatedly will only initialise a single docker container, and your changes to the database will only be removed if you delete the container.
+For more information about the Docker cli, please refer to the [documentation](https://docs.docker.com/engine/reference/commandline/cli/).
 
 ### Offline
 
@@ -107,6 +119,8 @@ Publishing and artifacts are managed separately by the pipeline.
 To facilitate the standardisation of the code, a few helpers and tools have been adopted for this repository.
 
 ### External dependencies
+
+The project depends on the cvs-nop repository as a git module. Use `--recurse-submodules` when cloning the project to automatically set up the submodule, or use `git submodule init` followed by `git submodule update` to pull the submodule in if you already have the project checked out.
 
 The projects has multiple hooks configured using [husky](https://github.com/typicode/husky#readme) which will execute the following scripts: `audit`, `lint`, `build`, `test` and format your code with [eslint](https://github.com/typescript-eslint/typescript-eslint#readme) and [prettier](https://github.com/prettier/prettier).
 
