@@ -152,6 +152,8 @@ Domain Drive Design diagram with Interfaces, Application, Domain layers and Infr
   <img src="./docs/DDD_architecture.jpg" alt="Domain Drive Design diagram with Interfaces, Application, Domain layers and Infrastructure across the layers" >
 </p>
 
+Please refer to the the [docs](./docs/README.md) for the API specification and samples of postman requests.
+
 #### Toolings
 
 The code uses [eslint](https://eslint.org/docs/user-guide/getting-started), [typescript clean code standards](https://github.com/labs42io/clean-code-typescript) as well as sonarqube for static analysis.
