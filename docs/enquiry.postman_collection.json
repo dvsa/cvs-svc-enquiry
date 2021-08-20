@@ -1,0 +1,112 @@
+{
+	"info": {
+		"_postman_id": "38b02d87-27b7-498b-9488-58674d70ae0f",
+		"name": "enquiry",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Vehicle by  vin number",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.{{api}}.cvs.dvsacloud.uk/{{branch}}/v1/enquiry/vehicle?vinNumber=MIX3XQ94OIKPWBTL",
+					"protocol": "https",
+					"host": [
+						"api",
+						"{{api}}",
+						"cvs",
+						"dvsacloud",
+						"uk"
+					],
+					"path": [
+						"{{branch}}",
+						"v1",
+						"enquiry",
+						"vehicle"
+					],
+					"query": [
+						{
+							"key": "vinNumber",
+							"value": "MIX3XQ94OIKPWBTL"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vehicle by vin number local",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3010/local/v1/enquiry/vehicle?vinNumber=P1234567890123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3010",
+					"path": [
+						"local",
+						"v1",
+						"enquiry",
+						"vehicle"
+					],
+					"query": [
+						{
+							"key": "vinNumber",
+							"value": "P1234567890123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testResults by vinNumber local",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3010/local/v1/enquiry/testResults?vinNumber=P1234567890123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3010",
+					"path": [
+						"local",
+						"v1",
+						"enquiry",
+						"testResults"
+					],
+					"query": [
+						{
+							"key": "vinNumber",
+							"value": "P1234567890123"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

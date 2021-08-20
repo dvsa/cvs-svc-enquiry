@@ -4,7 +4,7 @@ Lambda service to retrieve vehicle and test information for commerical vehicles
 
 ## Dependencies
 
-The project runs on node 10.x with typescript and serverless framework. For further details about project dependencies, please refer to the `package.json` file.
+The project runs on node 14.x with typescript and serverless framework. For further details about project dependencies, please refer to the `package.json` file.
 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) is used to managed node versions and configuration explicitely done per project using an `.npmrc` file.
 
 ## Running the project
@@ -151,6 +151,8 @@ Domain Drive Design diagram with Interfaces, Application, Domain layers and Infr
 <p align="center">
   <img src="./docs/DDD_architecture.jpg" alt="Domain Drive Design diagram with Interfaces, Application, Domain layers and Infrastructure across the layers" >
 </p>
+
+Please refer to the the [docs](./docs/README.md) for the API specification and samples of postman requests.
 
 #### Toolings
 
