@@ -7,7 +7,9 @@ describe('Secrets service', () => {
     const mockSecretsManager = ({} as unknown) as SecretsManager;
     const service = new SecretsManagerService(mockSecretsManager);
 
-    mockSecretsManager.getSecretValue = jest.fn().mockRejectedValue(new Error());
+    mockSecretsManager.getSecretValue = jest.fn().mockImplementation(() => {
+      throw new Error('Error');
+    });
 
     await expect(service.getSecret(undefined)).rejects.toThrow(Error);
   });
