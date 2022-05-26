@@ -3,15 +3,17 @@ import express, { Request } from 'express';
 import mysql from 'mysql2/promise';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
-import { getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
+import { getResultsDetails, getVehicleDetails, getEvlFeedDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
+import EvlEvent from '../../interfaces/EvlEvent';
 import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
 import NotFoundError from '../../errors/NotFoundError';
 import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
 import LocalSecretsManagerService from '../localSecretsManagerService';
+import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
 
 const app = express();
 const router = express.Router();
@@ -100,6 +102,38 @@ router.get(
       });
   },
 );
+
+router.get(
+  '/evl',
+  (
+    request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, EvlEvent>,
+    res
+  ) => {
+    let secretsManager: SecretsManagerServiceInterface;
+
+    if (process.env.IS_OFFLINE === 'true') {
+      secretsManager = new LocalSecretsManagerService();
+    } else {
+      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    }
+
+    DatabaseService.build(secretsManager, mysql)
+      .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
+      .then((result) => {
+        res.contentType('json').send(JSON.stringify(result));
+      })
+      .catch((e: Error) => {
+        if (e instanceof ParametersError) {
+          res.status(400);
+        } else if (e instanceof NotFoundError) {
+          res.status(404);
+        } else {
+          res.status(500);
+        }
+
+        res.send(e.message);
+      });
+})
 
 router.all(/testResults|vehicle/, (_request, res) => {
   res.status(405).send();
