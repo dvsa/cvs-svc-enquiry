@@ -14,6 +14,7 @@ import NotFoundError from '../../errors/NotFoundError';
 import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
 import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
+import { generateEvlFile } from '../IOService';
 
 const app = express();
 const router = express.Router();
@@ -107,7 +108,7 @@ router.get(
   '/evl',
   (
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, EvlEvent>,
-    res
+    res,
   ) => {
     let secretsManager: SecretsManagerServiceInterface;
 
@@ -120,7 +121,7 @@ router.get(
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
       .then((result) => {
-        res.contentType('json').send(JSON.stringify(result));
+        generateEvlFile(result);
       })
       .catch((e: Error) => {
         if (e instanceof ParametersError) {
@@ -131,9 +132,11 @@ router.get(
           res.status(500);
         }
 
+        res.status(200);
         res.send(e.message);
       });
-})
+  },
+);
 
 router.all(/testResults|vehicle/, (_request, res) => {
   res.status(405).send();

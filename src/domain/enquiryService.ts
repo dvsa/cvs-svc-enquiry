@@ -8,7 +8,7 @@ import ResultsEvent from '../interfaces/ResultsEvent';
 import EvlEvent from '../interfaces/EvlEvent';
 import VehicleDetails from '../interfaces/queryResults/technical/vehicleDetails';
 import TestResult from '../interfaces/queryResults/test/testResult';
-import EvlFeedData from '../interfaces/queryResults/evlFeedData'
+import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 
 const getVehicleDetails = async (
   event: VehicleEvent,
@@ -37,8 +37,7 @@ const getEvlFeedDetails = async (
   dbService: DatabaseService,
 ): Promise<EvlFeedData[]> => {
   const query = queryFuncFactory(event);
-
-  return query(dbService, event)
-}
+  return query(dbService, event);
+};
 
 export { getVehicleDetails, getResultsDetails, getEvlFeedDetails };
