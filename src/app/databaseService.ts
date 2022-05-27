@@ -199,55 +199,48 @@ async function getTestResultsByTestId(
   return [result];
 }
 
-
-async function getEvlFeedByVrmDetails(
+function getEvlFeedByVrmDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
-): Promise<EvlFeedData> {
-
+): EvlFeedData {
   const evlFeedQueryResult = queryResult[0][0] as EvlFeedData;
   if (
     evlFeedQueryResult === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
-  
+
   return evlFeedQueryResult;
 }
 
-async function getEvlFeedDetails(
+function getEvlFeedDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
-): Promise<EvlFeedData[]> {
-
+): EvlFeedData[] {
   const evlFeedQueryResults = queryResult[0] as EvlFeedData[];
 
   if (evlFeedQueryResults === undefined || evlFeedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
-  
-  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => {
-    return evlFeedQueryResult;
-  })
+
+  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => evlFeedQueryResult);
 }
 
 async function getEvlFeedByVrm(
   databaseService: DatabaseServiceInterface,
-  event: EvlEvent
+  event: EvlEvent,
 ): Promise<EvlFeedData[]> {
   console.info('Using getEvlFeedByVrm');
   const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
-  const result = await getEvlFeedByVrmDetails(queryResult)
+  const result = getEvlFeedByVrmDetails(queryResult);
 
-  return [result]
+  return [result];
 }
 
 async function getEvlFeed(
-  databaseService: DatabaseServiceInterface
+  databaseService: DatabaseServiceInterface,
 ): Promise<EvlFeedData[]> {
   console.info('Using getEvlFeed');
   const queryResult = await databaseService.get(EVL_QUERY, []);
-  const result = await getEvlFeedDetails(queryResult)
-
-  return result
+  return getEvlFeedDetails(queryResult);
 }
 
 export {

@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import express, { Request } from 'express';
+import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
@@ -17,7 +17,7 @@ import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
 import { generateEvlFile } from '../IOService';
 
 const app = express();
-const router = express.Router();
+const router: Router = express.Router();
 
 const { API_VERSION } = process.env;
 
@@ -122,6 +122,8 @@ router.get(
       .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
       .then((result) => {
         generateEvlFile(result);
+        res.status(200);
+        res.contentType('json').send();
       })
       .catch((e: Error) => {
         if (e instanceof ParametersError) {
@@ -131,8 +133,6 @@ router.get(
         } else {
           res.status(500);
         }
-
-        res.status(200);
         res.send(e.message);
       });
   },
