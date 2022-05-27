@@ -1,7 +1,7 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import * as technicalQueries from './queries/technicalRecord';
 import * as testResultsQueries from './queries/testResults';
-import EVL_QUERY, { EVL_VRM_QUERY } from './queries/evlQuery';
+import { EVL_QUERY, EVL_VRM_QUERY } from './queries/evlQuery';
 import DatabaseServiceInterface from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import VehicleEvent from '../interfaces/VehicleEvent';
@@ -204,31 +204,28 @@ async function getEvlFeedByVrmDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
 ): Promise<EvlFeedData> {
 
-  const evlFeedQueryResult = queryResult[0][0] as EvlFeedQueryResult;
-
+  const evlFeedQueryResult = queryResult[0][0] as EvlFeedData;
   if (
     evlFeedQueryResult === undefined
-    || evlFeedQueryResult.id === undefined
-    || evlFeedQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
-
-  return evlFeedQueryResult.result;
+  
+  return evlFeedQueryResult;
 }
 
 async function getEvlFeedDetails(
   queryResult: [RowDataPacket[], FieldPacket[]],
 ): Promise<EvlFeedData[]> {
 
-  const evlFeedQueryResults = queryResult[0] as EvlFeedQueryResult[];
+  const evlFeedQueryResults = queryResult[0] as EvlFeedData[];
 
   if (evlFeedQueryResults === undefined || evlFeedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
-
-  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedQueryResult) => {
-    return evlFeedQueryResult.result;
+  
+  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => {
+    return evlFeedQueryResult;
   })
 }
 
@@ -309,9 +306,4 @@ interface TestDefectQueryResult extends RowDataPacket {
 interface CustomDefectQueryResult extends RowDataPacket {
   id: string;
   result: CustomDefect;
-}
-
-interface EvlFeedQueryResult extends RowDataPacket {
-  id: string;
-  result: EvlFeedData;
 }
