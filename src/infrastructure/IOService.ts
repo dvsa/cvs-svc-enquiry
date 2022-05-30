@@ -1,14 +1,17 @@
 import moment from 'moment';
-import { writeFile } from 'fs';
+import { writeFileSync } from 'fs';
 import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 
-export function generateEvlFile(data: EvlFeedData[]): void {
-  console.log(data);
+export function generateEvlFile(data: EvlFeedData[], fileName: string): void {
+  console.debug('Generating EVL File Data');
   const evlFeedProcessedData: string[] = data.map((entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`);
-  // add logging
-  writeFile(`EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`, evlFeedProcessedData.join('\n'), (err) => {
-    if (err) {
-      console.log(err);
+
+  try {
+    writeFileSync(fileName, evlFeedProcessedData.join('\n'));
+    console.debug('Generating EVL File Data Completed');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.debug(`An Error Occured: ${error.message}`);
     }
-  });
+  }
 }

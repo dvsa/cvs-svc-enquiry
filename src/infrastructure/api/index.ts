@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk';
 import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
+import moment from 'moment';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
 import { getResultsDetails, getVehicleDetails, getEvlFeedDetails } from '../../domain/enquiryService';
@@ -15,6 +16,7 @@ import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerServi
 import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
 import { generateEvlFile } from '../IOService';
+import { uploadToS3 } from '../s3BucketService';
 
 const app = express();
 const router: Router = express.Router();
@@ -121,7 +123,9 @@ router.get(
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
       .then((result) => {
-        generateEvlFile(result);
+        const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
+        generateEvlFile(result, fileName);
+        uploadToS3(fileName);
         res.status(200);
         res.contentType('json').send();
       })
