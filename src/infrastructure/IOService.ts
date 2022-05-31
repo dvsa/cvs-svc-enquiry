@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { writeFileSync } from 'fs';
+import { existsSync, rmSync, writeFileSync } from 'fs';
 import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 
 export function generateEvlFile(data: EvlFeedData[], fileName: string): void {
@@ -13,5 +13,14 @@ export function generateEvlFile(data: EvlFeedData[], fileName: string): void {
     if (error instanceof Error) {
       console.debug(`An Error Occured: ${error.message}`);
     }
+  }
+}
+
+export function removeFile(filePath: string):void {
+  rmSync(filePath);
+  if (!existsSync(filePath)) {
+    console.debug(`Deleted Local File: ${filePath}`);
+  } else {
+    console.debug(`Unable To Remove Local File ${filePath}`);
   }
 }

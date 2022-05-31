@@ -15,7 +15,7 @@ import NotFoundError from '../../errors/NotFoundError';
 import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
 import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
-import { generateEvlFile } from '../IOService';
+import { generateEvlFile, removeFile } from '../IOService';
 import { uploadToS3 } from '../s3BucketService';
 
 const app = express();
@@ -126,6 +126,7 @@ router.get(
         const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
         generateEvlFile(result, fileName);
         uploadToS3(fileName);
+        removeFile(fileName);
         res.status(200);
         res.contentType('json').send();
       })
