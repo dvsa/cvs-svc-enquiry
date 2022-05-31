@@ -138,7 +138,7 @@ router.get(
         } else {
           res.status(500);
         }
-        res.send(`Error Generating EVL FEEd Data: ${e.message}`);
+        res.send(`Error Generating EVL Feed Data: ${e.message}`);
       });
   },
 );

@@ -177,7 +177,7 @@ describe('API', () => {
         const evlFeedData: EvlFeedData = {
           certificateNumber: '123',
           testExpiryDate: '2020/01/20',
-          vrm_trm: '123'
+          vrm_trm: '123',
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getEvlFeedDetails').mockResolvedValue([evlFeedData]);
@@ -190,7 +190,7 @@ describe('API', () => {
         jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/v1/enquiry/evl');
 
-        expect(result.text).toEqual('This is an error');
+        expect(result.text).toEqual('Error Generating EVL Feed Data: This is an error');
       });
 
       it('sets the status to 400 for a parameters error', async () => {
@@ -217,6 +217,5 @@ describe('API', () => {
         expect(result.status).toEqual(500);
       });
     });
-
   });
 });
