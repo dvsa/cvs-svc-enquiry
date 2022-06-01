@@ -119,14 +119,12 @@ router.get(
     } else {
       secretsManager = new SecretsManagerService(new AWS.SecretsManager());
     }
-
+    const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
       .then((result) => {
-        const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
         generateEvlFile(result, fileName);
         uploadToS3(fileName);
-        removeFile(fileName);
         res.status(200);
         res.contentType('json').send();
       })
