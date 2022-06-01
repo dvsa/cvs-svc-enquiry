@@ -15,7 +15,7 @@ import NotFoundError from '../../errors/NotFoundError';
 import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
 import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
-import { generateEvlFile, removeFile } from '../IOService';
+import { generateEvlFile } from '../IOService';
 import { uploadToS3 } from '../s3BucketService';
 
 const app = express();
