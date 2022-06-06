@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { existsSync, readFileSync } from 'fs';
-import { generateEvlFile } from '../../../src/infrastructure/IOService';
+import { existsSync } from 'fs';
+import { generateEvlFile, removeFile } from '../../../src/infrastructure/IOService';
 import EvlFeedData from '../../../src/interfaces/queryResults/evlFeedData';
 
 describe('IO Service', () => {
@@ -12,15 +12,12 @@ describe('IO Service', () => {
         vrm_trm: '123',
       },
     ];
-
-    const expectedFileResult = '123,123,20-Jan-2020';
-
     it('should generate a csv file', () => {
       const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
       generateEvlFile(evlFeedData, fileName);
-      const fileExists = existsSync(fileName);
+      const fileExists = existsSync(`/tmp/${fileName}`);
       expect(fileExists).toBeTruthy();
-      expect(readFileSync(fileName, { encoding: 'utf-8' })).toEqual(expectedFileResult);
+      removeFile(`/tmp/${fileName}`);
     });
   });
 });

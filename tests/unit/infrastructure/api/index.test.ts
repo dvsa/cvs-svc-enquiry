@@ -8,6 +8,8 @@ import ParametersError from '../../../../src/errors/ParametersError';
 import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
 import NotFoundError from '../../../../src/errors/NotFoundError';
 import EvlFeedData from '../../../../src/interfaces/queryResults/evlFeedData';
+import * as upload from '../../../../src/infrastructure/s3BucketService';
+import * as writeFile from '../../../../src/infrastructure/IOService';
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -180,6 +182,8 @@ describe('API', () => {
           vrm_trm: '123',
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(upload, 'uploadToS3').mockImplementation(() => 'happy');
+        jest.spyOn(writeFile, 'generateEvlFile').mockImplementation(() => 'happy');
         jest.spyOn(enquiryService, 'getEvlFeedDetails').mockResolvedValue([evlFeedData]);
         const result = await supertest(app).get('/v1/enquiry/evl');
         expect(result.status).toEqual(200);

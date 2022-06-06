@@ -5,9 +5,9 @@ import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 export function generateEvlFile(data: EvlFeedData[], fileName: string): void {
   console.log('Generating EVL File Data');
   const evlFeedProcessedData: string[] = data.map((entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`);
-
+  const filePath = `/tmp/${fileName}`;
   try {
-    writeFileSync(fileName, evlFeedProcessedData.join('\n'));
+    writeFileSync(filePath, evlFeedProcessedData.join('\n'));
     console.log('Generating EVL File Data Completed');
   } catch (error) {
     if (error instanceof Error) {
