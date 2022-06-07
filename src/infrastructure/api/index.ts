@@ -112,18 +112,11 @@ router.get(
     res,
   ) => {
     let secretsManager: SecretsManagerServiceInterface;
-    let s3: AWS.S3;
     if (process.env.IS_OFFLINE === 'true') {
       secretsManager = new LocalSecretsManagerService();
-      s3 = new AWS.S3({
-        s3ForcePathStyle: true,
-        accessKeyId: "S3RVER", // This specific key is required when working offline
-        secretAccessKey: "S3RVER",
-        endpoint: 'http://localhost:4569'
-      });
+
     } else {
       secretsManager = new SecretsManagerService(new AWS.SecretsManager());
-      s3 = new AWS.S3();
     }
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     DatabaseService.build(secretsManager, mysql)
@@ -131,9 +124,9 @@ router.get(
       .then((result) => {
         console.log('Generating EVL File Data');
         const evlFeedProcessedData: string = result.map(
-          (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`
-          ).join('\n');
-        uploadToS3(evlFeedProcessedData, fileName)
+          (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+        ).join('\n');
+        uploadToS3(evlFeedProcessedData, fileName);
 
         res.status(200);
         res.contentType('json').send();
