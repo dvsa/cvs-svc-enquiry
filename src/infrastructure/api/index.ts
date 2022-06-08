@@ -114,7 +114,6 @@ router.get(
     let secretsManager: SecretsManagerServiceInterface;
     if (process.env.IS_OFFLINE === 'true') {
       secretsManager = new LocalSecretsManagerService();
-
     } else {
       secretsManager = new SecretsManagerService(new AWS.SecretsManager());
     }
@@ -126,10 +125,11 @@ router.get(
         const evlFeedProcessedData: string = result.map(
           (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
         ).join('\n');
-        uploadToS3(evlFeedProcessedData, fileName);
 
-        res.status(200);
-        res.contentType('json').send();
+        uploadToS3(evlFeedProcessedData, fileName, () => {
+          res.status(200);
+          res.contentType('json').send();
+        });
       })
       .catch((e: Error) => {
         if (e instanceof ParametersError) {

@@ -181,7 +181,7 @@ describe('API', () => {
           vrm_trm: '123',
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(upload, 'uploadToS3').mockImplementation(() => 'happy');
+        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
         jest.spyOn(enquiryService, 'getEvlFeedDetails').mockResolvedValue([evlFeedData]);
         const result = await supertest(app).get('/v1/enquiry/evl');
         expect(result.status).toEqual(200);
