@@ -7,6 +7,8 @@ import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService
 import ParametersError from '../../../../src/errors/ParametersError';
 import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
 import NotFoundError from '../../../../src/errors/NotFoundError';
+import EvlFeedData from '../../../../src/interfaces/queryResults/evlFeedData';
+import * as upload from '../../../../src/infrastructure/s3BucketService';
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -168,6 +170,53 @@ describe('API', () => {
         const resultDelete = await supertest(app).delete('/v1/enquiry/testResults?vinNumber=123456789');
 
         expect(resultDelete.status).toEqual(405);
+      });
+    });
+
+    describe('EVL Feed', () => {
+      it('returns the db query result if there are no errors', async () => {
+        const evlFeedData: EvlFeedData = {
+          certificateNumber: '123',
+          testExpiryDate: '2020/01/20',
+          vrm_trm: '123',
+        };
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockResolvedValue([evlFeedData]);
+        const result = await supertest(app).get('/v1/enquiry/evl');
+        expect(result.status).toEqual(200);
+      });
+
+      it('returns the error message if there is an error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/evl');
+
+        expect(result.text).toEqual('Error Generating EVL Feed Data: This is an error');
+      });
+
+      it('sets the status to 400 for a parameters error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/evl');
+
+        expect(result.status).toEqual(400);
+      });
+
+      it('sets the status to 404 for a not found error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/evl');
+
+        expect(result.status).toEqual(404);
+      });
+
+      it('sets the status to 500 for a generic error', async () => {
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/evl');
+
+        expect(result.status).toEqual(500);
       });
     });
   });

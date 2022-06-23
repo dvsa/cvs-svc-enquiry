@@ -83,10 +83,6 @@ For further information about debugging, please refer to the following documenta
 
 - [Debug process section](https://www.serverless.com/plugins/serverless-offline#usage-with-webpack)
 
-## Testing
-
-[json-serverless](https://github.com/pharindoko/json-serverless) has been added to the repository should we wish to mock external services during development and can be used in conjunction with the `test` environment.
-
 ### Unit
 
 Jest is used for unit testing.

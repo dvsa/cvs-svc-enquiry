@@ -1,20 +1,24 @@
 import AWS from 'aws-sdk';
-import express, { Request } from 'express';
+import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
+import moment from 'moment';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
-import { getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
+import { getResultsDetails, getVehicleDetails, getEvlFeedDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
+import EvlEvent from '../../interfaces/EvlEvent';
 import DatabaseService from '../databaseService';
 import SecretsManagerService from '../secretsManagerService';
 import NotFoundError from '../../errors/NotFoundError';
 import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
 import LocalSecretsManagerService from '../localSecretsManagerService';
+import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
+import { uploadToS3 } from '../s3BucketService';
 
 const app = express();
-const router = express.Router();
+const router: Router = express.Router();
 
 const { API_VERSION } = process.env;
 
@@ -97,6 +101,45 @@ router.get(
         }
 
         res.send(e.message);
+      });
+  },
+);
+
+router.get(
+  '/evl',
+  (
+    request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, EvlEvent>,
+    res,
+  ) => {
+    let secretsManager: SecretsManagerServiceInterface;
+    if (process.env.IS_OFFLINE === 'true') {
+      secretsManager = new LocalSecretsManagerService();
+    } else {
+      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    }
+    const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
+    DatabaseService.build(secretsManager, mysql)
+      .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
+      .then((result) => {
+        console.log('Generating EVL File Data');
+        const evlFeedProcessedData: string = result.map(
+          (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+        ).join('\n');
+
+        uploadToS3(evlFeedProcessedData, fileName, () => {
+          res.status(200);
+          res.contentType('json').send();
+        });
+      })
+      .catch((e: Error) => {
+        if (e instanceof ParametersError) {
+          res.status(400);
+        } else if (e instanceof NotFoundError) {
+          res.status(404);
+        } else {
+          res.status(500);
+        }
+        res.send(`Error Generating EVL Feed Data: ${e.message}`);
       });
   },
 );

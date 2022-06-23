@@ -1,6 +1,7 @@
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import * as technicalQueries from './queries/technicalRecord';
 import * as testResultsQueries from './queries/testResults';
+import { EVL_QUERY, EVL_VRM_QUERY } from './queries/evlQuery';
 import DatabaseServiceInterface from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import VehicleEvent from '../interfaces/VehicleEvent';
@@ -13,7 +14,9 @@ import Plate from '../interfaces/queryResults/technical/plate';
 import TestResult from '../interfaces/queryResults/test/testResult';
 import CustomDefect from '../interfaces/queryResults/test/customDefect';
 import TestDefect from '../interfaces/queryResults/test/testDefect';
+import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 import NotFoundError from '../errors/NotFoundError';
+import EvlEvent from '../interfaces/EvlEvent';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -196,6 +199,50 @@ async function getTestResultsByTestId(
   return [result];
 }
 
+function getEvlFeedByVrmDetails(
+  queryResult: [RowDataPacket[], FieldPacket[]],
+): EvlFeedData {
+  const evlFeedQueryResult = queryResult[0][0] as EvlFeedData;
+  if (
+    evlFeedQueryResult === undefined
+  ) {
+    throw new NotFoundError('Test not found');
+  }
+
+  return evlFeedQueryResult;
+}
+
+function getEvlFeedDetails(
+  queryResult: [RowDataPacket[], FieldPacket[]],
+): EvlFeedData[] {
+  const evlFeedQueryResults = queryResult[0] as EvlFeedData[];
+
+  if (evlFeedQueryResults === undefined || evlFeedQueryResults.length === 0) {
+    throw new NotFoundError('No tests found');
+  }
+
+  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => evlFeedQueryResult);
+}
+
+async function getEvlFeedByVrm(
+  databaseService: DatabaseServiceInterface,
+  event: EvlEvent,
+): Promise<EvlFeedData[]> {
+  console.info('Using getEvlFeedByVrm');
+  const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
+  const result = getEvlFeedByVrmDetails(queryResult);
+
+  return [result];
+}
+
+async function getEvlFeed(
+  databaseService: DatabaseServiceInterface,
+): Promise<EvlFeedData[]> {
+  console.info('Using getEvlFeed');
+  const queryResult = await databaseService.get(EVL_QUERY, []);
+  return getEvlFeedDetails(queryResult);
+}
+
 export {
   getVehicleDetailsByVrm,
   getVehicleDetailsByVin,
@@ -203,6 +250,10 @@ export {
   getTestResultsByVrm,
   getTestResultsByVin,
   getTestResultsByTestId,
+  getEvlFeed,
+  getEvlFeedDetails,
+  getEvlFeedByVrm,
+  getEvlFeedByVrmDetails,
 };
 
 interface VehicleQueryResult extends RowDataPacket {
