@@ -132,7 +132,7 @@ router.get(
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
         uploadToS3(evlFeedProcessedData, fileName, () => {
-          logger.debug(`Successfully uploaded ${fileName} to S3`);
+          logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
         });
