@@ -16,6 +16,7 @@ import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerServi
 import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
 import { uploadToS3 } from '../s3BucketService';
+import logger from '../../utils/logger';
 
 const app = express();
 const router: Router = express.Router();
@@ -113,20 +114,25 @@ router.get(
   ) => {
     let secretsManager: SecretsManagerServiceInterface;
     if (process.env.IS_OFFLINE === 'true') {
+      logger.debug('configuring local secret manager');
       secretsManager = new LocalSecretsManagerService();
     } else {
+      logger.debug('configuring aws secret manager');
       secretsManager = new SecretsManagerService(new AWS.SecretsManager());
     }
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
+    logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
       .then((result) => {
-        console.log('Generating EVL File Data');
+        logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result.map(
           (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
         ).join('\n');
+        logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
         uploadToS3(evlFeedProcessedData, fileName, () => {
+          logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
         });
@@ -139,6 +145,7 @@ router.get(
         } else {
           res.status(500);
         }
+        logger.error(`Error occured with message ${e.message}. Stack Trace: ${e.stack}`);
         res.send(`Error Generating EVL Feed Data: ${e.message}`);
       });
   },

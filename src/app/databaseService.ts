@@ -17,6 +17,7 @@ import TestDefect from '../interfaces/queryResults/test/testDefect';
 import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 import NotFoundError from '../errors/NotFoundError';
 import EvlEvent from '../interfaces/EvlEvent';
+import logger from '../utils/logger';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -228,19 +229,23 @@ async function getEvlFeedByVrm(
   databaseService: DatabaseServiceInterface,
   event: EvlEvent,
 ): Promise<EvlFeedData[]> {
-  console.info('Using getEvlFeedByVrm');
+  logger.info('Using getEvlFeedByVrm');
+  logger.debug(`calling database for vrm: ${event.vrm_trm} with query ${EVL_VRM_QUERY}`);
   const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
   const result = getEvlFeedByVrmDetails(queryResult);
-
+  logger.debug(`result from database: ${result.vrm_trm}, ${result.certificateNumber}, ${result.testExpiryDate}`);
   return [result];
 }
 
 async function getEvlFeed(
   databaseService: DatabaseServiceInterface,
 ): Promise<EvlFeedData[]> {
-  console.info('Using getEvlFeed');
+  logger.info('Using getEvlFeed');
+  logger.debug(`calling database with evl query ${EVL_QUERY}`);
   const queryResult = await databaseService.get(EVL_QUERY, []);
-  return getEvlFeedDetails(queryResult);
+  const result = getEvlFeedDetails(queryResult);
+  logger.debug(`result from database: ${result.toString()}`);
+  return result;
 }
 
 export {
