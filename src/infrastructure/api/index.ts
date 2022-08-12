@@ -179,7 +179,6 @@ router.get('/tfl', (_req, res) => {
       const fileName = `VOSA-${moment(Date.now()).format('YYYYMMDD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);
       logger.info('Generating TFL File Data');
-      // TODO: Apply processing around quotes etc ad documentation says to do.
       const processedResult = result.map((entry) => processTFLFeedData(entry));
       const tflFeedProcessedData: string = processedResult
         .map(
