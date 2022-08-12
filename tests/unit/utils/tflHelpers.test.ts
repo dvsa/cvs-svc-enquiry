@@ -45,12 +45,6 @@ describe('tfl helper functions', () => {
       expect(result).toEqual('12345');
     });
 
-    it('takes a date and upcases it', () => {
-      const input = new Date('December 17, 1995 03:24:00');
-      const result = escapeString(input);
-      expect(result).toEqual('SUN DEC 17 1995 03:24:00 GMT+0000 (GREENWICH MEAN TIME)');
-    });
-
     it('takes a string with a comma and adds quote marks', () => {
       const input = 'This,string';
       const result = escapeString(input);
