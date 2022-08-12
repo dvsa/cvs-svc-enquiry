@@ -1,9 +1,9 @@
 import AWS from 'aws-sdk';
 import logger from '../utils/logger';
 
-export function uploadToS3(evlFeedProcessedData: string, fileName: string, callback: () => void) {
+export function uploadToS3(processedData: string, fileName: string, callback: () => void) {
   const s3 = configureS3();
-  const params = { Bucket: process.env.AWS_S3_BUCKET_NAME, Key: fileName, Body: evlFeedProcessedData };
+  const params = { Bucket: process.env.AWS_S3_BUCKET_NAME, Key: fileName, Body: processedData };
 
   logger.info(`uploading ${fileName} to S3`);
   s3.upload(params, (err) => {
