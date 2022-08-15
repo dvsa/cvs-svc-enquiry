@@ -20,6 +20,7 @@ import EvlEvent from '../interfaces/EvlEvent';
 import logger from '../utils/logger';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
+import { FeedName } from '../interfaces/FeedTypes';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -230,23 +231,48 @@ async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event:
   return [result];
 }
 
-async function getEvlFeed(databaseService: DatabaseServiceInterface): Promise<EvlFeedData[]> {
-  logger.info('Using getEvlFeed');
-  logger.debug(`calling database with evl query ${EVL_QUERY}`);
-  const queryResult = await databaseService.get(EVL_QUERY, []);
+function selectQuery(feedName: FeedName) {
+  if (feedName === FeedName.TFL) {
+    return TFL_QUERY;
+  }
+
+  if (feedName === FeedName.EVL) {
+    return EVL_QUERY;
+  }
+
+  throw new Error('Could not select a query, check the feed name given');
+}
+
+async function getFeed(
+  databaseService: DatabaseServiceInterface,
+  feedName: FeedName,
+): Promise<EvlFeedData[] | TflFeedData[]> {
+  logger.info(`Using get${feedName}Feed`);
+  const query = selectQuery(feedName);
+  logger.debug(`calling database with ${feedName} query ${query}`);
+  const queryResult = await databaseService.get(query, []);
   const result = getFeedDetails(queryResult);
   logger.debug(`result from database: ${result.toString()}`);
   return result;
 }
 
-async function getTflFeed(databaseService: DatabaseServiceInterface): Promise<TflFeedData[]> {
-  logger.info('Using getTflFeed');
-  logger.debug(`calling database with tfl query ${TFL_QUERY}`);
-  const queryResult = await databaseService.get(TFL_QUERY, []);
-  const result = getFeedDetails(queryResult);
-  logger.debug(`result from database: ${result.toString()}`);
-  return result;
-}
+// async function getEvlFeed(databaseService: DatabaseServiceInterface): Promise<EvlFeedData[]> {
+//   logger.info('Using getEvlFeed');
+//   logger.debug(`calling database with evl query ${EVL_QUERY}`);
+//   const queryResult = await databaseService.get(EVL_QUERY, []);
+//   const result = getFeedDetails(queryResult);
+//   logger.debug(`result from database: ${result.toString()}`);
+//   return result;
+// }
+
+// async function getTflFeed(databaseService: DatabaseServiceInterface): Promise<TflFeedData[]> {
+//   logger.info('Using getTflFeed');
+//   logger.debug(`calling database with tfl query ${TFL_QUERY}`);
+//   const queryResult = await databaseService.get(TFL_QUERY, []);
+//   const result = getFeedDetails(queryResult);
+//   logger.debug(`result from database: ${result.toString()}`);
+//   return result;
+// }
 
 export {
   getVehicleDetailsByVrm,
@@ -255,10 +281,11 @@ export {
   getTestResultsByVrm,
   getTestResultsByVin,
   getTestResultsByTestId,
-  getEvlFeed,
+  // getEvlFeed,
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
-  getTflFeed,
+  // getTflFeed,
+  getFeed,
 };
 
 interface VehicleQueryResult extends RowDataPacket {

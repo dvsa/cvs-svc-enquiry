@@ -11,6 +11,7 @@ import TestResult from '../interfaces/queryResults/test/testResult';
 import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import tflFeedQueryFunctionFactory from '../app/tflFeedQueryFunctionFactory';
+import { FeedName } from '../interfaces/FeedTypes';
 
 const getVehicleDetails = async (
   event: VehicleEvent,
@@ -39,7 +40,7 @@ const getEvlFeedDetails = async (
   dbService: DatabaseService,
 ): Promise<EvlFeedData[]> => {
   const query = queryFuncFactory(event);
-  return query(dbService, event);
+  return query(dbService, FeedName.EVL, event);
 };
 
 const getTflFeedDetails = async (
@@ -47,7 +48,7 @@ const getTflFeedDetails = async (
   dbService: DatabaseService,
 ): Promise<TflFeedData[]> => {
   const query = queryFuncFactory();
-  return query(dbService);
+  return query(dbService, FeedName.TFL);
 };
 
 export { getVehicleDetails, getResultsDetails, getEvlFeedDetails, getTflFeedDetails };
