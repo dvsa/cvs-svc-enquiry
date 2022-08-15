@@ -181,7 +181,7 @@ router.get('/tfl', (_req, res) => {
       const tflFeedProcessedData: string = processedResult
         .map(
           (entry) =>
-            `${entry.vrm_trm},${entry.vin},${entry.certificateNumber}, ${entry.modificationTypeUsed}, ${entry.testStatus}, ${entry.fuel_emission_id}, ${entry.createdAt}, ${entry.lastUpdatedAt}, ${entry.createdBy_Id}, ${entry.firstUseDate}`,
+            `${entry.vrm_trm},${entry.vin},${entry.certificateNumber},${entry.modificationTypeUsed},${entry.testStatus},${entry.fuel_emission_id},${entry.createdAt},${entry.lastUpdatedAt},${entry.createdBy_Id},${entry.firstUseDate}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
