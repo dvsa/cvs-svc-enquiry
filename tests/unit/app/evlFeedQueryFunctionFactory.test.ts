@@ -2,6 +2,7 @@ import { mocked } from 'ts-jest/utils';
 import queryFunctionFactory from '../../../src/app/evlFeedQueryFunctionFactory';
 import * as dbFunctions from '../../../src/app/databaseService';
 import DatabaseService from '../../../src/infrastructure/databaseService';
+import { FeedName } from '../../../src/interfaces/FeedTypes';
 
 jest.mock('../../../src/app/databaseService');
 jest.mock('../../../src/infrastructure/databaseService');
@@ -15,14 +16,14 @@ describe('Query Function Factory', () => {
 
     const func = queryFunctionFactory({ vrm_trm: '1234' });
 
-    expect(func(dbServiceMock, { vrm_trm: '1234' })).toEqual('Success');
+    expect(func(dbServiceMock, FeedName.EVL, { vrm_trm: '1234' })).toEqual('Success');
   });
 
   it('return the correct function when passed no parameter', () => {
-    dbFunctionsMock.getEvlFeed = jest.fn().mockReturnValue('Success');
+    dbFunctionsMock.getFeed = jest.fn().mockReturnValue('Success');
 
     const func = queryFunctionFactory({});
 
-    expect(func(dbServiceMock, {})).toEqual('Success');
+    expect(func(dbServiceMock, FeedName.EVL, {})).toEqual('Success');
   });
 });

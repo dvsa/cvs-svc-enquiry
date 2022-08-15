@@ -183,14 +183,14 @@ describe('API', () => {
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
-        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockResolvedValue([evlFeedData]);
+        jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([evlFeedData]);
         const result = await supertest(app).get('/v1/enquiry/evl');
         expect(result.status).toEqual(200);
       });
 
       it('returns the error message if there is an error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new Error('This is an error'));
+        jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/v1/enquiry/evl');
 
         expect(result.text).toEqual('Error Generating EVL Feed Data: This is an error');
@@ -198,7 +198,7 @@ describe('API', () => {
 
       it('sets the status to 400 for a parameters error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
+        jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
         const result = await supertest(app).get('/v1/enquiry/evl');
 
         expect(result.status).toEqual(400);
@@ -206,7 +206,7 @@ describe('API', () => {
 
       it('sets the status to 404 for a not found error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
+        jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
         const result = await supertest(app).get('/v1/enquiry/evl');
 
         expect(result.status).toEqual(404);
@@ -214,7 +214,7 @@ describe('API', () => {
 
       it('sets the status to 500 for a generic error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(enquiryService, 'getEvlFeedDetails').mockRejectedValue(new Error('This is an error'));
+        jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
         const result = await supertest(app).get('/v1/enquiry/evl');
 
         expect(result.status).toEqual(500);
@@ -238,14 +238,14 @@ describe('API', () => {
       };
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
-      jest.spyOn(enquiryService, 'getTflFeedDetails').mockResolvedValue([tflFeedData]);
+      jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([tflFeedData]);
       const result = await supertest(app).get('/v1/enquiry/tfl');
       expect(result.status).toEqual(200);
     });
 
     it('returns the error message if there is an error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(enquiryService, 'getTflFeedDetails').mockRejectedValue(new Error('This is an error'));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
       expect(result.text).toEqual('Error Generating TFL Feed Data: This is an error');
@@ -253,7 +253,7 @@ describe('API', () => {
 
     it('sets the status to 400 for a parameters error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(enquiryService, 'getTflFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
       expect(result.status).toEqual(400);
@@ -261,7 +261,7 @@ describe('API', () => {
 
     it('sets the status to 404 for a not found error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(enquiryService, 'getTflFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
       expect(result.status).toEqual(404);
@@ -269,7 +269,7 @@ describe('API', () => {
 
     it('sets the status to 500 for a generic error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(enquiryService, 'getTflFeedDetails').mockRejectedValue(new Error('This is an error'));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
       expect(result.status).toEqual(500);
