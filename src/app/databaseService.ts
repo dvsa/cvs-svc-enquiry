@@ -256,24 +256,6 @@ async function getFeed(
   return result;
 }
 
-// async function getEvlFeed(databaseService: DatabaseServiceInterface): Promise<EvlFeedData[]> {
-//   logger.info('Using getEvlFeed');
-//   logger.debug(`calling database with evl query ${EVL_QUERY}`);
-//   const queryResult = await databaseService.get(EVL_QUERY, []);
-//   const result = getFeedDetails(queryResult);
-//   logger.debug(`result from database: ${result.toString()}`);
-//   return result;
-// }
-
-// async function getTflFeed(databaseService: DatabaseServiceInterface): Promise<TflFeedData[]> {
-//   logger.info('Using getTflFeed');
-//   logger.debug(`calling database with tfl query ${TFL_QUERY}`);
-//   const queryResult = await databaseService.get(TFL_QUERY, []);
-//   const result = getFeedDetails(queryResult);
-//   logger.debug(`result from database: ${result.toString()}`);
-//   return result;
-// }
-
 export {
   getVehicleDetailsByVrm,
   getVehicleDetailsByVin,
@@ -281,10 +263,8 @@ export {
   getTestResultsByVrm,
   getTestResultsByVin,
   getTestResultsByTestId,
-  // getEvlFeed,
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
-  // getTflFeed,
   getFeed,
 };
 
