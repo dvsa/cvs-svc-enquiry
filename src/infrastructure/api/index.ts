@@ -187,7 +187,6 @@ router.get('/tfl', (_req, res) => {
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
-      console.log(tflFeedProcessedData);
       uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
         res.status(200);
