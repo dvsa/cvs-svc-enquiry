@@ -231,24 +231,18 @@ async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event:
   return [result];
 }
 
-function selectQuery(feedName: FeedName) {
-  if (feedName === FeedName.TFL) {
-    return TFL_QUERY;
-  }
-
-  if (feedName === FeedName.EVL) {
-    return EVL_QUERY;
-  }
-
-  throw new Error('Could not select a query, check the feed name given');
-}
+const getQueryMap: { [key in FeedName]: string } = {
+  EVL: EVL_QUERY,
+  TFL: TFL_QUERY,
+};
 
 async function getFeed(
   databaseService: DatabaseServiceInterface,
   feedName: FeedName,
 ): Promise<EvlFeedData[] | TflFeedData[]> {
   logger.info(`Using get${feedName}Feed`);
-  const query = selectQuery(feedName);
+  // eslint-disable-next-line security/detect-object-injection
+  const query = getQueryMap[feedName];
   logger.debug(`calling database with ${feedName} query ${query}`);
   const queryResult = await databaseService.get(query, []);
   const result = getFeedDetails(queryResult);
