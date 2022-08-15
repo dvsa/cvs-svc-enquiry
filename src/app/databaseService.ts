@@ -211,24 +211,14 @@ function getEvlFeedByVrmDetails(queryResult: [RowDataPacket[], FieldPacket[]]): 
   return evlFeedQueryResult;
 }
 
-function getEvlFeedDetails(queryResult: [RowDataPacket[], FieldPacket[]]): EvlFeedData[] {
-  const evlFeedQueryResults = queryResult[0] as EvlFeedData[];
+function getFeedDetails(queryResult: [RowDataPacket[], FieldPacket[]]): EvlFeedData[] | TflFeedData[] {
+  const feedQueryResults = queryResult[0] as (TflFeedData | EvlFeedData)[];
 
-  if (evlFeedQueryResults === undefined || evlFeedQueryResults.length === 0) {
+  if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 
-  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => evlFeedQueryResult);
-}
-
-function getTflFeedDetails(queryResult: [RowDataPacket[], FieldPacket[]]): TflFeedData[] {
-  const tflFeedQueryResults = queryResult[0] as TflFeedData[];
-
-  if (tflFeedQueryResults === undefined || tflFeedQueryResults.length === 0) {
-    throw new NotFoundError('No tests found');
-  }
-
-  return tflFeedQueryResults.map((tflFeedQueryResult: TflFeedData) => tflFeedQueryResult);
+  return feedQueryResults.map((feedQueryResult) => feedQueryResult);
 }
 
 async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event: EvlEvent): Promise<EvlFeedData[]> {
@@ -244,7 +234,7 @@ async function getEvlFeed(databaseService: DatabaseServiceInterface): Promise<Ev
   logger.info('Using getEvlFeed');
   logger.debug(`calling database with evl query ${EVL_QUERY}`);
   const queryResult = await databaseService.get(EVL_QUERY, []);
-  const result = getEvlFeedDetails(queryResult);
+  const result = getFeedDetails(queryResult);
   logger.debug(`result from database: ${result.toString()}`);
   return result;
 }
@@ -253,7 +243,7 @@ async function getTflFeed(databaseService: DatabaseServiceInterface): Promise<Tf
   logger.info('Using getTflFeed');
   logger.debug(`calling database with tfl query ${TFL_QUERY}`);
   const queryResult = await databaseService.get(TFL_QUERY, []);
-  const result = getTflFeedDetails(queryResult);
+  const result = getFeedDetails(queryResult);
   logger.debug(`result from database: ${result.toString()}`);
   return result;
 }
@@ -266,7 +256,6 @@ export {
   getTestResultsByVin,
   getTestResultsByTestId,
   getEvlFeed,
-  getEvlFeedDetails,
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
   getTflFeed,
