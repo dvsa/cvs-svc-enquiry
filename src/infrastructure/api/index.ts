@@ -6,12 +6,7 @@ import mysql from 'mysql2/promise';
 import moment from 'moment';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
-import {
-  getResultsDetails,
-  getVehicleDetails,
-  getEvlFeedDetails,
-  getTflFeedDetails,
-} from '../../domain/enquiryService';
+import { getResultsDetails, getVehicleDetails, getFeedDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
@@ -26,6 +21,9 @@ import { uploadToS3 } from '../s3BucketService';
 import logger from '../../utils/logger';
 import tflFeedQueryFunctionFactory from '../../app/tflFeedQueryFunctionFactory';
 import { processTFLFeedData } from '../../utils/tflHelpers';
+import { FeedName } from '../../interfaces/FeedTypes';
+import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
+import TflFeedData from '../../interfaces/queryResults/tflFeedData';
 
 const app = express();
 const router: Router = express.Router();
@@ -132,8 +130,8 @@ router.get(
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
-      .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
-      .then((result) => {
+      .then((dbService) => getFeedDetails(evlFeedQueryFunctionFactory, FeedName.EVL, dbService, request.query))
+      .then((result: EvlFeedData[]) => {
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
@@ -173,8 +171,8 @@ router.get('/tfl', (_req, res) => {
     secretsManager = new SecretsManagerService(new AWS.SecretsManager());
   }
   DatabaseService.build(secretsManager, mysql)
-    .then((dbService) => getTflFeedDetails(tflFeedQueryFunctionFactory, dbService))
-    .then((result) => {
+    .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
+    .then((result: TflFeedData[]) => {
       const numberOfRows = result.length;
       const fileName = `VOSA-${moment(Date.now()).format('YYYYMMDD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);

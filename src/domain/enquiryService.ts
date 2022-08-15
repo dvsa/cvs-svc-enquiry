@@ -34,21 +34,14 @@ const getResultsDetails = async (
   return query(dbService, event);
 };
 
-const getEvlFeedDetails = async (
-  event: EvlEvent,
-  queryFuncFactory: typeof evlFeedQueryFunctionFactory,
+const getFeedDetails = async (
+  queryFuncFactory: typeof evlFeedQueryFunctionFactory | typeof tflFeedQueryFunctionFactory,
+  feedName: FeedName,
   dbService: DatabaseService,
-): Promise<EvlFeedData[]> => {
+  event: EvlEvent = null,
+): Promise<EvlFeedData[] | TflFeedData[]> => {
   const query = queryFuncFactory(event);
-  return query(dbService, FeedName.EVL, event);
+  return query(dbService, feedName, event);
 };
 
-const getTflFeedDetails = async (
-  queryFuncFactory: typeof tflFeedQueryFunctionFactory,
-  dbService: DatabaseService,
-): Promise<TflFeedData[]> => {
-  const query = queryFuncFactory();
-  return query(dbService, FeedName.TFL);
-};
-
-export { getVehicleDetails, getResultsDetails, getEvlFeedDetails, getTflFeedDetails };
+export { getVehicleDetails, getResultsDetails, getFeedDetails };
