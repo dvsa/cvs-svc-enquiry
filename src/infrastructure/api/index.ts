@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import AWS from 'aws-sdk';
 import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
 import moment from 'moment';
 import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
 import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
-import { getResultsDetails, getVehicleDetails, getEvlFeedDetails } from '../../domain/enquiryService';
+import { getResultsDetails, getVehicleDetails, getFeedDetails } from '../../domain/enquiryService';
 import ParametersError from '../../errors/ParametersError';
 import ResultsEvent from '../../interfaces/ResultsEvent';
 import VehicleEvent from '../../interfaces/VehicleEvent';
@@ -17,6 +19,11 @@ import LocalSecretsManagerService from '../localSecretsManagerService';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
 import { uploadToS3 } from '../s3BucketService';
 import logger from '../../utils/logger';
+import tflFeedQueryFunctionFactory from '../../app/tflFeedQueryFunctionFactory';
+import { processTFLFeedData } from '../../utils/tflHelpers';
+import { FeedName } from '../../interfaces/FeedTypes';
+import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
+import TflFeedData from '../../interfaces/queryResults/tflFeedData';
 
 const app = express();
 const router: Router = express.Router();
@@ -123,12 +130,15 @@ router.get(
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
-      .then((dbService) => getEvlFeedDetails(request.query, evlFeedQueryFunctionFactory, dbService))
-      .then((result) => {
+      .then((dbService) => getFeedDetails(evlFeedQueryFunctionFactory, FeedName.EVL, dbService, request.query))
+      .then((result: EvlFeedData[]) => {
         logger.info('Generating EVL File Data');
-        const evlFeedProcessedData: string = result.map(
-          (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
-        ).join('\n');
+        const evlFeedProcessedData: string = result
+          .map(
+            (entry) =>
+              `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+          )
+          .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
         uploadToS3(evlFeedProcessedData, fileName, () => {
@@ -150,6 +160,49 @@ router.get(
       });
   },
 );
+
+router.get('/tfl', (_req, res) => {
+  let secretsManager: SecretsManagerServiceInterface;
+  if (process.env.IS_OFFLINE === 'true') {
+    logger.debug('configuring local secret manager');
+    secretsManager = new LocalSecretsManagerService();
+  } else {
+    logger.debug('configuring aws secret manager');
+    secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+  }
+  DatabaseService.build(secretsManager, mysql)
+    .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
+    .then((result: TflFeedData[]) => {
+      const numberOfRows = result.length;
+      const fileName = `VOSA-${moment(Date.now()).format('YYYYMMDD')}-G1-${numberOfRows}-01-01.csv`;
+      logger.debug(`creating file for TFL feed called: ${fileName}`);
+      logger.info('Generating TFL File Data');
+      const processedResult = result.map((entry) => processTFLFeedData(entry));
+      const tflFeedProcessedData: string = processedResult
+        .map(
+          (entry) =>
+            `${entry.vrm_trm},${entry.vin},${entry.certificateNumber},${entry.modificationTypeUsed},${entry.testStatus},${entry.fuel_emission_id},${entry.createdAt},${entry.lastUpdatedAt},${entry.createdBy_Id},${entry.firstUseDate}`,
+        )
+        .join('\n');
+      logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
+      uploadToS3(tflFeedProcessedData, fileName, () => {
+        logger.info(`Successfully uploaded ${fileName} to S3`);
+        res.status(200);
+        res.contentType('json').send();
+      });
+    })
+    .catch((e: Error) => {
+      if (e instanceof ParametersError) {
+        res.status(400);
+      } else if (e instanceof NotFoundError) {
+        res.status(404);
+      } else {
+        res.status(500);
+      }
+      logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
+      res.send(`Error Generating TFL Feed Data: ${e.message}`);
+    });
+});
 
 router.all(/testResults|vehicle/, (_request, res) => {
   res.status(405).send();

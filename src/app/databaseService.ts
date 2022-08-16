@@ -18,6 +18,9 @@ import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 import NotFoundError from '../errors/NotFoundError';
 import EvlEvent from '../interfaces/EvlEvent';
 import logger from '../utils/logger';
+import TflFeedData from '../interfaces/queryResults/tflFeedData';
+import { TFL_QUERY } from './queries/tflQuery';
+import { FeedName } from '../interfaces/FeedTypes';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -55,9 +58,9 @@ async function getVehicleDetails(
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined
-    || vehicleDetailsResult.id === undefined
-    || vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined ||
+    vehicleDetailsResult.id === undefined ||
+    vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -136,9 +139,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined
-    || testResultQueryResult.id === undefined
-    || testResultQueryResult.result === undefined
+    testResultQueryResult === undefined ||
+    testResultQueryResult.id === undefined ||
+    testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -200,35 +203,26 @@ async function getTestResultsByTestId(
   return [result];
 }
 
-function getEvlFeedByVrmDetails(
-  queryResult: [RowDataPacket[], FieldPacket[]],
-): EvlFeedData {
+function getEvlFeedByVrmDetails(queryResult: [RowDataPacket[], FieldPacket[]]): EvlFeedData {
   const evlFeedQueryResult = queryResult[0][0] as EvlFeedData;
-  if (
-    evlFeedQueryResult === undefined
-  ) {
+  if (evlFeedQueryResult === undefined) {
     throw new NotFoundError('Test not found');
   }
 
   return evlFeedQueryResult;
 }
 
-function getEvlFeedDetails(
-  queryResult: [RowDataPacket[], FieldPacket[]],
-): EvlFeedData[] {
-  const evlFeedQueryResults = queryResult[0] as EvlFeedData[];
+function getFeedDetails(queryResult: [RowDataPacket[], FieldPacket[]]): EvlFeedData[] | TflFeedData[] {
+  const feedQueryResults = queryResult[0] as (TflFeedData | EvlFeedData)[];
 
-  if (evlFeedQueryResults === undefined || evlFeedQueryResults.length === 0) {
+  if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 
-  return evlFeedQueryResults.map((evlFeedQueryResult: EvlFeedData) => evlFeedQueryResult);
+  return feedQueryResults.map((feedQueryResult) => feedQueryResult);
 }
 
-async function getEvlFeedByVrm(
-  databaseService: DatabaseServiceInterface,
-  event: EvlEvent,
-): Promise<EvlFeedData[]> {
+async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event: EvlEvent): Promise<EvlFeedData[]> {
   logger.info('Using getEvlFeedByVrm');
   logger.debug(`calling database for vrm: ${event.vrm_trm} with query ${EVL_VRM_QUERY}`);
   const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
@@ -237,13 +231,21 @@ async function getEvlFeedByVrm(
   return [result];
 }
 
-async function getEvlFeed(
+const getQueryMap: { [key in FeedName]: string } = {
+  EVL: EVL_QUERY,
+  TFL: TFL_QUERY,
+};
+
+async function getFeed(
   databaseService: DatabaseServiceInterface,
-): Promise<EvlFeedData[]> {
-  logger.info('Using getEvlFeed');
-  logger.debug(`calling database with evl query ${EVL_QUERY}`);
-  const queryResult = await databaseService.get(EVL_QUERY, []);
-  const result = getEvlFeedDetails(queryResult);
+  feedName: FeedName,
+): Promise<EvlFeedData[] | TflFeedData[]> {
+  logger.info(`Using get${feedName}Feed`);
+  // eslint-disable-next-line security/detect-object-injection
+  const query = getQueryMap[feedName];
+  logger.debug(`calling database with ${feedName} query ${query}`);
+  const queryResult = await databaseService.get(query, []);
+  const result = getFeedDetails(queryResult);
   logger.debug(`result from database: ${result.toString()}`);
   return result;
 }
@@ -255,10 +257,9 @@ export {
   getTestResultsByVrm,
   getTestResultsByVin,
   getTestResultsByTestId,
-  getEvlFeed,
-  getEvlFeedDetails,
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
+  getFeed,
 };
 
 interface VehicleQueryResult extends RowDataPacket {
