@@ -174,7 +174,7 @@ router.get('/tfl', (_req, res) => {
     .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
     .then((result: TflFeedData[]) => {
       const numberOfRows = result.length;
-      const fileName = `VOSA-${moment(Date.now()).format('YYYYMMDD')}-G1-${numberOfRows}-01-01.csv`;
+      const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);
       logger.info('Generating TFL File Data');
       const processedResult = result.map((entry) => processTFLFeedData(entry));
