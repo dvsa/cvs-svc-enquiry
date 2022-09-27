@@ -23,7 +23,7 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByVrm(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_VRM_QUERY);
+      expect(mockDbService.get).toBeCalledWith(technicalQueries.VEHICLE_DETAILS_VRM_QUERY, expect.arrayContaining([event.VehicleRegMark]));
     });
 
     it('passes the expected SQL query to the infrastructure DB service for get by VIN', async () => {
@@ -37,7 +37,7 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByVin(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_VIN_QUERY);
+      expect(mockDbService.get).toBeCalledWith(technicalQueries.VEHICLE_DETAILS_VIN_QUERY, expect.arrayContaining([event.vinNumber]));
     });
 
     it('passes the expected SQL query to the infrastructure DB service for get by trailer ID', async () => {
@@ -51,7 +51,7 @@ describe('Database Service', () => {
 
       await getVehicleDetailsByTrailerId(mockDbService, event);
 
-      expect(mockDbService.get.mock.calls[0][0]).toEqual(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY);
+      expect(mockDbService.get).toBeCalledWith(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY, expect.arrayContaining([event.trailerId]));
     });
 
     it('throws if there is no result from getting the vehicle', async () => {

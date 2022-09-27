@@ -102,7 +102,7 @@ async function getVehicleDetailsByTrailerId(
 ): Promise<VehicleDetails> {
   console.info('Using get by Trailer ID');
   const vehicleDetailsQueryResult = await databaseService.get(technicalQueries.VEHICLE_DETAILS_TRAILER_ID_QUERY, [
-    event.vinNumber,
+    event.trailerId,
   ]);
   return getVehicleDetails(vehicleDetailsQueryResult, databaseService);
 }
