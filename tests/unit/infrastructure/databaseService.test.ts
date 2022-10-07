@@ -1,4 +1,4 @@
-import mysqlp from 'mysql2/promise';
+import mysqlp, { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import DatabaseService from '../../../src/infrastructure/databaseService';
 
 describe('Database Service', () => {
@@ -24,14 +24,14 @@ describe('Database Service', () => {
   });
 
   it('should throw an error when the query fails', async () => {
-    const mockConnection = ({ execute: jest.fn().mockRejectedValue(new Error()) } as unknown) as mysqlp.Connection;
+    const mockConnection = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;
     const dbService = new DatabaseService(mockConnection);
 
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrow(Error);
   });
 
   it('adds the expected prefix to the error', async () => {
-    const mockConnection = ({ execute: jest.fn().mockRejectedValue(new Error()) } as unknown) as mysqlp.Connection;
+    const mockConnection = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;;
     const dbService = new DatabaseService(mockConnection);
 
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrowError('Database error: ');
@@ -42,7 +42,7 @@ describe('Database Service', () => {
       getSecret: jest.fn().mockResolvedValueOnce(JSON.stringify(connectionDetails)).mockResolvedValue('dbName'),
     };
     const mockMysql = ({
-      createConnection: jest.fn().mockResolvedValue({ execute: jest.fn() }),
+      createPool: jest.fn().mockResolvedValue({ execute: jest.fn() }),
     } as unknown) as typeof mysqlp;
 
     await DatabaseService.build(mockSecretsManager, mockMysql);
@@ -51,7 +51,7 @@ describe('Database Service', () => {
   });
 
   it('returns the response from executing the DB query', async () => {
-    const mockConnection = ({ execute: jest.fn().mockReturnValue('Success') } as unknown) as mysqlp.Connection;
+    const mockConnection = jest.fn().mockReturnValue('Success') as (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;
     const dbService = new DatabaseService(mockConnection);
     const response = await dbService.get('sdfsdf', ['']);
 
