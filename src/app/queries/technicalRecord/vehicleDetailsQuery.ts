@@ -3,7 +3,7 @@ const baseQuery = 'SELECT `v`.`id`, JSON_OBJECT('
   + "'vin', `v`.`vin`, "
   + "'vrm_trm', `v`.`vrm_trm`, "
   + "'trailer_id',`v`.`trailer_id`, "
-  + "'createdAt', `v`.`createdAt`"
+  + "'createdAt', DATE_FORMAT(`v`.`createdAt`, '%Y-%m-%d %H:%i:%s') "
   + ') result'
   + ' FROM `vehicle` `v`';
 

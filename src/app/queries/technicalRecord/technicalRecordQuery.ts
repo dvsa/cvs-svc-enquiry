@@ -1,7 +1,7 @@
 const TECHNICAL_RECORD_QUERY = 'SELECT `t`.`id`, JSON_OBJECT('
   + "'recordCompleteness', `t`.`recordCompleteness`, "
-  + "'createdAt', `t`.`createdAt`, "
-  + "'lastUpdatedAt', `t`.`lastUpdatedAt`, "
+  + "'createdAt', DATE_FORMAT(`t`.`createdAt`, '%Y-%m-%d %H:%i:%s'), "
+  + "'lastUpdatedAt', DATE_FORMAT(`t`.`lastUpdatedAt`, '%Y-%m-%d %H:%i:%s'), "
   + "'makeModel', JSON_OBJECT("
   + "'make', `mm`.`make`, "
   + "'model', `mm`.`model`, "
