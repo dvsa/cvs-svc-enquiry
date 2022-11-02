@@ -135,8 +135,7 @@ router.get(
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
-            (entry) =>
-              `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+            (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
           )
           .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
@@ -180,8 +179,7 @@ router.get('/tfl', (_req, res) => {
       const processedResult = result.map((entry) => processTFLFeedData(entry));
       const tflFeedProcessedData: string = processedResult
         .map(
-          (entry) =>
-            `${entry.vrm_trm},${entry.vin},${entry.certificateNumber},${entry.modificationTypeUsed},${entry.testStatus},${entry.fuel_emission_id},${entry.createdAt},${entry.lastUpdatedAt},${entry.createdBy_Id},${entry.firstUseDate}`,
+          (entry) => `${entry.vrm_trm},${entry.vin},${entry.certificateNumber},${entry.modificationTypeUsed},${entry.testStatus},${entry.fuel_emission_id},${entry.createdAt},${entry.lastUpdatedAt},${entry.createdBy_Id},${entry.firstUseDate}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
