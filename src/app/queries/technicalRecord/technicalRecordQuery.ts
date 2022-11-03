@@ -2,7 +2,7 @@ import { dateFormat } from '../../../constants';
 
 const TECHNICAL_RECORD_QUERY = 'SELECT t.id, JSON_OBJECT('
   + "'recordCompleteness', t.recordCompleteness, "
-  + `'createdAjt', DATE_FORMAT(t.createdAt, '${dateFormat}'), `
+  + `'createdAt', DATE_FORMAT(t.createdAt, '${dateFormat}'), `
   + `'lastUpdatedAt', DATE_FORMAT(t.lastUpdatedAt, '${dateFormat}'), `
   + "'makeModel', JSON_OBJECT("
   + "'make', mm.make, "
