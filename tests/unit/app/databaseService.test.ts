@@ -21,9 +21,7 @@ describe('Database Service', () => {
 
       const event = { VehicleRegMark: 'aa11AAA' };
 
-      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow(
-        'Vehicle was not found',
-      );
+      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow('Vehicle was not found');
     });
 
     it('throws an error if no vehicle found, no id', async () => {
@@ -35,9 +33,7 @@ describe('Database Service', () => {
 
       const event = { VehicleRegMark: 'aa11AAA' };
 
-      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow(
-        'Vehicle was not found',
-      );
+      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow('Vehicle was not found');
     });
 
     it('throws an error if no vehicle found, no result', async () => {
@@ -49,9 +45,7 @@ describe('Database Service', () => {
 
       const event = { VehicleRegMark: 'aa11AAA' };
 
-      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow(
-        'Vehicle was not found',
-      );
+      await expect(getVehicleDetailsByVrm(mockDbService, event)).rejects.toThrow('Vehicle was not found');
     });
 
     it('passes the expected SQL query to the infrastructure DB service for get by VRM', async () => {
