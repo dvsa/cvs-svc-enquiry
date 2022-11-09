@@ -31,7 +31,7 @@ describe('Database Service', () => {
   });
 
   it('adds the expected prefix to the error', async () => {
-    const mockConnection = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;;
+    const mockConnection = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;
     const dbService = new DatabaseService(mockConnection);
 
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrowError('Database error: ');

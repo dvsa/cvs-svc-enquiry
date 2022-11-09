@@ -3,9 +3,9 @@ import SecretsManagerServiceInterface from '../interfaces/SecretsManagerService'
 import DatabaseServiceInterface from '../interfaces/DatabaseService';
 
 export default class DatabaseService implements DatabaseServiceInterface {
-  getDb: (query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>;
+  getDb: (query: string, params: string[] | undefined) => Promise<[RowDataPacket[], FieldPacket[]]>;
 
-  constructor(getDb:(query:string, params:string[] | undefined)=>Promise<[RowDataPacket[], FieldPacket[]]>) {
+  constructor(getDb: (query: string, params: string[] | undefined) => Promise<[RowDataPacket[], FieldPacket[]]>) {
     this.getDb = getDb;
   }
 
@@ -25,8 +25,7 @@ export default class DatabaseService implements DatabaseServiceInterface {
     }
   }
 
-  static pool:mysqlp.Pool = undefined;
-
+  static pool: mysqlp.Pool = undefined;
 
   public static async build(
     secretsManager: SecretsManagerServiceInterface,
@@ -34,10 +33,9 @@ export default class DatabaseService implements DatabaseServiceInterface {
   ): Promise<DatabaseServiceInterface> {
     const dbConnectionDetailsString = await secretsManager.getSecret(process.env.SECRET);
     const dbConnectionDetails = JSON.parse(dbConnectionDetailsString) as StoredConnectionDetails;
-    if(this.pool === undefined)
-    {
+    if (this.pool === undefined) {
       this.pool = mysql.createPool(<mysqlp.PoolOptions>{
-        connectionLimit:50,
+        connectionLimit: 50,
         user: dbConnectionDetails.username,
         password: dbConnectionDetails.password,
         host: dbConnectionDetails.host,
@@ -46,6 +44,7 @@ export default class DatabaseService implements DatabaseServiceInterface {
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     return new DatabaseService(this.pool.query);
   }
 }
