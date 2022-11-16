@@ -8,12 +8,12 @@ export function escapeString(str: any): string {
   let newStr = String(str).toUpperCase();
 
   if (newStr.includes('"')) {
-    newStr = '"' + newStr.replace(/"/g, '""') + '"';
+    newStr = `"${newStr.replace(/"/g, '""')}"`;
     return newStr;
   }
 
   if (newStr.includes(',')) {
-    newStr = '"' + newStr + '"';
+    newStr = `"${newStr}"`;
     return newStr;
   }
 

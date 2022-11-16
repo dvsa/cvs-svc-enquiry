@@ -12,18 +12,14 @@ describe('logger functions', () => {
     const consoleSpy = jest.spyOn(console._stdout, 'write');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     logger.info('I am an info message!');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      `info: I am an info message!${EOL}`,
-    );
+    expect(consoleSpy).toHaveBeenCalledWith(`info: I am an info message!${EOL}`);
   });
 
   it('GIVEN a logger WHEN a debug is logged THEN the console message is correct.', () => {
     // @ts-ignore
     const consoleSpy = jest.spyOn(console._stdout, 'write');
     logger.debug('I am a debug message!');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      `debug: I am a debug message!${EOL}`,
-    );
+    expect(consoleSpy).toHaveBeenCalledWith(`debug: I am a debug message!${EOL}`);
   });
 
   it('GIVEN a logger WHEN an error is logged THEN the console message is correct.', () => {
