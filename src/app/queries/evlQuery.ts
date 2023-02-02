@@ -4,7 +4,7 @@ FROM (
     SELECT testExpiryDate, vrm_trm, certificateNumber, IF(@prev <> vrm_trm, @rn:=0,@rn) AS row_number_over_partition, @prev:=vrm_trm, @rn:=@rn+1 AS rn
     FROM evl_view
 ) as SubQ
-WHERE row_number_over_partition = 0
+WHERE row_number_over_partition = 0;
 `
 
 const EVL_VRM_QUERY = `${EVL_QUERY} WHERE vrm_trm = ?;`;
