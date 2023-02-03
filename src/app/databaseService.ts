@@ -184,6 +184,16 @@ async function getTestResultsByVin(
   return getTestResultsDetails(queryResult, databaseService);
 }
 
+async function getTestResultsByTrailerId(
+  databaseService: DatabaseServiceInterface,
+  event: ResultsEvent,
+): Promise<TestResult[]> {
+  console.info('Using get by TrailerId');
+  const queryResult = await databaseService.get(testResultsQueries.TEST_RESULTS_BY_TRAILER_ID, [event.trailerId]);
+
+  return getTestResultsDetails(queryResult, databaseService);
+}
+
 async function getTestResultsByTestId(
   databaseService: DatabaseServiceInterface,
   event: ResultsEvent,
@@ -248,6 +258,7 @@ export {
   getVehicleDetailsByTrailerId,
   getTestResultsByVrm,
   getTestResultsByVin,
+  getTestResultsByTrailerId,
   getTestResultsByTestId,
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
