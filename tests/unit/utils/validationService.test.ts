@@ -56,6 +56,10 @@ describe('Validation Service', () => {
       expect(() => validateResultsEvent({ VehicleRegMark: '' })).toThrow();
     });
 
+    it('throws an error if the trailer_id parameter is empty', () => {
+      expect(() => validateResultsEvent({ trailerId: '' })).toThrow();
+    });
+
     it('throws an error if the test_id parameter is empty', () => {
       expect(() => validateResultsEvent({ testnumber: '' })).toThrow();
     });
@@ -72,12 +76,32 @@ describe('Validation Service', () => {
       );
     });
 
+    it('throws an error if there are too many identifiers (VRM and trailer id)', () => {
+      expect(() => validateResultsEvent({ VehicleRegMark: 'GL10RFE', trailerId: '2345678' })).toThrow(
+        ParametersError,
+      );
+    });
+
+    it('throws an error if there are too many identifiers (trailerId and VIN)', () => {
+      expect(() => validateResultsEvent({ trailerId: '2345678', vinNumber: '123534567' })).toThrow(ParametersError);
+    });
+
     it('throws an error if there are too many identifiers (test number and VIN)', () => {
       expect(() => validateResultsEvent({ testnumber: '123456789', vinNumber: '123534567' })).toThrow(ParametersError);
     });
 
-    it('throws an error if there are too many identifiers (all)', () => {
+    it('throws an error if there are too many identifiers (test number and trailerId)', () => {
+      expect(() => validateResultsEvent({ testnumber: '123456789', trailerId: '2345678' })).toThrow(ParametersError);
+    });
+
+    it('throws an error if there are too many identifiers (3 out of 4)', () => {
       expect(() => validateResultsEvent({ VehicleRegMark: 'GL10RFE', vinNumber: '123534567', testnumber: '123456789' })).toThrow(ParametersError);
+    });
+
+    it('throws an error if there are too many identifiers (all)', () => {
+      expect(() => validateResultsEvent({
+        VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '2345678', testnumber: '123456789',
+      })).toThrow(ParametersError);
     });
 
     it('rejects a invalid identifier', () => {
