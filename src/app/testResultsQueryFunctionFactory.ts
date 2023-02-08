@@ -1,6 +1,8 @@
 import DatabaseService from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
-import { getTestResultsByVrm, getTestResultsByVin, getTestResultsByTestId } from './databaseService';
+import {
+  getTestResultsByVrm, getTestResultsByVin, getTestResultsByTrailerId, getTestResultsByTestId,
+} from './databaseService';
 import TestResult from '../interfaces/queryResults/test/testResult';
 
 export default (
@@ -16,6 +18,11 @@ export default (
     console.info('Using getTestResultsByVrm');
 
     return getTestResultsByVrm;
+  }
+  if (event.trailerId) {
+    console.info('Using getTestResultsByTrailerId');
+
+    return getTestResultsByTrailerId;
   }
 
   console.info('Using getTestResultsByTestId');

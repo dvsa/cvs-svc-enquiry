@@ -44,6 +44,17 @@ describe('Enquiry Service', () => {
       expect(databaseService.getTestResultsByVin).toHaveBeenCalled();
     });
 
+    it('uses the TrailerId query if only a Trailer ID is passed', async () => {
+      const event = { trailerId: '5678' };
+      const rowDataPacket = { result: 'Success' } as TestResult;
+      jest.spyOn(databaseService, 'getTestResultsByTrailerId').mockResolvedValue([rowDataPacket]);
+      const mockDbService = {} as DatabaseService;
+
+      await getResultsDetails(event, testQueryFunctionFactory, mockDbService);
+
+      expect(databaseService.getTestResultsByTrailerId).toHaveBeenCalled();
+    });
+
     it('uses the vehicle and test query if a vehicle Id and a test id are passed', async () => {
       const event = { testnumber: '123165446' };
       const rowDataPacket = { result: 'Success' } as RowDataPacket;
