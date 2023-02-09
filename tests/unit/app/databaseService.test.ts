@@ -9,6 +9,7 @@ import {
 } from '../../../src/app/databaseService';
 import * as technicalQueries from '../../../src/app/queries/technicalRecord';
 import * as testQueries from '../../../src/app/queries/testResults';
+import { QueryOutput } from '../../../src/interfaces/DatabaseService';
 
 describe('Database Service', () => {
   describe('Get vehicle details', () => {
@@ -51,7 +52,7 @@ describe('Database Service', () => {
     it('passes the expected SQL query to the infrastructure DB service for get by VRM', async () => {
       const mockDbService = {
         get: jest
-          .fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .fn<Promise<QueryOutput>, [query: string, params: string[]]>()
           .mockResolvedValue([[{ id: '1', result: {} } as RowDataPacket], []]),
       };
 
