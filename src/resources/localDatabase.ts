@@ -3,7 +3,7 @@ import { spawnSync } from 'child_process';
 const port = 3306;
 const databaseName = 'CVSBNOP';
 const containerName = 'mysql-test-jenkins';
-const rootPassword = 'password';
+const rootPassword = '12345';
 const rootUsername = 'root';
 
 function runCommand(command: string, options: string[]): string {

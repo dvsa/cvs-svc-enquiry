@@ -1,6 +1,5 @@
 import mysqlp from 'mysql2/promise';
 import DatabaseService from '../../../src/infrastructure/databaseService';
-import { QueryOutput } from '../../../src/interfaces/DatabaseService';
 
 describe('Database Service', () => {
   const connectionDetails = {
@@ -25,15 +24,15 @@ describe('Database Service', () => {
   });
 
   it('should throw an error when the query fails', async () => {
-    const mockQuery = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<QueryOutput>;
-    const dbService = new DatabaseService(<mysqlp.Pool><unknown>{ query: mockQuery });
+    const mockConnection = ({ execute: jest.fn().mockRejectedValue(new Error()) } as unknown) as mysqlp.Connection;
+    const dbService = new DatabaseService(mockConnection);
 
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrow(Error);
   });
 
   it('adds the expected prefix to the error', async () => {
-    const mockQuery = jest.fn().mockRejectedValue(new Error()) as (query:string, params:string[] | undefined)=>Promise<QueryOutput>;
-    const dbService = new DatabaseService(<mysqlp.Pool><unknown>{ query: mockQuery });
+    const mockConnection = ({ execute: jest.fn().mockRejectedValue(new Error()) } as unknown) as mysqlp.Connection;
+    const dbService = new DatabaseService(mockConnection);
 
     await expect(dbService.get('sdfsdf', [''])).rejects.toThrowError('Database error: ');
   });
@@ -43,7 +42,7 @@ describe('Database Service', () => {
       getSecret: jest.fn().mockResolvedValueOnce(JSON.stringify(connectionDetails)).mockResolvedValue('dbName'),
     };
     const mockMysql = ({
-      createPool: jest.fn().mockResolvedValue({ execute: jest.fn() }),
+      createConnection: jest.fn().mockResolvedValue({ execute: jest.fn() }),
     } as unknown) as typeof mysqlp;
 
     await DatabaseService.build(mockSecretsManager, mockMysql);
@@ -52,8 +51,8 @@ describe('Database Service', () => {
   });
 
   it('returns the response from executing the DB query', async () => {
-    const mockQuery = jest.fn().mockReturnValue('Success') as (query:string, params:string[] | undefined)=>Promise<QueryOutput>;
-    const dbService = new DatabaseService(<mysqlp.Pool><unknown>{ query: mockQuery });
+    const mockConnection = ({ execute: jest.fn().mockReturnValue('Success') } as unknown) as mysqlp.Connection;
+    const dbService = new DatabaseService(mockConnection);
     const response = await dbService.get('sdfsdf', ['']);
 
     expect(response).toEqual('Success');
