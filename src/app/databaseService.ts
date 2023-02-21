@@ -55,9 +55,9 @@ async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databas
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined ||
-    vehicleDetailsResult.id === undefined ||
-    vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined
+    || vehicleDetailsResult.id === undefined
+    || vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -136,9 +136,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined ||
-    testResultQueryResult.id === undefined ||
-    testResultQueryResult.result === undefined
+    testResultQueryResult === undefined
+    || testResultQueryResult.id === undefined
+    || testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -220,13 +220,12 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 }
 
 function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
-  const feedQueryResults =
-    feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
+  const feedQueryResults: EvlFeedData[] | TflFeedData[] = feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 
-  return feedQueryResults.map((feedQueryResult) => feedQueryResult);
+  return feedQueryResults;
 }
 
 async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event: EvlEvent): Promise<EvlFeedData[]> {
