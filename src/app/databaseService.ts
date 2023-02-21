@@ -220,8 +220,8 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 }
 
 function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
-  logger.debug(`Inside the getFeedDetails: ${JSON.stringify(queryResult)}`);
   const feedQueryResults = queryResult[feedName === FeedName.EVL ? 1 : 0] as (TflFeedData | EvlFeedData)[];
+  logger.debug(`Inside the getFeedDetails: ${JSON.stringify(feedQueryResults)}`);
 
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
