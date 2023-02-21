@@ -34,7 +34,7 @@ async function getTechnicalRecordDetails(
     databaseService.get(technicalQueries.PLATING_QUERY, [technicalRecordQueryResult.id]),
   ]);
 
-  technicalRecord.psvBrakes = brakes.map((brake:BrakeQueryResult) => brake.result);
+  technicalRecord.psvBrakes = brakes.map((brake: BrakeQueryResult) => brake.result);
   technicalRecord.axles = axles.map((axle: AxlesQueryResult) => axle.result);
   technicalRecord.axlespacing = axleSpacing.map((axlespacing: AxleSpacingQueryResult) => axlespacing.result);
   technicalRecord.plates = plating.map((plate: PlatesQueryResult) => plate.result);
@@ -45,22 +45,19 @@ async function getTechnicalRecordDetails(
 async function getTechnicalRecords(vehicleId, databaseService: DatabaseServiceInterface): Promise<TechnicalRecord[]> {
   const [results] = await databaseService.get(technicalQueries.TECHNICAL_RECORD_QUERY, [vehicleId]);
   const technicalRecords = Promise.all(
-    results.map((result:TechnicalRecordQueryResult) => getTechnicalRecordDetails(result, databaseService)),
+    results.map((result: TechnicalRecordQueryResult) => getTechnicalRecordDetails(result, databaseService)),
   );
 
   return technicalRecords;
 }
 
-async function getVehicleDetails(
-  vehicleDetailsQueryResult: QueryOutput,
-  databaseService: DatabaseServiceInterface,
-) {
+async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databaseService: DatabaseServiceInterface) {
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined
-    || vehicleDetailsResult.id === undefined
-    || vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined ||
+    vehicleDetailsResult.id === undefined ||
+    vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -139,9 +136,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined
-    || testResultQueryResult.id === undefined
-    || testResultQueryResult.result === undefined
+    testResultQueryResult === undefined ||
+    testResultQueryResult.id === undefined ||
+    testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -236,6 +233,7 @@ async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event:
   logger.info('Using getEvlFeedByVrm');
   logger.debug(`calling database for vrm: ${event.vrm_trm} with query ${EVL_VRM_QUERY}`);
   const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
+  logger.debug(JSON.stringify(queryResult));
   const result = getEvlFeedByVrmDetails(queryResult);
   logger.debug(`result from database: ${result.vrm_trm}, ${result.certificateNumber}, ${result.testExpiryDate}`);
   return [result];
