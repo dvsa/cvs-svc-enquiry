@@ -3,7 +3,7 @@ import SecretsManagerServiceInterface from '../interfaces/SecretsManagerService'
 import DatabaseServiceInterface from '../interfaces/DatabaseService';
 
 export default class DatabaseService implements DatabaseServiceInterface {
-  public constructor(pool:mysqlp.Pool) {
+  public constructor(pool: mysqlp.Pool) {
     this.pool = pool;
   }
 
@@ -22,9 +22,9 @@ export default class DatabaseService implements DatabaseServiceInterface {
     }
   }
 
-  pool:mysqlp.Pool;
+  pool: mysqlp.Pool;
 
-  static pool:mysqlp.Pool = undefined;
+  static pool: mysqlp.Pool = undefined;
 
   public static async build(
     secretsManager: SecretsManagerServiceInterface,
@@ -40,6 +40,7 @@ export default class DatabaseService implements DatabaseServiceInterface {
         host: dbConnectionDetails.host,
         port: dbConnectionDetails.port,
         database: process.env.SCHEMA_NAME,
+        multipleStatements: true,
       });
     }
 

@@ -220,6 +220,7 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 }
 
 function getFeedDetails(queryResult: QueryOutput): EvlFeedData[] | TflFeedData[] {
+  logger.debug(queryResult);
   const feedQueryResults = queryResult[0] as (TflFeedData | EvlFeedData)[];
 
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
