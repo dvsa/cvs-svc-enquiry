@@ -233,7 +233,6 @@ async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event:
   logger.info('Using getEvlFeedByVrm');
   logger.debug(`calling database for vrm: ${event.vrm_trm} with query ${EVL_VRM_QUERY}`);
   const queryResult = await databaseService.get(EVL_VRM_QUERY, [event.vrm_trm]);
-  logger.debug(JSON.stringify(queryResult));
   const result = getEvlFeedByVrmDetails(queryResult);
   logger.debug(`result from database: ${result.vrm_trm}, ${result.certificateNumber}, ${result.testExpiryDate}`);
   return [result];
@@ -253,8 +252,9 @@ async function getFeed(
   const query = getQueryMap[feedName];
   logger.debug(`calling database with ${feedName} query ${query}`);
   const queryResult = await databaseService.get(query, []);
+  logger.debug(JSON.stringify(queryResult));
   const result = getFeedDetails(queryResult);
-  logger.debug(`result from database: ${result.toString()}`);
+  logger.debug(`result from database: ${JSON.stringify(result)}`);
   return result;
 }
 
