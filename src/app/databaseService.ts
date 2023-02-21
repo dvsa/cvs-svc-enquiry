@@ -34,7 +34,7 @@ async function getTechnicalRecordDetails(
     databaseService.get(technicalQueries.PLATING_QUERY, [technicalRecordQueryResult.id]),
   ]);
 
-  technicalRecord.psvBrakes = brakes.map((brake:BrakeQueryResult) => brake.result);
+  technicalRecord.psvBrakes = brakes.map((brake: BrakeQueryResult) => brake.result);
   technicalRecord.axles = axles.map((axle: AxlesQueryResult) => axle.result);
   technicalRecord.axlespacing = axleSpacing.map((axlespacing: AxleSpacingQueryResult) => axlespacing.result);
   technicalRecord.plates = plating.map((plate: PlatesQueryResult) => plate.result);
@@ -45,16 +45,13 @@ async function getTechnicalRecordDetails(
 async function getTechnicalRecords(vehicleId, databaseService: DatabaseServiceInterface): Promise<TechnicalRecord[]> {
   const [results] = await databaseService.get(technicalQueries.TECHNICAL_RECORD_QUERY, [vehicleId]);
   const technicalRecords = Promise.all(
-    results.map((result:TechnicalRecordQueryResult) => getTechnicalRecordDetails(result, databaseService)),
+    results.map((result: TechnicalRecordQueryResult) => getTechnicalRecordDetails(result, databaseService)),
   );
 
   return technicalRecords;
 }
 
-async function getVehicleDetails(
-  vehicleDetailsQueryResult: QueryOutput,
-  databaseService: DatabaseServiceInterface,
-) {
+async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databaseService: DatabaseServiceInterface) {
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
@@ -222,14 +219,13 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
   return evlFeedQueryResult;
 }
 
-function getFeedDetails(queryResult: QueryOutput): EvlFeedData[] | TflFeedData[] {
-  const feedQueryResults = queryResult[0] as (TflFeedData | EvlFeedData)[];
-
+function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
+  const feedQueryResults: EvlFeedData[] | TflFeedData[] = feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 
-  return feedQueryResults.map((feedQueryResult) => feedQueryResult);
+  return feedQueryResults;
 }
 
 async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event: EvlEvent): Promise<EvlFeedData[]> {
@@ -255,8 +251,8 @@ async function getFeed(
   const query = getQueryMap[feedName];
   logger.debug(`calling database with ${feedName} query ${query}`);
   const queryResult = await databaseService.get(query, []);
-  const result = getFeedDetails(queryResult);
-  logger.debug(`result from database: ${result.toString()}`);
+  const result = getFeedDetails(queryResult, feedName);
+  logger.debug(`result from database: ${JSON.stringify(result)}`);
   return result;
 }
 
