@@ -219,9 +219,9 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
   return evlFeedQueryResult;
 }
 
-function getFeedDetails(queryResult: QueryOutput): EvlFeedData[] | TflFeedData[] {
+function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
   logger.debug(`Inside the getFeedDetails: ${JSON.stringify(queryResult)}`);
-  const feedQueryResults = queryResult[0] as (TflFeedData | EvlFeedData)[];
+  const feedQueryResults = queryResult[feedName === FeedName.EVL ? 1 : 0] as (TflFeedData | EvlFeedData)[];
 
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
@@ -254,7 +254,7 @@ async function getFeed(
   logger.debug(`calling database with ${feedName} query ${query}`);
   const queryResult = await databaseService.get(query, []);
   logger.debug(JSON.stringify(queryResult));
-  const result = getFeedDetails(queryResult);
+  const result = getFeedDetails(queryResult, feedName);
   logger.debug(`result from database: ${JSON.stringify(result)}`);
   return result;
 }
