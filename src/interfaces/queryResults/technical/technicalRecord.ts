@@ -67,8 +67,8 @@ interface TechnicalRecord {
   width?: number;
   frontAxleTo5thWheelMin?: number;
   frontAxleTo5thWheelMax?: number;
-  frontAxleTo5thWheelCouplingMin?: number;
-  frontAxleTo5thWheelCouplingMax?: number;
+  frontVehicleTo5thWheelCouplingMin?: number;
+  frontVehicleTo5thWheelCouplingMax?: number;
   frontAxleToRearAxle?: number;
   rearAxleToRearTrl?: number;
   couplingCenterToRearAxleMin?: number;
