@@ -18,7 +18,9 @@ export async function getItemFromS3(key: string): Promise<string> {
   logger.info(`Reading contents of file ${key}`);
   const s3 = configureS3();
   const params: AWS.S3.GetObjectRequest = { Bucket: process.env.AWS_S3_BUCKET_NAME, Key: key };
-  return (await s3.getObject(params).promise()).Body.toString();
+  const body = (await s3.getObject(params).promise()).Body.toString();
+  logger.info(`File contents retrieved: ${body}`);
+  return body;
 }
 
 function configureS3() {

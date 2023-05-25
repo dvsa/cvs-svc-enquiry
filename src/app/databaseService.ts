@@ -244,11 +244,20 @@ const getQueryMap: { [key in FeedName]: string } = {
   TFL: TFL_QUERY,
 };
 
+function getDateInQueryFormat(date: Date): string {
+  return `${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+}
+
 async function getLastTFLFileDate(): Promise<string> {
   const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
-  const latestDate = await getItemFromS3(fileName);
-  const date = latestDate ? new Date(latestDate) : new Date();
-  return `${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+  try {
+    const latestDate = await getItemFromS3(fileName);
+    const date = new Date(latestDate);
+    return getDateInQueryFormat(date);
+  } catch (err) {
+    logger.error(`Error reading the file: ${JSON.stringify(err)}`);
+    return getDateInQueryFormat(new Date());
+  }
 }
 
 async function getFeed(
