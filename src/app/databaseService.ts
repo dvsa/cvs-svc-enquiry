@@ -21,7 +21,7 @@ import logger from '../utils/logger';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
 import { FeedName } from '../interfaces/FeedTypes';
-import { readOrCreateIfNotExists } from '../infrastructure/s3BucketService';
+import { readAndUpsert } from '../infrastructure/s3BucketService';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -56,9 +56,9 @@ async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databas
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined ||
-    vehicleDetailsResult.id === undefined ||
-    vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined
+    || vehicleDetailsResult.id === undefined
+    || vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -137,9 +137,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined ||
-    testResultQueryResult.id === undefined ||
-    testResultQueryResult.result === undefined
+    testResultQueryResult === undefined
+    || testResultQueryResult.id === undefined
+    || testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -221,8 +221,7 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 }
 
 function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
-  const feedQueryResults: EvlFeedData[] | TflFeedData[] =
-    feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
+  const feedQueryResults: EvlFeedData[] | TflFeedData[] = feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
@@ -250,7 +249,7 @@ function getDateInQueryFormat(date: Date): string {
 
 async function getLastTFLFileDate(): Promise<string> {
   const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
-  const latestDate = await readOrCreateIfNotExists(fileName, new Date().toISOString());
+  const latestDate = await readAndUpsert(fileName, new Date().toISOString());
   return getDateInQueryFormat(new Date(latestDate));
 }
 

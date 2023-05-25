@@ -10,7 +10,8 @@ import TestResult from '../interfaces/queryResults/test/testResult';
 
 export default (
   event: ResultsEvent,
-): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<TestResult[]>) => {
+): ((databaseService: DatabaseService, event: ResultsEvent) => Promise<TestResult[]>
+  ) => {
   if (event.vinNumber) {
     console.info('Using getTestResultsByVin');
 
