@@ -28,11 +28,14 @@ export async function getItemFromS3(key: string): Promise<string> {
   }
 }
 
-export async function readOrCreateIfNotExists(key: string, body: string): Promise<string> {
+export async function readAndUpsert(key: string, body: string): Promise<string> {
   logger.debug('Reading of creating file if not exits');
+  const cb = () => {
+    logger.info(`Upserted ${key} in S3`);
+  };
   try {
     const contents = await getItemFromS3(key);
-    logger.info('');
+    uploadToS3(body, key, cb);
     return contents;
   } catch (err) {
     // the "not found" status code depends on if the lambda has the s3:ListObjects permission, adding both to be safe
@@ -41,10 +44,10 @@ export async function readOrCreateIfNotExists(key: string, body: string): Promis
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (notFoundStatusCode.includes(err.statusCode)) {
       logger.debug('Creating missing file');
-      uploadToS3(body, key, () => {});
+      uploadToS3(body, key, cb);
       return body;
     }
-    logger.error(`Could not create non-existing file ${JSON.stringify(err)}`);
+    logger.error(`Error occured when upserting file ${JSON.stringify(err)}`);
     throw new Error('Error creating file');
   }
 }
