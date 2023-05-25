@@ -21,7 +21,7 @@ import logger from '../utils/logger';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
 import { FeedName } from '../interfaces/FeedTypes';
-import { getItemFromS3 } from '../infrastructure/s3BucketService';
+import { getItemFromS3, readOrCreateIfNotExists } from '../infrastructure/s3BucketService';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -250,14 +250,8 @@ function getDateInQueryFormat(date: Date): string {
 
 async function getLastTFLFileDate(): Promise<string> {
   const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
-  try {
-    const latestDate = await getItemFromS3(fileName);
-    const date = new Date(latestDate);
-    return getDateInQueryFormat(date);
-  } catch (err) {
-    logger.error(`Error reading the file: ${JSON.stringify(err)}`);
-    return getDateInQueryFormat(new Date());
-  }
+  const latestDate = await readOrCreateIfNotExists(fileName, new Date().toISOString());
+  return getDateInQueryFormat(new Date(latestDate));
 }
 
 async function getFeed(

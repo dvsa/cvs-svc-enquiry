@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import logger from '../utils/logger';
 
-export function uploadToS3(processedData: string, fileName: string, callback: () => void) {
+export function uploadToS3(processedData: string, fileName: string, callback: () => void): void {
   const s3 = configureS3();
   const params = { Bucket: process.env.AWS_S3_BUCKET_NAME, Key: fileName, Body: processedData };
 
@@ -18,9 +18,35 @@ export async function getItemFromS3(key: string): Promise<string> {
   logger.info(`Reading contents of file ${key}`);
   const s3 = configureS3();
   const params: AWS.S3.GetObjectRequest = { Bucket: process.env.AWS_S3_BUCKET_NAME, Key: key };
-  const body = (await s3.getObject(params).promise()).Body.toString();
-  logger.info(`File contents retrieved: ${body}`);
-  return body;
+  try {
+    const body = (await s3.getObject(params).promise()).Body.toString();
+    logger.info(`File contents retrieved: ${body}`);
+    return body;
+  } catch (err) {
+    logger.error(`Error reading file from S3 ${JSON.stringify(err)}`);
+    throw new Error(err);
+  }
+}
+
+export async function readOrCreateIfNotExists(key: string, body: string): Promise<string> {
+  logger.debug('Reading of creating file if not exits');
+  try {
+    const contents = await getItemFromS3(key);
+    logger.info('');
+    return contents;
+  } catch (err) {
+    // the "not found" status code depends on if the lambda has the s3:ListObjects permission, adding both to be safe
+    const notFoundStatusCode = [403, 404];
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (notFoundStatusCode.includes(err.statusCode)) {
+      logger.debug('Creating missing file');
+      uploadToS3(body, key, () => {});
+      return body;
+    }
+    logger.error(`Could not create non-existing file ${JSON.stringify(err)}`);
+    throw new Error('Error creating file');
+  }
 }
 
 function configureS3() {
