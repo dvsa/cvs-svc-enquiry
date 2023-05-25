@@ -21,7 +21,7 @@ import logger from '../utils/logger';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
 import { FeedName } from '../interfaces/FeedTypes';
-import { getLastAlphabeticalItemByPrefix } from '../infrastructure/s3BucketService';
+import { getItemFromS3 } from '../infrastructure/s3BucketService';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -245,9 +245,10 @@ const getQueryMap: { [key in FeedName]: string } = {
 };
 
 async function getLastTFLFileDate(): Promise<string> {
-  const lastDate = (await getLastAlphabeticalItemByPrefix('VOSA')).substring(5, 15);
-  logger.info(`File was last generated on ${lastDate}`);
-  return lastDate;
+  const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
+  const latestDate = await getItemFromS3(fileName);
+  const date = latestDate ? new Date(latestDate) : new Date();
+  return `${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
 }
 
 async function getFeed(
