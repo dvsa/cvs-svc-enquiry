@@ -24,7 +24,7 @@ export async function getItemFromS3(key: string): Promise<string> {
     return body;
   } catch (err) {
     logger.error(`Error reading file from S3 ${JSON.stringify(err)}`);
-    throw new Error(err);
+    throw err;
   }
 }
 
