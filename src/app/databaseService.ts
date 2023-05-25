@@ -21,7 +21,7 @@ import logger from '../utils/logger';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
 import { FeedName } from '../interfaces/FeedTypes';
-import { getItemFromS3, readOrCreateIfNotExists } from '../infrastructure/s3BucketService';
+import { readOrCreateIfNotExists } from '../infrastructure/s3BucketService';
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
