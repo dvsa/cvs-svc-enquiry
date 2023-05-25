@@ -56,9 +56,9 @@ async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databas
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined
-    || vehicleDetailsResult.id === undefined
-    || vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined ||
+    vehicleDetailsResult.id === undefined ||
+    vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -137,9 +137,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined
-    || testResultQueryResult.id === undefined
-    || testResultQueryResult.result === undefined
+    testResultQueryResult === undefined ||
+    testResultQueryResult.id === undefined ||
+    testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -221,7 +221,8 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 }
 
 function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
-  const feedQueryResults: EvlFeedData[] | TflFeedData[] = feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
+  const feedQueryResults: EvlFeedData[] | TflFeedData[] =
+    feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
@@ -243,14 +244,13 @@ const getQueryMap: { [key in FeedName]: string } = {
   TFL: TFL_QUERY,
 };
 
-function getDateInQueryFormat(date: Date): string {
-  return `${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
-}
-
 async function getLastTFLFileDate(): Promise<string> {
   const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
   const latestDate = await readAndUpsert(fileName, new Date().toISOString());
-  return getDateInQueryFormat(new Date(latestDate));
+  const date = new Date(latestDate);
+  return `${date.getUTCDate()}/${
+    date.getUTCMonth() + 1
+  }/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
 }
 
 async function getFeed(
