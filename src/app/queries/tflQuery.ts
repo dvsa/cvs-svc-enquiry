@@ -10,5 +10,5 @@ SELECT
     ExpiryDate,
     IssuedBy,
     IssueDate
-WHERE ValidFromDate >= STR_TO_DATE(?, '%d/%m/%Y %h:%i:%s');
-`;
+FROM tfl_view
+WHERE ValidFromDate >= STR_TO_DATE(?, '%d/%m/%Y %h:%i:%s');`;
