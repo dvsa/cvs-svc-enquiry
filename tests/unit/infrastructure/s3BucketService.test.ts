@@ -36,11 +36,12 @@ describe('readAndUpsert', () => {
   it.each([404, 403])('it should create a new file the the content and return the new content', async (statusCode) => {
     const fileName = 'a_file_with_a_date.txt';
     const newFileContents = 'new content for the file';
+    const valueIfNotFound = 'a week ago';
 
     mockPromise.mockRejectedValueOnce({ statusCode });
 
-    const contents = await readAndUpsert(fileName, newFileContents);
-    expect(contents).toEqual(newFileContents);
+    const contents = await readAndUpsert(fileName, newFileContents, valueIfNotFound);
+    expect(contents).toEqual(valueIfNotFound);
     expect(mockUpload).toHaveBeenCalledWith(
       expect.objectContaining({ Key: fileName, Body: newFileContents }),
       expect.anything(),

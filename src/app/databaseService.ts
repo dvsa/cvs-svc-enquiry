@@ -246,7 +246,9 @@ const getQueryMap: { [key in FeedName]: string } = {
 
 async function getLastTFLFileDate(): Promise<string> {
   const fileName = 'TFL_LATEST_VALID_FROM_DATE.txt';
-  const latestDate = await readAndUpsert(fileName, new Date().toISOString());
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setUTCDate(new Date().getUTCDate() - 7);
+  const latestDate = await readAndUpsert(fileName, new Date().toISOString(), oneWeekAgo.toISOString());
   const date = new Date(latestDate);
   return `${date.getUTCDate()}/${
     date.getUTCMonth() + 1

@@ -9,7 +9,7 @@ export default class DatabaseService implements DatabaseServiceInterface {
 
   async get(query: string, params: string[] | undefined): Promise<[RowDataPacket[], FieldPacket[]]> {
     try {
-      console.info(`Executing query ${query} with params ${params.join(', ')}`);
+      console.info(`Executing query ${query} with params ${params?.join(', ')}`);
       const tempResult = await this.pool.query(query, params);
       return tempResult as [RowDataPacket[], FieldPacket[]];
     } catch (e) {
@@ -24,13 +24,13 @@ export default class DatabaseService implements DatabaseServiceInterface {
 
   pool: mysqlp.Pool;
 
-  static pool: mysqlp.Pool = undefined;
+  static pool: mysqlp.Pool | undefined = undefined;
 
   public static async build(
     secretsManager: SecretsManagerServiceInterface,
     mysql: typeof mysqlp,
   ): Promise<DatabaseServiceInterface> {
-    const dbConnectionDetailsString = await secretsManager.getSecret(process.env.SECRET);
+    const dbConnectionDetailsString = await secretsManager.getSecret(process.env.SECRET ?? '');
     const dbConnectionDetails = JSON.parse(dbConnectionDetailsString) as StoredConnectionDetails;
     if (this.pool === undefined) {
       this.pool = mysql.createPool(<mysqlp.PoolOptions>{
