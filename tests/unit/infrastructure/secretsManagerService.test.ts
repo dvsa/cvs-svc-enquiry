@@ -11,14 +11,14 @@ describe('Secrets service', () => {
       throw new Error('Error');
     });
 
-    await expect(service.getSecret(undefined)).rejects.toThrow(Error);
+    await expect(service.getSecret((undefined as unknown) as string)).rejects.toThrow(Error);
   });
 
   it('throws an error when the secretName is undefined', async () => {
     const mockSecretsManager = ({} as unknown) as SecretsManager;
     const service = new SecretsManagerService(mockSecretsManager);
 
-    await expect(service.getSecret(undefined)).rejects.toThrow(Error);
+    await expect(service.getSecret((undefined as unknown) as string)).rejects.toThrow(Error);
   });
 
   it('should return the secret string', async () => {

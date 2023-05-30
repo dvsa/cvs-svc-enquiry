@@ -1,7 +1,10 @@
 import DatabaseService from '../interfaces/DatabaseService';
 import ResultsEvent from '../interfaces/ResultsEvent';
 import {
-  getTestResultsByVrm, getTestResultsByVin, getTestResultsByTrailerId, getTestResultsByTestId,
+  getTestResultsByVrm,
+  getTestResultsByVin,
+  getTestResultsByTrailerId,
+  getTestResultsByTestId,
 } from './databaseService';
 import TestResult from '../interfaces/queryResults/test/testResult';
 

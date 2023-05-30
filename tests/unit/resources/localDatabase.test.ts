@@ -43,8 +43,8 @@ describe('Local database', () => {
     localDatabase();
 
     expect(mockedSpawnSync).toHaveBeenCalledTimes(2);
-    expect(mockedSpawnSync.mock.calls[1][1][0]).toEqual('start');
-    expect(mockedSpawnSync.mock.calls[1][1][1]).toEqual(containerName);
+    expect(mockedSpawnSync.mock.calls[1][1]?.[0]).toEqual('start');
+    expect(mockedSpawnSync.mock.calls[1][1]?.[1]).toEqual(containerName);
   });
 
   it('boots the DB from scratch when it does not exist', () => {
@@ -71,7 +71,7 @@ describe('Local database', () => {
 
     expect(mockedSpawnSync).toHaveBeenCalledTimes(3);
     expect(mockedSpawnSync.mock.calls[1][0]).toEqual('docker');
-    expect(mockedSpawnSync.mock.calls[1][1][0]).toEqual('run');
+    expect(mockedSpawnSync.mock.calls[1][1]?.[0]).toEqual('run');
     expect(mockedSpawnSync.mock.calls[2][0]).toContain('liquibase');
   });
 

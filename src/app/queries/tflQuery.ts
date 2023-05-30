@@ -1,2 +1,15 @@
-export const TFL_QUERY = 'SELECT `v`.`vrm_trm`, `v`.`vin`, `c`.`certificateNumber`, `c`.`modificationTypeUsed`, `c`.`testStatus`, `c`.`fuel_emission_id`,`c`.`createdAt`, `c`.`lastUpdatedAt`, `c`.`createdBy_Id`, `c`.`firstUseDate` FROM `vehicle` `v`, `test_result` `c` LIMIT 100;';
-// TODO: This is totally wrong and needs updating when data have completed the work for this query
+export const TFL_QUERY = `
+SELECT 
+    VRM,
+    VIN,
+    SerialNumberOfCertificate,
+    CertificationModificationType,
+    TestStatus,
+    PMEuropeanEmissionClassificationCode,
+    ValidFromDate,
+    ExpiryDate,
+    IssuedBy,
+    IssueDate
+FROM tfl_view
+WHERE ValidFromDate >= STR_TO_DATE(?, '%d/%m/%Y %h:%i:%s')
+ORDER BY IssueDate ASC;`;

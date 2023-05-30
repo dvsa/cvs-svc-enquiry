@@ -155,13 +155,13 @@ describe('Database Service', () => {
       expect(result.technicalrecords).toHaveLength(1);
       expect(result.technicalrecords[0].functionCode).toEqual('Test tech record');
       expect(result.technicalrecords[0].psvBrakes).toHaveLength(2);
-      expect(result.technicalrecords[0].psvBrakes[0].brakeCode).toEqual('Test brakes');
+      expect(result.technicalrecords?.[0].psvBrakes?.[0].brakeCode).toEqual('Test brakes');
       expect(result.technicalrecords[0].axles).toHaveLength(2);
-      expect(result.technicalrecords[0].axles[0].axleNumber).toEqual(1);
+      expect(result.technicalrecords?.[0].axles?.[0].axleNumber).toEqual(1);
       expect(result.technicalrecords[0].axlespacing).toHaveLength(2);
-      expect(result.technicalrecords[0].axlespacing[0].axles).toEqual('Test axle spacing');
+      expect(result.technicalrecords?.[0].axlespacing?.[0].axles).toEqual('Test axle spacing');
       expect(result.technicalrecords[0].plates).toHaveLength(2);
-      expect(result.technicalrecords[0].plates[0].plateSerialNumber).toEqual('Test plate');
+      expect(result.technicalrecords?.[0].plates?.[0].plateSerialNumber).toEqual('Test plate');
     });
 
     it('defaults to an empty array if nothing is returned by the subqueries', async () => {
@@ -364,8 +364,8 @@ describe('Database Service', () => {
       expect(response).toHaveLength(2);
       expect(response[0].customDefect).toHaveLength(2);
       expect(response[0].defects).toHaveLength(2);
-      expect(response[0].customDefect[0].defectName).toEqual('Custom defect');
-      expect(response[0].defects[1].defect.imDescription).toEqual('Test defect 2');
+      expect(response[0].customDefect?.[0].defectName).toEqual('Custom defect');
+      expect(response[0].defects?.[1].defect?.imDescription).toEqual('Test defect 2');
     });
   });
 });

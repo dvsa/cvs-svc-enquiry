@@ -5,8 +5,8 @@ import Version from '../../local/data/version.json';
 
 describe('Application entry', () => {
   const OLD_ENV = process.env;
-  let event;
-  let context;
+  let event: any;
+  let context: any;
   let majorVersionNumber: string;
 
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe('Application entry', () => {
           event = { httpMethod: 'GET', path: '/v1/enquiry/' };
 
           const response = await handler(event, context);
-          const parsedBody = JSON.parse(response.body) as { ok: boolean };
+          const parsedBody = JSON.parse(response.body ?? '') as { ok: boolean };
 
           expect(parsedBody.ok).toBe(true);
         });
@@ -65,7 +65,7 @@ describe('Application entry', () => {
           };
 
           const response = await handler(event, context);
-          const parsedResponse = JSON.parse(response.body) as { version: string };
+          const parsedResponse = JSON.parse(response.body ?? '') as { version: string };
           // is given when we build the file as API_VERSION from package.json with $npm_package_version
           // TODO we follow semver for code versioning ATM and only use the major for the API endpoint as v1
           const { API_VERSION } = process.env;
