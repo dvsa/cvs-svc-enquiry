@@ -11,4 +11,5 @@ SELECT
     IssuedBy,
     IssueDate
 FROM tfl_view
-WHERE ValidFromDate >= STR_TO_DATE(?, '%d/%m/%Y %h:%i:%s');`;
+WHERE ValidFromDate >= STR_TO_DATE(?, '%d/%m/%Y %h:%i:%s')
+ORDER BY IssueDate ASC;`;
