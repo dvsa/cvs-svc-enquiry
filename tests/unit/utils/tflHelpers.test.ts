@@ -1,32 +1,33 @@
+import TflFeedData from '../../../src/interfaces/queryResults/tflFeedData';
 import { processTFLFeedData, escapeString } from '../../../src/utils/tflHelpers';
 
 describe('tfl helper functions', () => {
   describe('process feed data function', () => {
     it('should update all strings on TFL feed data', () => {
-      const input = {
-        vrm_trm: '12345',
-        vin: '56789',
-        certificateNumber: 'CeRt1234',
-        modificationTypeUsed: 'type 1',
-        testStatus: 'submitted, done',
-        fuel_emission_id: '123',
-        createdAt: 'now',
-        lastUpdatedAt: 'before "they said"',
-        createdBy_Id: 'some person',
-        firstUseDate: 'not today',
+      const input: TflFeedData = {
+        VRM: '12345',
+        VIN: '56789',
+        SerialNumberOfCertificate: 'CeRt1234',
+        CertificationModificationType: 'type 1',
+        TestStatus: 'submitted, done',
+        PMEuropeanEmissionClassificationCode: '123',
+        ValidFromDate: 'now',
+        ExpiryDate: 'before "they said"',
+        IssuedBy: 'some person',
+        IssueDate: 'not today',
       };
       const result = processTFLFeedData(input);
-      const expectedResult = {
-        vrm_trm: '12345',
-        vin: '56789',
-        certificateNumber: 'CERT1234',
-        modificationTypeUsed: 'TYPE 1',
-        testStatus: '"SUBMITTED, DONE"',
-        fuel_emission_id: '123',
-        createdAt: 'NOW',
-        lastUpdatedAt: '"BEFORE ""THEY SAID"""',
-        createdBy_Id: 'SOME PERSON',
-        firstUseDate: 'NOT TODAY',
+      const expectedResult: TflFeedData = {
+        VRM: '12345',
+        VIN: '56789',
+        SerialNumberOfCertificate: 'CERT1234',
+        CertificationModificationType: 'TYPE 1',
+        TestStatus: '"SUBMITTED, DONE"',
+        PMEuropeanEmissionClassificationCode: '123',
+        ValidFromDate: 'NOW',
+        ExpiryDate: '"BEFORE ""THEY SAID"""',
+        IssuedBy: 'SOME PERSON',
+        IssueDate: 'NOT TODAY',
       };
       expect(result).toMatchObject(expectedResult);
     });

@@ -1,13 +1,12 @@
 export default interface TflFeedData {
-  vrm_trm?: string | undefined;
-  vin?: string | undefined;
-  certificateNumber?: string | undefined;
-  modificationTypeUsed?: string | undefined;
-  testStatus?: string | undefined;
-  fuel_emission_id?: string | undefined;
-  createdAt?: string | undefined;
-  lastUpdatedAt?: string | undefined;
-  createdBy_Id?: string | undefined;
-  firstUseDate?: string | undefined;
+  VRM?: string | undefined;
+  VIN?: string | undefined;
+  SerialNumberOfCertificate?: string | undefined;
+  CertificationModificationType?: string | undefined;
+  TestStatus?: string | undefined;
+  PMEuropeanEmissionClassificationCode?: string | undefined;
+  ValidFromDate?: string | undefined;
+  ExpiryDate?: string | undefined;
+  IssuedBy?: string | undefined;
+  IssueDate?: string | undefined;
 }
-// TODO: In here needs updating when the SQL query is updated.

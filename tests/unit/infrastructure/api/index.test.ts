@@ -225,16 +225,15 @@ describe('API', () => {
   describe('TFL Feed', () => {
     it('returns the db query result if there are no errors', async () => {
       const tflFeedData: TflFeedData = {
-        vrm_trm: '12345',
-        vin: '56789',
-        certificateNumber: 'CeRt1234',
-        modificationTypeUsed: 'type 1',
-        testStatus: 'submitted, done',
-        fuel_emission_id: '123',
-        createdAt: 'now',
-        lastUpdatedAt: 'before "they said"',
-        createdBy_Id: 'some person',
-        firstUseDate: 'not today',
+        VRM: '12345',
+        VIN: '56789',
+        CertificationModificationType: 'CeRt1234',
+        PMEuropeanEmissionClassificationCode: 'type 1',
+        TestStatus: 'submitted, done',
+        ValidFromDate: '123',
+        ExpiryDate: 'now',
+        IssueDate: 'before "they said"',
+        IssuedBy: 'some person',
       };
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
