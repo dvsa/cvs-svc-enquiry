@@ -6,5 +6,5 @@ import { FeedName } from '../interfaces/FeedTypes';
 
 export default (): ((databaseService: DatabaseService, feedName: FeedName) => Promise<TflFeedData[]>) => {
   logger.debug('redirecting to getTflFeed using tfl factory');
-  return getFeed;
+  return getFeed as (databaseService: DatabaseService, feedName: FeedName) => Promise<TflFeedData[]>;
 };
