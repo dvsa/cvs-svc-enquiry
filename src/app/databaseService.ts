@@ -223,7 +223,7 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
 function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
   const feedQueryResults: EvlFeedData[] | TflFeedData[] =
     feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
-  if ((feedQueryResults === undefined || feedQueryResults.length === 0) && feedName === FeedName.EVL) {
+  if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
 

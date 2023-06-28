@@ -195,7 +195,13 @@ router.get('/tfl', (_req, res) => {
       if (e instanceof ParametersError) {
         res.status(400);
       } else if (e instanceof NotFoundError) {
-        res.status(404);
+        const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
+        uploadToS3(' , , , , , , , , , ', fileName, () => {
+          logger.info(`Successfully uploaded ${fileName} to S3`);
+          res.status(200);
+          res.contentType('json').send();
+        });
+        res.status(200);
       } else {
         res.status(500);
       }
