@@ -194,6 +194,7 @@ router.get('/tfl', (_req, res) => {
     .catch((e: Error) => {
       if (e instanceof ParametersError) {
         res.status(400);
+        res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
         uploadToS3(' , , , , , , , , , ', fileName, () => {
@@ -201,12 +202,11 @@ router.get('/tfl', (_req, res) => {
           res.status(200);
           res.contentType('json').send();
         });
-        res.status(200);
       } else {
         res.status(500);
+        res.send(`Error Generating TFL Feed Data: ${e.message}`);
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
-      res.send(`Error Generating TFL Feed Data: ${e.message}`);
     });
 });
 

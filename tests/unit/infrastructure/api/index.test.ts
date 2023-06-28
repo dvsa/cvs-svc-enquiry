@@ -269,10 +269,11 @@ describe('API', () => {
 
     it('sets the status to 404 for a not found error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
-      expect(result.status).toEqual(404);
+      expect(result.status).toEqual(200);
     });
 
     it('sets the status to 500 for a generic error', async () => {
