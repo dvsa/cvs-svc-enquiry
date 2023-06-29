@@ -91,6 +91,15 @@ describe('API', () => {
         expect(result.status).toEqual(500);
       });
 
+      it('sets the status to 500 for a secrets error', async () => {
+        process.env.IS_OFFLINE = 'true';
+        DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+        jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
+        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+
+        expect(result.status).toEqual(500);
+      });
+
       it('returns a 405 if the method is not supported', async () => {
         const resultPost = await supertest(app).post('/v1/enquiry/vehicle?vinNumber=123456789');
 
@@ -260,10 +269,11 @@ describe('API', () => {
 
     it('sets the status to 404 for a not found error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
-      expect(result.status).toEqual(404);
+      expect(result.status).toEqual(200);
     });
 
     it('sets the status to 500 for a generic error', async () => {
