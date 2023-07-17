@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import logger from '../utils/logger';
 
-export function uploadToS3(processedData: string | Buffer, fileName: string, callback: () => void): void {
+export function uploadToS3(processedData: string, fileName: string, callback: () => void): void {
   const s3 = configureS3();
   const params = { Bucket: process.env.AWS_S3_BUCKET_NAME ?? '', Key: fileName, Body: processedData };
 
