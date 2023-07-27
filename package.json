@@ -4,14 +4,14 @@
   "description": "",
   "main": "src/handler.ts",
   "engines": {
-    "node": "14.*",
-    "npm": "6.*"
+    "node": "18.*",
+    "npm": "9.*"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm-run-all audit security-checks prettier lint",
+      "pre-commit": "npm run audit && npm run security-checks && npm run prettier && npm run lint",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm-run-all build test"
+      "pre-push": "npm run build && npm run test"
     }
   },
   "scripts": {
@@ -27,7 +27,7 @@
     "test:integration:coverage": "cross-env echo 'integration tests coverage to be added'",
     "test": "npm-run-all test:unit:coverage",
     "jest": "jest",
-    "audit": "npm audit",
+    "audit": "npm audit --omit=dev",
     "lint:analyse": "eslint . --ext js,ts --fix",
     "lint:report": "npm run lint:analyse -- -f json -o reports/eslint/eslint-report.json",
     "lint": "npm-run-all lint:*",
@@ -43,8 +43,6 @@
     "package:prepare": "mv ./.build/app.zip ./.build/build.zip",
     "package:move": "mv ./.build/build.zip ./${ZIP_NAME}.zip",
     "package": "npm-run-all clean package:*",
-    "release": "semantic-release",
-    "prerelease": "semantic-release --dry-run",
     "dependencies:check": "ncu",
     "tools-setup": "echo 'pipeline requires this'"
   },
@@ -64,10 +62,6 @@
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "11.0.0",
     "@dvsa/eslint-config-ts": "2.0.0",
-    "@semantic-release/changelog": "5.0.1",
-    "@semantic-release/git": "9.0.0",
-    "@semantic-release/github": "7.2.0",
-    "@semantic-release/npm": "9.0.1",
     "@serverless/typescript": "2.17.0",
     "@types/aws-lambda": "8.10.70",
     "@types/express": "4.17.13",
@@ -90,7 +84,6 @@
     "npm-run-all": "4.1.5",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
-    "semantic-release": "19.0.3",
     "serverless": "3.17.0",
     "serverless-dotenv-plugin": "3.1.0",
     "serverless-offline": "8.8.1",
