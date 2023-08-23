@@ -4,6 +4,7 @@ on:
     branches:
         - 'feature/CB2-8606'
   workflow_dispatch:
+    
 permissions:
   id-token: write
   contents: read
