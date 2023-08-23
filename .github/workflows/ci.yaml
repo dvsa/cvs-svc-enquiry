@@ -4,7 +4,6 @@ on:
     branches:
         - 'feature/CB2-8606'
   workflow_dispatch:
-    
 jobs:
   ci:
     uses: dvsa/cvs-github-actions/.github/workflows/node-ci.yaml@develop
