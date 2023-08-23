@@ -4,14 +4,10 @@ on:
     branches:
         - 'feature/CB2-8606'
   workflow_dispatch:
-
-permissions:
-  id-token: write
-  contents: read
     
 jobs:
   ci:
     uses: dvsa/cvs-github-actions/.github/workflows/node-ci.yaml@develop
-    # secrets:
+     # secrets:
     #   CVS_MGMT_AWS_ROLE: ${{ secrets.CVS_MGMT_AWS_ROLE }}
     #   CVS_SERVICES_S3: ${{ secrets.CVS_SERVICES_S3 }}
