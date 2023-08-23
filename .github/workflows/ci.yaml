@@ -12,6 +12,6 @@ permissions:
 jobs:
   ci:
     uses: dvsa/cvs-github-actions/.github/workflows/node-ci.yaml@develop
-     # secrets:
-    #   CVS_MGMT_AWS_ROLE: ${{ secrets.CVS_MGMT_AWS_ROLE }}
-    #   CVS_SERVICES_S3: ${{ secrets.CVS_SERVICES_S3 }}
+    secrets:
+      CVS_MGMT_AWS_ROLE: ${{ secrets.CVS_MGMT_AWS_ROLE }}
+      CVS_SERVICES_S3: ${{ secrets.CVS_SERVICES_S3 }}
