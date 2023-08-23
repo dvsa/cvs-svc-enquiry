@@ -1,0 +1,8 @@
+name: CI
+on:
+  push:
+    branches:
+        - 'feature/CB2-8606'
+jobs:
+  cleanup:
+    uses: dvsa/cvs-github-actions/.github/workflows/node-ci.yaml@develop
