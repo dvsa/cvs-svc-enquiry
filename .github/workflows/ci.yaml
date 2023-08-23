@@ -3,6 +3,7 @@ on:
   push:
     branches:
         - 'feature/CB2-8606'
+        
   workflow_dispatch:
 
 permissions:
