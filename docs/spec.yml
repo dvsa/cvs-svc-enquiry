@@ -1,0 +1,673 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Enquiry Microservice
+paths:
+  /enquiry/version:
+    get:
+      summary: Get API Version
+      responses:
+        '200':
+          description: API version retrieved successfully
+        '404':
+          description: Not Found
+
+  /enquiry/vehicle:
+    get:
+      summary: Get Vehicle Details
+      parameters:
+        - name: vinNumber
+          in: query
+          description: The VIN number
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vehicle details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDetails'
+        '400':
+          description: Bad request
+        '404':
+          description: Vehicle not found
+        '500':
+          description: Internal server error
+
+  /enquiry/testResults:
+    get:
+      summary: Get Test Results
+      parameters:
+        - name: vehicleId
+          in: query
+          description: The vehicle ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Test results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestResult'
+        '400':
+          description: Bad request
+        '404':
+          description: Test results not found
+        '500':
+          description: Internal server error
+
+  /enquiry/evl:
+    get:
+      summary: Generate EVL Feed
+      responses:
+        '200':
+          description: EVL feed generated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvlFeedData'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /enquiry/tfl:
+    get:
+      summary: Generate TFL Feed
+      responses:
+        '200':
+          description: TFL feed generated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TflFeedData'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    VehicleDetails:
+      type: object
+      properties:
+        system_number:
+          type: string
+        vrm_trm:
+          type: string
+        trailer_id:
+          type: string
+        vin:
+          type: string
+        technicalrecords:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechnicalRecord'
+
+    TestResult:
+      type: object
+      properties:
+        testStatus:
+          type: string
+        reasonForCancellation:
+          type: string
+        numberOfSeats:
+          type: number
+        odometerReading:
+          type: number
+        odometerReadingUnits:
+          type: string
+        countryOfRegistration:
+          type: string
+        noOfAxles:
+          type: number
+        regndate:
+          type: string
+        firstUsedate:
+          type: string
+        createdAt:
+          type: string
+        lastUpdatedAt:
+          type: string
+        testCode:
+          type: string
+        testNumber:
+          type: string
+        certificateNumber:
+          type: string
+        secondaryCertificateNumber:
+          type: string
+        testExpiryDate:
+          type: string
+        testAnniversaryDate:
+          type: string
+        testDateStartTimestamp:
+          type: string
+        testDateEndTimestamp:
+          type: string
+        numberOfSeatbeltsFitted:
+          type: number
+        lastSeatbeltInstallationCheckDate:
+          type: string
+        seatbeltInstallationCheckDate:
+          type: string
+        testResult:
+          type: string
+        reasonForAbandoning:
+          type: string
+        additionalNotesRecorded:
+          type: string
+        additionalCommentsForAbandon:
+          type: string
+        particulateTrapFitted:
+          type: string
+        particulateTrapSerialNumber:
+          type: string
+        modificationDateUsed:
+          type: string
+        smokeTestKLimitApplied:
+          type: string
+        createdById:
+          type: string
+        createdByName:
+          type: string
+        lastUpdatedById:
+          type: string
+        lastUpdatedByName:
+          type: string
+        fuelEmission:
+          $ref: '#/components/schemas/FuelEmission'
+        testStation:
+          $ref: '#/components/schemas/TestStation'
+        tester:
+          $ref: '#/components/schemas/Tester'
+        vehicleClass:
+          $ref: '#/components/schemas/VehicleClass'
+        testType:
+          $ref: '#/components/schemas/TestType'
+        defects:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestDefect'
+        customDefect:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDefect'
+
+    EvlFeedData:
+      type: object
+      properties:
+        certificateNumber:
+          type: string
+        testExpiryDate:
+          type: string
+        vrm_trm:
+          type: string
+
+    TflFeedData:
+      type: object
+      properties:
+        VRM:
+          type: string
+        VIN:
+          type: string
+        SerialNumberOfCertificate:
+          type: string
+        CertificationModificationType:
+          type: string
+        TestStatus:
+          type: string
+        PMEuropeanEmissionClassificationCode:
+          type: string
+        ValidFromDate:
+          type: string
+        ExpiryDate:
+          type: string
+        IssuedBy:
+          type: string
+        IssueDate:
+          type: string
+
+    FuelEmission:
+      type: object
+      properties:
+        modTypeCode:
+          type: string
+        description:
+          type: string
+        emissionStandard:
+          type: string
+        fuelType:
+          type: string
+
+    TestStation:
+      type: object
+      properties:
+        stationNumber:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+
+    Tester:
+      type: object
+      properties:
+        staffId:
+          type: string
+        name:
+          type: string
+        emailAddress:
+          type: string
+
+    VehicleClass:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+        vehicleType:
+          type: string
+        vehicleSize:
+          type: string
+        vehicleConfiguration:
+          type: string
+        euVehicleCategory:
+          type: string
+
+    TestType:
+      type: object
+      properties:
+        testTypeClassification:
+          type: string
+        testTypeName:
+          type: string
+
+    TestDefect:
+      type: object
+      properties:
+        defect:
+          $ref: '#/components/schemas/Defect'
+        location:
+          $ref: '#/components/schemas/Location'
+        notes:
+          type: string
+        prs:
+          type: number
+        prohibitionIssued:
+          type: number
+
+    CustomDefect:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        defectName:
+          type: string
+        defectNotes:
+          type: string
+
+    Defect:
+      type: object
+      properties:
+        imNumber:
+          type: number
+        imDescription:
+          type: string
+        itemNumber:
+          type: number
+        itemDescription:
+          type: string
+        deficiencyRef:
+          type: string
+        deficiencyId:
+          type: string
+        deficiencySubId:
+          type: string
+        deficiencyCategory:
+          type: string
+        deficiencyText:
+          type: string
+        stdForProhibition:
+          type: boolean
+
+    Location:
+      type: object
+      properties:
+        vertical:
+          type: string
+        horizontal:
+          type: string
+        lateral:
+          type: number
+        longitudinal:
+          type: number
+        rowNumber:
+          type: number
+        seatNumber:
+          type: number
+        axleNumber:
+          type: number
+
+    RecordType:
+      type: string
+      enum:
+        - current
+        - provisional
+
+    Axles:
+      type: object
+      properties:
+        axleNumber:
+          type: number
+        parkingBrakeMrk:
+          type: boolean
+        kerbWeight:
+          type: number
+        ladenWeight:
+          type: number
+        gbWeight:
+          type: number
+        eecWeight:
+          type: number
+        designWeight:
+          type: number
+        tyreSize:
+          type: string
+        plyRating:
+          type: string
+        fitmentCode:
+          type: string
+        dataTrAxles:
+          type: number
+        speedCategorySymbol:
+          type: string
+        tyreCode:
+          type: number
+        brakeActuator:
+          type: number
+        leverLength:
+          type: number
+        springBrakeParking:
+          type: boolean
+        tyres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tyre'
+        dtpNumber:
+          type: string
+        loadSensingValve:
+          type: number
+        antilockBrakingSystem:
+          type: number
+
+    Tyre:
+      type: object
+      properties:
+        tyreSize:
+          type: string
+        plyRating:
+          type: string
+        fitmentCode:
+          type: string
+        dataTrAxles:
+          type: string
+        speedCategorySymbol:
+          type: string
+        tyreCode:
+          type: number
+
+    PSVBrakes:
+      type: object
+      properties:
+        id:
+          type: number
+        brakeCodeOriginal:
+          type: string
+        brakeCode:
+          type: string
+        dataTrBrakeOne:
+          type: string
+        dataTrBrakeTwo:
+          type: string
+        dataTrBrakeThree:
+          type: string
+        retarderBrakeOne:
+          type: string
+        retarderBrakeTwo:
+          type: string
+        serviceBrakeForceA:
+          type: number
+        secondaryBrakeForceA:
+          type: number
+        parkingBrakeForceA:
+          type: number
+        serviceBrakeForceB:
+          type: number
+        secondaryBrakeForceB:
+          type: number
+        parkingBrakeForceB:
+          type: number
+
+    AxleSpacing:
+      type: object
+      properties:
+        axles:
+          type: string
+        value:
+          type: number
+
+    Plate:
+      type: object
+      properties:
+        plateSerialNumber:
+          type: string
+        plateIssueDate:
+          type: string
+        plateReasonForIssue:
+          type: string
+        plateIssuer:
+          type: number
+
+    MakeModel:
+      type: object
+      properties:
+        make:
+          type: string
+        model:
+          type: string
+        chassisMake:
+          type: string
+        chassisModel:
+          type: string
+        bodyMake:
+          type: string
+        bodyModel:
+          type: string
+        modelLiteral:
+          type: string
+        bodyTypeCode:
+          type: string
+        bodyTypeDescription:
+          type: string
+        fuelPropulsionSystem:
+          type: string
+
+    TechnicalRecord:
+      type: object
+      properties:
+        recordtype:
+          $ref: '#/components/schemas/RecordType'
+        createdAt:
+          type: string
+        lastUpdatedAt:
+          type: string
+        functionCode:
+          type: string
+        offRoad:
+          type: boolean
+        numberOfWheelsDriven:
+          type: number
+        emissionsLimit:
+          type: string
+        departmentalVehicleMarker:
+          type: number
+        alterationMarker:
+          type: number
+        variantVersionMarker:
+          type: string
+        grossEecWeight:
+          type: number
+        trainEecWeight:
+          type: number
+        maxTrainEecWeight:
+          type: number
+        manufactureYear:
+          type: string
+        regnDate:
+          type: string
+        firstUseDate:
+          type: string
+        coifDate:
+          type: string
+        ntaNumber:
+          type: string
+        coifSerialNumber:
+          type: string
+        coifCertifierName:
+          type: string
+        approvalType:
+          type: string
+        approvalTypeNumber:
+          type: string
+        variantNumber:
+          type: string
+        conversionRefNo:
+          type: string
+        seatsLowerDeck:
+          type: number
+        seatsUpperDeck:
+          type: number
+        standingCapacity:
+          type: number
+        speedRestriction:
+          type: number
+        speedLimiterMrk:
+          type: number
+        tachoExemptionMrk:
+          type: number
+        dispensations:
+          type: string
+        remarks:
+          type: string
+        reasonForCreation:
+          type: string
+        statusCode:
+          type: string
+        unladenWeight:
+          type: number
+        grossKerbWeight:
+          type: number
+        grossLadenWeight:
+          type: number
+        grossGbWeight:
+          type: number
+        grossDesignWeight:
+          type: number
+        trainGbWeight:
+          type: number
+        trainDesignWeight:
+          type: number
+        maxTrainGbWeight:
+          type: number
+        maxTrainDesignWeight:
+          type: number
+        maxLoadOnCoupling:
+          type: number
+        frameDescription:
+          type: string
+        tyreUseCode:
+          type: string
+        roadFriendly:
+          type: boolean
+        drawbarCouplingFitted:
+          type: boolean
+        euroStandard:
+          type: string
+        suspensionType:
+          type: string
+        couplingType:
+          type: string
+        length:
+          type: number
+        height:
+          type: number
+        width:
+          type: number
+        frontAxleTo5thWheelMin:
+          type: number
+        frontAxleTo5thWheelMax:
+          type: number
+        frontVehicleTo5thWheelCouplingMin:
+          type: number
+        frontVehicleTo5thWheelCouplingMax:
+          type: number
+        frontAxleToRearAxle:
+          type: number
+        rearAxleToRearTrl:
+          type: number
+        couplingCenterToRearAxleMin:
+          type: number
+        couplingCenterToRearAxleMax:
+          type: number
+        couplingCenterToRearTrlMin:
+          type: number
+        couplingCenterToRearTrlMax:
+          type: number
+        centreOfRearmostAxleToRearOfTrl:
+          type: number
+        notes:
+          type: string
+        purchaserNotes:
+          type: string
+        manufacturerNotes:
+          type: string
+        noOfAxles:
+          type: number
+        brakeCode:
+          type: string
+        numberOfSeatbelts:
+          type: string
+        seatbeltInstallationApprovalDate:
+          type: string
+        axles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Axles'
+        psvBrakes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PSVBrakes'
+        axlespacing:
+          type: array
+          items:
+            $ref: '#/components/schemas/AxleSpacing'
+        plates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plate'
+        makeModel:
+          $ref: '#/components/schemas/MakeModel'
+        vehicleClass:
+          $ref: '#/components/schemas/VehicleClass'
