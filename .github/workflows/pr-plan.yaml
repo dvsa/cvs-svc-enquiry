@@ -2,9 +2,9 @@ name: PR-checks
 
 on:
  push:
-   branches: ['develop','feature/CB2-10767']
+   branches: ['develop']
  pull_request:
-   branches: ['develop','feature/CB2-10767']
+   branches: ['develop']
 
 jobs:
   scanner:
