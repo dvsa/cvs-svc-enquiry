@@ -88,6 +88,7 @@
     "serverless-dotenv-plugin": "3.1.0",
     "serverless-offline": "8.8.1",
     "serverless-webpack": "5.10.0",
+    "sonar-scanner": "3.1.0",
     "supertest": "6.3.3",
     "ts-jest": "26.4.4",
     "ts-loader": "8.0.14",
