@@ -1,21 +1,18 @@
-name: CI
+name: Continuous Integration
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - develop
-      - 'release/*'
-  pull_request:
-    branches:
-      - develop
+    paths-ignore:
+      - .github/**
+      - manifest.json
 
-permissions:
-  id-token: write
-  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
-    uses: dvsa/cvs-github-actions/.github/workflows/node-ci.yaml@develop
+  security:
+    uses: dvsa/.github/.github/workflows/nodejs-security.yaml@v2
+    with:
+      args: '--all-projects'
     secrets:
-      CVS_MGMT_AWS_ROLE: ${{ secrets.CVS_MGMT_AWS_ROLE }}
-      CVS_SERVICES_S3: ${{ secrets.CVS_SERVICES_S3 }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
