@@ -131,17 +131,16 @@ router.get(
     logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getFeedDetails(evlFeedQueryFunctionFactory, FeedName.EVL, dbService, request.query))
-      .then((result: EvlFeedData[]) => {
+      .then(async (result: EvlFeedData[]) => {
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
-            (entry) =>
-              `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+            (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
           )
           .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
-        uploadToS3(evlFeedProcessedData, fileName, () => {
+        await uploadToS3(evlFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
@@ -172,7 +171,7 @@ router.get('/tfl', (_req, res) => {
   }
   DatabaseService.build(secretsManager, mysql)
     .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
-    .then((result: TflFeedData[]) => {
+    .then(async (result: TflFeedData[]) => {
       const numberOfRows = result.length;
       const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);
@@ -180,24 +179,23 @@ router.get('/tfl', (_req, res) => {
       const processedResult = result.map((entry) => processTFLFeedData(entry));
       const tflFeedProcessedData: string = processedResult
         .map(
-          (entry) =>
-            `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
+          (entry) => `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
-      uploadToS3(tflFeedProcessedData, fileName, () => {
+      await uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
         res.status(200);
         res.contentType('json').send();
       });
     })
-    .catch((e: Error) => {
+    .catch(async (e: Error) => {
       if (e instanceof ParametersError) {
         res.status(400);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
-        uploadToS3(' , ,', fileName, () => {
+        await uploadToS3(' , ,', fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();

@@ -39,7 +39,7 @@ export async function readAndUpsert(key: string, body: string, valueIfNotFound?:
   };
   try {
     const contents = await getItemFromS3(key);
-    uploadToS3(body, key, cb);
+    await uploadToS3(body, key, cb);
     return contents ?? '';
   } catch (err) {
     // the "not found" status code depends on if the lambda has the s3:ListObjects permission, adding both to be safe
@@ -48,7 +48,7 @@ export async function readAndUpsert(key: string, body: string, valueIfNotFound?:
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (notFoundStatusCode.includes(err.statusCode)) {
       logger.debug('Creating missing file');
-      uploadToS3(body, key, cb);
+      await uploadToS3(body, key, cb);
       return valueIfNotFound ?? body;
     }
     logger.error(`Error occured when upserting file ${JSON.stringify(err)}`);
