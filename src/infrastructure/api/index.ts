@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import AWS from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
 import moment from 'moment';
@@ -53,7 +53,7 @@ router.get(
       if (process.env.IS_OFFLINE === 'true') {
         secretsManager = new LocalSecretsManagerService();
       } else {
-        secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+        secretsManager = new SecretsManagerService(new SecretsManager());
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -91,7 +91,7 @@ router.get(
     if (process.env.IS_OFFLINE === 'true') {
       secretsManager = new LocalSecretsManagerService();
     } else {
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
 
     DatabaseService.build(secretsManager, mysql)
@@ -125,7 +125,7 @@ router.get(
       secretsManager = new LocalSecretsManagerService();
     } else {
       logger.debug('configuring aws secret manager');
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     logger.debug(`creating file for EVL feed called: ${fileName}`);
@@ -168,7 +168,7 @@ router.get('/tfl', (_req, res) => {
     secretsManager = new LocalSecretsManagerService();
   } else {
     logger.debug('configuring aws secret manager');
-    secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    secretsManager = new SecretsManagerService(new SecretsManager());
   }
   DatabaseService.build(secretsManager, mysql)
     .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))

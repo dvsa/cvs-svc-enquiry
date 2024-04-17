@@ -1,4 +1,4 @@
-import { SecretsManager } from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import MissingSecretError from '../errors/MissingSecretError';
 import SecretsManagerServiceInterface from '../interfaces/SecretsManagerService';
 
@@ -10,13 +10,13 @@ export default class SecretsManagerService implements SecretsManagerServiceInter
   }
 
   async getSecret(secretName: string): Promise<string> {
-    const data = await this.secretsManager.getSecretValue({ SecretId: secretName }).promise();
+    const data = await this.secretsManager.getSecretValue({ SecretId: secretName });
 
     if (data.SecretString) {
       return data.SecretString;
     }
     if (data.SecretBinary) {
-      return data.SecretBinary.toString('utf-8');
+      return Buffer.from(data.SecretBinary).toString();
     }
 
     throw new MissingSecretError();
