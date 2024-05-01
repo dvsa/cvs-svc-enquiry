@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import AWS from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
 import moment from 'moment';
@@ -53,7 +53,7 @@ router.get(
       if (process.env.IS_OFFLINE === 'true') {
         secretsManager = new LocalSecretsManagerService();
       } else {
-        secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+        secretsManager = new SecretsManagerService(new SecretsManager());
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -91,7 +91,7 @@ router.get(
     if (process.env.IS_OFFLINE === 'true') {
       secretsManager = new LocalSecretsManagerService();
     } else {
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
 
     DatabaseService.build(secretsManager, mysql)
@@ -125,13 +125,13 @@ router.get(
       secretsManager = new LocalSecretsManagerService();
     } else {
       logger.debug('configuring aws secret manager');
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getFeedDetails(evlFeedQueryFunctionFactory, FeedName.EVL, dbService, request.query))
-      .then((result: EvlFeedData[]) => {
+      .then(async (result: EvlFeedData[]) => {
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
@@ -140,7 +140,7 @@ router.get(
           .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
-        uploadToS3(evlFeedProcessedData, fileName, () => {
+        await uploadToS3(evlFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
@@ -167,11 +167,11 @@ router.get('/tfl', (_req, res) => {
     secretsManager = new LocalSecretsManagerService();
   } else {
     logger.debug('configuring aws secret manager');
-    secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    secretsManager = new SecretsManagerService(new SecretsManager());
   }
   DatabaseService.build(secretsManager, mysql)
     .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
-    .then((result: TflFeedData[]) => {
+    .then(async (result: TflFeedData[]) => {
       const numberOfRows = result.length;
       const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);
@@ -183,19 +183,19 @@ router.get('/tfl', (_req, res) => {
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
-      uploadToS3(tflFeedProcessedData, fileName, () => {
+      await uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
         res.status(200);
         res.contentType('json').send();
       });
     })
-    .catch((e: Error) => {
+    .catch(async (e: Error) => {
       if (e instanceof ParametersError) {
         res.status(400);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
-        uploadToS3(' , ,', fileName, () => {
+        await uploadToS3(' , ,', fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
