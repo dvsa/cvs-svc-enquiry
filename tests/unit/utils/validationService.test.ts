@@ -77,9 +77,7 @@ describe('Validation Service', () => {
     });
 
     it('throws an error if there are too many identifiers (VRM and trailer id)', () => {
-      expect(() => validateResultsEvent({ VehicleRegMark: 'GL10RFE', trailerId: '2345678' })).toThrow(
-        ParametersError,
-      );
+      expect(() => validateResultsEvent({ VehicleRegMark: 'GL10RFE', trailerId: '2345678' })).toThrow(ParametersError);
     });
 
     it('throws an error if there are too many identifiers (trailerId and VIN)', () => {
@@ -100,7 +98,10 @@ describe('Validation Service', () => {
 
     it('throws an error if there are too many identifiers (all)', () => {
       expect(() => validateResultsEvent({
-        VehicleRegMark: 'GL10RFE', vinNumber: '123534567', trailerId: '2345678', testnumber: '123456789',
+        VehicleRegMark: 'GL10RFE',
+        vinNumber: '123534567',
+        trailerId: '2345678',
+        testnumber: '123456789',
       })).toThrow(ParametersError);
     });
 
