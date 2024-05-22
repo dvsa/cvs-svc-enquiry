@@ -14,6 +14,7 @@ console.log(
 const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyStructuredResultV2> => {
   console.log('event');
   console.log(JSON.stringify(event, null, 2));
+  console.log('hi');
 
   // if (!API_VERSION) {
   //   throw new Error('API_VERSION not specified');
