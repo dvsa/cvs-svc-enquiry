@@ -55,7 +55,7 @@
     "mysql2": "3.9.7",
     "serverless-http": "2.6.0",
     "source-map-support": "0.5.19",
-    "winston": "^3.7.2",
+    "winston": "^3.13.0",
     "zlib": "1.0.5"
   },
   "devDependencies": {
