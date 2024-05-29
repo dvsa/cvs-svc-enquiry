@@ -1,0 +1,87 @@
+name: 🧱 Build and Test
+run-name: 🧱 Build and Test ${{ github.ref_name }}
+on:
+  push:
+    paths:
+      - 'application/**'
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      ignore-test-failures:
+        type: boolean
+        description: Ignore Test Failures
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  environment:
+    name: 🧹 Prepare Environment
+    runs-on: ubuntu-latest
+    outputs: 
+      environment-name: ${{ steps.environment.outputs.environment-name }}
+      environment-type: ${{ steps.environment.outputs.environment-type }}
+      github-branch: ${{ steps.environment.outputs.github-branch }}
+      commit: ${{ steps.commit.outputs.commit }}
+      package-name: ${{ steps.name.outputs.package-name }}
+
+    steps:
+      - name: Generate Package Name
+        id: name
+        run: |
+          repo=${{ github.repository }}
+          echo "package-name=${repo#dvsa/}" >> $GITHUB_OUTPUT
+          echo "Package Name: ${repo#dvsa/}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📥 Get Codebase
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: ↕️ Get Environment Details
+        id: environment
+        uses: dvsa/cvs-github-actions/environment@develop
+        with:
+          environment: ${{ github.ref_name }}
+
+      - name: Get Commit SHA
+        id: commit
+        run: |
+          # Get the branch Commit ID
+          commit_id=$(git rev-parse HEAD)
+          echo "commit=${commit_id}"
+          echo "commit=${commit_id}" >> $GITHUB_OUTPUT
+          echo "Commit ID: ${commit_id}" >> $GITHUB_STEP_SUMMARY
+
+  build-service:
+    name: 🧱 Build ${{ needs.environment.outputs.package-name }}
+    runs-on: ubuntu-latest
+    environment: ${{ needs.environment.outputs.environment-type }}
+    needs: environment
+    steps:
+      - name: 📥 Get Codebase
+        uses: actions/checkout@v4
+
+      - name: 🗒️ Process Manifest Data
+        id: manifest
+        run: |
+          # Generate Manifest Outputs & Identify Build Requirements
+          hash_files="[]"
+          if [[ -f "manifest.json" ]]; then
+            package=$(jq -r '.name' manifest.json)
+            echo "package=$(jq -r '.name' manifest.json)" >> $GITHUB_OUTPUT
+            echo "language=$(jq -r '.language' manifest.json)" >> $GITHUB_OUTPUT
+            echo "liquibase=$(jq -r '.liquibase' manifest.json)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🏗️ Build Node Function
+        uses: dvsa/cvs-github-actions/build-node-function@develop
+        with:
+          commit-sha: ${{ needs.environment.outputs.commit }}
+          branch: ${{needs.environment.outputs.github-branch }}
+          mysql_liquibase: ${{ steps.manifest.outputs.liquibase }}
+          mysql_user: ${{ secrets.MYSQL_USER }}
+          mysql_password: ${{ secrets.MYSQL_PASS }}
+          continue-on-error: ${{ inputs.ignore-test-failures }}
