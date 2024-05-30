@@ -88,7 +88,7 @@
     "rimraf": "3.0.2",
     "serverless": "3.17.0",
     "serverless-dotenv-plugin": "3.1.0",
-    "serverless-offline": "8.8.1",
+    "serverless-offline": "13.6.0",
     "serverless-webpack": "5.10.0",
     "sonar-scanner": "3.1.0",
     "supertest": "6.3.3",
