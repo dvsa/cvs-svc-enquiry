@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SendMessage",
+      "Effect": "Allow",
+
+      "Action": [
+        "SQS:SendMessage",
+        "SQS:GetQueueUrl",
+        "SQS:GetQueueAttributes"
+      ],
+
+      "Resource": [
+        "${arn}"
+      ]
+    }
+  ]
+}

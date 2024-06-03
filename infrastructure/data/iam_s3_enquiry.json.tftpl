@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CVSS3Bucket${ title(action)}",
+      "Effect": "Allow",
+
+      "Action": [
+        %{ if action == "write" }"s3:PutObject",%{ endif }
+        "s3:GetObject"
+      ],
+
+      "Resource": [
+        "${arn}",
+        "${arn}/*"
+      ]
+    }
+  ]
+}

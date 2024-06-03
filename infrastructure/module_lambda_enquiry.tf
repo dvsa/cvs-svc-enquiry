@@ -20,7 +20,11 @@ module "enquiry_lambda" {
   service_name   = local.enquiry_service_map.name
 
   principal_services  = ["apigateway", "events"]
-  invoker_source_arns = [data.aws_api_gateway_rest_api.remote_gateway.arn, aws_cloudwatch_event_rule.trigger_enquiry_lambda_tfl.arn, aws_cloudwatch_event_rule.trigger_enquiry_lambda_evl.arn]
+  invoker_source_arns = [
+    data.aws_api_gateway_rest_api.remote_gateway.arn, 
+    aws_cloudwatch_event_rule.enquiry_lambda_trigger["tfl"].arn, 
+    aws_cloudwatch_event_rule.enquiry_lambda_trigger["evl"].arn
+  ]
 
   custom_policy_enabled = false
   project               = var.project
