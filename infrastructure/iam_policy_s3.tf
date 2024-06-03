@@ -2,7 +2,7 @@ resource "aws_iam_policy" "s3_enquiry" {
   for_each    = toset(["read", "write"])
   name        = "${local.csi}-${each.value}-s3-enquiry-document"
   description = "${ title(each.value) } S3 Enquiry Document"
-  policy      = templatefile("./data/iam_s3_enquiry.json.tftpl", { action = each.value, arn = aws_s3_bucket.enquiry_document_feed.arn })
+  policy      = templatefile("./data/iam_s3.json.tftpl", { action = each.value, arn = aws_s3_bucket.enquiry_document_feed.arn })
 }
 
 
