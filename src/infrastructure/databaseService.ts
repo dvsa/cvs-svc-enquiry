@@ -41,7 +41,6 @@ export default class DatabaseService implements DatabaseServiceInterface {
         port: dbConnectionDetails.port,
         database: process.env.SCHEMA_NAME,
         multipleStatements: true,
-        charset: 'utf8mb4',
       });
     }
 
