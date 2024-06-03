@@ -4,7 +4,10 @@
   "team": "",
   "documentation": "",
   "language": "node",
-  "terraform": true,
+  "terraform": {
+    "included": true,
+    "var-file": true
+  },
   "monorepo": false,
   "dynamo_tables": []
 }

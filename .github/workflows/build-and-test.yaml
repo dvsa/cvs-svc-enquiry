@@ -85,3 +85,39 @@ jobs:
           mysql_user: ${{ secrets.MYSQL_USER }}
           mysql_password: ${{ secrets.MYSQL_PASS }}
           continue-on-error: ${{ inputs.ignore-test-failures }}
+
+  plan-environment:
+    name: 🎯 Plan Environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - environment
+    outputs:
+      changes-detected: ${{ steps.plan.outputs.changes-detected }}
+    steps:
+      - name: 🪪 Configure AWS Profiles
+        uses: dvsa/cvs-github-actions/aws-profile-configure@develop
+        with:
+          actions-role: arn:aws:iam::${{ secrets.AWS_NONPROD_ACCOUNT }}:role/${{ secrets.AWS_GHA_ROLE }}
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-session-name: Terraform-GHA
+          main-role: arn:aws:iam::${{ secrets.AWS_NONPROD_ACCOUNT }}:role/${{ secrets.AWS_TF_ROLE }}
+          mgmt-role: arn:aws:iam::${{ secrets.AWS_MGMT_ACCOUNT }}:role/${{ secrets.AWS_TF_ROLE }}
+
+      - name: 🔍 Terraform Scan
+        uses: dvsa/cvs-github-actions/terraform-scan@feature/CB2-11926
+        with:
+          environment-name:  ${{ needs.environment.outputs.environment-name }}
+          terraform-version: ${{ vars.TF_VERSION }}
+          create-workspace: true 
+
+      - name: 📈 Terraform Plan
+        id: plan
+        uses: dvsa/cvs-github-actions/terraform-plan@develop
+        with:
+          environment-name:  ${{ needs.environment.outputs.environment-name }}
+          terraform-version: ${{ vars.TF_VERSION }}
+
+      - name: 🧹 Clean AWS Profiles
+        if: always()
+        uses: dvsa/cvs-github-actions/aws-profile-clean@develop
