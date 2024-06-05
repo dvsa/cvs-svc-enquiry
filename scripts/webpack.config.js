@@ -54,7 +54,11 @@ module.exports = (async () => {
     },
     plugins: [
       new ForkTsCheckerWebpackPlugin({
-        typescript: {},
+        typescript: true,
+        eslint: {
+          enabled: false,
+          files: path.resolve(__dirname, '..', 'src/**/*.{ts,js}'),
+        },
       }),
     ],
   };
