@@ -1,5 +1,4 @@
 import { spawnSync, SpawnSyncReturns } from 'child_process';
-import { mocked } from 'ts-jest/utils';
 import localDatabase, { containerName } from '../../../src/resources/localDatabase';
 
 jest.mock('child_process');
@@ -13,7 +12,7 @@ describe('Local database', () => {
   });
 
   it('does nothing when the docker container is running', () => {
-    const mockedSpawnSync = mocked(spawnSync, true);
+    const mockedSpawnSync = jest.mocked(spawnSync);
     const mockResponse = ({
       stdout: Buffer.from(`${containerName} up`),
       stderr: Buffer.from(''),
@@ -27,7 +26,7 @@ describe('Local database', () => {
   });
 
   it('starts the container when the container exists but is not running', () => {
-    const mockedSpawnSync = mocked(spawnSync, true);
+    const mockedSpawnSync = jest.mocked(spawnSync);
     const mockResponse = ({
       stdout: Buffer.from(`${containerName} exited`),
       stderr: Buffer.from(''),
@@ -48,7 +47,7 @@ describe('Local database', () => {
   });
 
   it('boots the DB from scratch when it does not exist', () => {
-    const mockedSpawnSync = mocked(spawnSync, true);
+    const mockedSpawnSync = jest.mocked(spawnSync);
     const mockListResponse = ({
       stdout: Buffer.from(''),
       stderr: Buffer.from(''),
@@ -76,7 +75,7 @@ describe('Local database', () => {
   });
 
   it('throws an error if the stderr is not empty', () => {
-    const mockedSpawnSync = mocked(spawnSync, true);
+    const mockedSpawnSync = jest.mocked(spawnSync);
     const mockResponse = ({
       stdout: Buffer.from(`${containerName} up`),
       stderr: Buffer.from('Something went wrong'),
