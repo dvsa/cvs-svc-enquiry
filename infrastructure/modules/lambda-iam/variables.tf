@@ -102,16 +102,9 @@ variable "service_name" {
 }
 
 
-variable "principal_services" {
-  type        = list(string)
-  description = "A list of service names allowed to invoke lambda. Accepted values: apigateway, events"
-  default     = [""]
-}
-
-variable "invoker_source_arns" {
-  type        = list(string)
-  description = "A list of arn of the Principal Service"
-  default     = [""]
+variable "lambda_triggers" {
+  type        = map(map(string))
+  description = "A collection of Lambda Triggers"
 }
 
 variable "dlq_arn" {

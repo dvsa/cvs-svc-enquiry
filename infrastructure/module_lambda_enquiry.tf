@@ -1,15 +1,15 @@
 locals {
   enquiry_ver = terraform.workspace
   enquiry_service_map = {
-    name        = "enquiry"
+    name        = var.api_service_name
     version     = local.enquiry_ver
     handler     = "src/handler.handler",
-    description = "Enquiry",
+    description = "${title(var.api_service_name)} Service",
     component   = "enq",
     memory      = 1024,
     timeout     = 60,
   }
-  enquiry_api_key = replace(data.aws_secretsmanager_secret_version.enquiry-api-key.secret_string, "BRANCH", terraform.workspace)
+  api_key = replace(data.aws_secretsmanager_secret_version.api-key.secret_string, "BRANCH", terraform.workspace)
 }
 
 
@@ -19,12 +19,20 @@ module "enquiry_lambda" {
   service_map    = local.enquiry_service_map
   service_name   = local.enquiry_service_map.name
 
-  principal_services  = ["apigateway", "events"]
-  invoker_source_arns = [
-    data.aws_api_gateway_rest_api.remote_gateway.arn, 
-    aws_cloudwatch_event_rule.enquiry_lambda_trigger["tfl"].arn, 
-    aws_cloudwatch_event_rule.enquiry_lambda_trigger["evl"].arn
-  ]
+  lambda_triggers  = merge(
+    {
+      for service in local.api_resources : service => { 
+        "arn" = "${module.api_gateway.api_gateway_arn}/*/*/${service}"
+        "principal" = "apigateway.amazonaws.com"
+      }
+    },
+    {
+      for task in local.scheduled_tasks : task => { 
+        "arn" = aws_cloudwatch_event_rule.lambda_trigger[task].arn
+        "principal" = "events.amazonaws.com"
+      }
+    }
+  )
 
   custom_policy_enabled = false
   project               = var.project
@@ -38,7 +46,7 @@ module "enquiry_lambda" {
   lambda_sgs = [data.terraform_remote_state.current_or_dev.outputs["lambda_sg"]]
 
   additional_env_vars = {
-    AWS_S3_BUCKET_NAME = "cvs-enquiry-document-feed-${terraform.workspace}"
+    AWS_S3_BUCKET_NAME = "cvs-${var.api_service_name}-document-feed-${terraform.workspace}"
     SECRET             = "${var.aws_environment}/rds-lambda-auth-ro/config"
     SCHEMA_NAME        = replace(upper("CVSNOP${terraform.workspace}"), "-", "")
   }
@@ -48,15 +56,7 @@ module "enquiry_lambda" {
   app_config_environment_id = var.app_config_environment_id
 }
 
-resource "aws_lambda_permission" "enquiry" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.enquiry_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = data.aws_api_gateway_rest_api.remote_gateway.arn
-}
-
-resource "aws_cloudwatch_log_subscription_filter" "enquiry" {
+resource "aws_cloudwatch_log_subscription_filter" "filter" {
   for_each        = local.enable_firehose
   log_group_name  = module.enquiry_lambda.log_group_name
   name            = "${local.enquiry_service_map.name}-${terraform.workspace}-metrics"
@@ -64,26 +64,4 @@ resource "aws_cloudwatch_log_subscription_filter" "enquiry" {
   role_arn        = data.aws_iam_role.firehose_metrics[each.key].arn
   filter_pattern  = ""
 }
-
-resource "aws_api_gateway_api_key" "enquiry-api" {
-  name  = "enquiry-api-${terraform.workspace}"
-  value = local.enquiry_api_key
-  tags = {
-    Environment = terraform.workspace
-  }
-}
-
-# resource "aws_api_gateway_usage_plan" "enquiry-up" {
-#   name = "enquiry-up-${terraform.workspace}"
-#   api_stages {
-#     api_id = data.aws_api_gateway_rest_api.remote_gateway.id
-#     stage  = aws_api_gateway_stage.stage.stage_name
-#   }
-# }
-
-# resource "aws_api_gateway_usage_plan_key" "enquiry-upk" {
-#   key_id        = aws_api_gateway_api_key.enquiry-api.id
-#   key_type      = "API_KEY"
-#   usage_plan_id = aws_api_gateway_usage_plan.enquiry-up.id
-# }
 

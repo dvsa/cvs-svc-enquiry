@@ -1,7 +1,7 @@
 locals {
 
   enquiry_sftp_push = {
-    name        = "enquiry-sftp-file-push"
+    name        = "${var.api_service_name}-sftp-file-push"
     version     = terraform.workspace
     handler     = "handler/s3Event.handler",
     description = "Push S3 data feed to SFTP ${terraform.workspace}",
@@ -13,16 +13,20 @@ locals {
   evl_config_prefix = var.environment
 }
 
-module "enquiry_sftp_file_push" {
+module "sftp_file_push" {
   source         = "./modules/lambda-iam"
-  s3_prefix      = "enquiry-evl-file-push"
+  s3_prefix      = "${var.api_service_name}-evl-file-push"
   aws_account_id = data.aws_caller_identity.current.account_id
   service_map    = local.enquiry_sftp_push
   service_name   = local.enquiry_sftp_push.name
 
   custom_policy_enabled = false
-  principal_services    = ["s3"]
-  invoker_source_arns   = [aws_s3_bucket.enquiry_document_feed.arn]
+  lambda_triggers  = {
+    bucket = {
+      arn = aws_s3_bucket.document_feed.arn
+      principal = "s3.amazonaws.com"
+    }
+  }
 
   project     = var.project
   environment = terraform.workspace
@@ -34,7 +38,7 @@ module "enquiry_sftp_file_push" {
   subnet_ids = local.subnet_ids
   lambda_sgs = local.lambda_sgs
 
-  dlq_arn = aws_sqs_queue.enquiry_evl_push_lambda.arn
+  dlq_arn = aws_sqs_queue.evl_push_lambda.arn
 
   additional_env_vars = var.sftp_vars
 
