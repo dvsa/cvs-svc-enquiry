@@ -12,6 +12,9 @@ locals {
   api_key = replace(data.aws_secretsmanager_secret_version.api-key.secret_string, "BRANCH", terraform.workspace)
 }
 
+output "state" {
+  value =  data.terraform_remote_state.current_or_dev
+}
 
 module "enquiry_lambda" {
   source         = "./modules/lambda-iam"
@@ -21,13 +24,13 @@ module "enquiry_lambda" {
 
   lambda_triggers  = merge(
     {
-      for service in local.api_resources : service => { 
-        "arn" = "${module.api_gateway.api_gateway_arn}/*/*/${service}"
+      for service in local.api_resources : title(service) => { 
+        "arn" = "${module.api_gateway.api_execution_arn}/*/*/${service}"
         "principal" = "apigateway.amazonaws.com"
       }
     },
     {
-      for task in local.scheduled_tasks : task => { 
+      for task in local.scheduled_tasks : title(task) => { 
         "arn" = aws_cloudwatch_event_rule.lambda_trigger[task].arn
         "principal" = "events.amazonaws.com"
       }
@@ -42,8 +45,8 @@ module "enquiry_lambda" {
   module                = "lambda"
   runtime               = "nodejs18.x"
 
-  subnet_ids = data.terraform_remote_state.current_or_dev.outputs["private_subnets"] 
-  lambda_sgs = [data.terraform_remote_state.current_or_dev.outputs["lambda_sg"]]
+  subnet_ids = local.subnet_ids
+  lambda_sgs = local.lambda_sgs
 
   additional_env_vars = {
     AWS_S3_BUCKET_NAME = "cvs-${var.api_service_name}-document-feed-${terraform.workspace}"

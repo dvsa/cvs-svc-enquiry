@@ -52,7 +52,7 @@ locals {
   enable_firehose = var.enable_firehose ? { (terraform.workspace) = terraform.workspace } : {}
 
   subnet_ids = data.terraform_remote_state.current_or_dev.outputs["private_subnets"]
-  lambda_sgs = [data.terraform_remote_state.current_or_dev.outputs["lambda_sg"]]
+  lambda_sgs = data.terraform_remote_state.current_or_dev.outputs["lambda_sg"]
 
   api_resources = toset([
     "testResults",
