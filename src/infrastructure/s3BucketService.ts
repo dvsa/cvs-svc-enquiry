@@ -1,10 +1,11 @@
 import {
   GetObjectCommand,
-  GetObjectCommandInput,
+  GetObjectCommandOutput,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import logger from '../utils/logger';
+import { Readable } from "stream";
 
 export async function uploadToS3(processedData: string, fileName: string, callback: () => void): Promise<void> {
   const s3: S3Client = configureS3();
@@ -21,11 +22,21 @@ export async function uploadToS3(processedData: string, fileName: string, callba
 export async function getItemFromS3(key: string): Promise<string | undefined> {
   logger.info(`Reading contents of file ${key}`);
   const s3 = configureS3();
-  const params: GetObjectCommandInput = { Bucket: process.env.AWS_S3_BUCKET_NAME ?? '', Key: key };
+  const command: GetObjectCommand = new GetObjectCommand(
+    {
+      Bucket: process.env.AWS_S3_BUCKET_NAME ?? '',
+      Key: key,
+    }
+  );
+
   try {
-    const body = (await s3.send(new GetObjectCommand(params))).Body?.toString();
-    logger.info(`File contents retrieved: ${body}`);
-    return body;
+    const response: GetObjectCommandOutput = await s3.send(command);
+
+    if (response.Body instanceof Readable) {
+      const bufferedString = await streamToString(response.Body);
+      logger.info(`File contents retrieved: ${bufferedString}`);
+      return bufferedString;
+    }
   } catch (err) {
     logger.error(`Error reading file from S3 ${JSON.stringify(err)}`);
     throw err;
@@ -77,4 +88,14 @@ function configureS3() {
     });
   }
   return new S3Client({});
+}
+
+async function streamToString(stream: Readable): Promise<string> {
+  const chunks: Uint8Array[] = [];
+
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+
+  return Buffer.concat(chunks).toString('utf-8');
 }

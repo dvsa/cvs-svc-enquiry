@@ -1,4 +1,6 @@
 /* eslint-disable import/first */
+import { Readable } from "stream";
+
 process.env.LOG_LEVEL = 'error';
 const mockPromise = jest.fn();
 const mockGetObject = jest.fn(() => ({
@@ -32,7 +34,7 @@ describe('readAndUpsert', () => {
     const originalFileContents = 'the original content of the file';
     const newFileContents = 'new content for the file';
 
-    client.on(GetObjectCommand).resolves({ Body: Buffer.from(originalFileContents) } as unknown as GetObjectCommandOutput);
+    client.on(GetObjectCommand).resolves({ Body: Readable.from(Buffer.from(originalFileContents)) } as unknown as GetObjectCommandOutput);
     client.on(PutObjectCommand).callsFake(mockUpload);
 
     const contents = await readAndUpsert(fileName, newFileContents);
