@@ -18,6 +18,6 @@ output "api_deployment" {
   value = terraform_data.create_stage.output.deployment
 }
 
-output "api_resources" {
-  value = aws_api_gateway_resource.service
+output "api_config" {
+  value = aws_api_gateway_rest_api.service
 }

@@ -37,7 +37,7 @@ resource "aws_api_gateway_integration" "parent" {
   type                    = "HTTP_PROXY"
   timeout_milliseconds    = 29000
   content_handling        = "CONVERT_TO_TEXT"
-  uri                     = "${aws_api_gateway_stage.service.invoke_url}/${each.key}"
+  uri                     = "https://${aws_api_gateway_rest_api.service.id}.execute-api.eu-west-1.amazonaws.com/${var.service_version != null ? format("%s/", var.service_version) : null}${each.key}"
 }
 
 # Parent API Gateaay Deployment
