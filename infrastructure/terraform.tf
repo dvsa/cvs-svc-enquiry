@@ -54,7 +54,7 @@ locals {
   default_tags = {
     Env        = terraform.workspace
     Project    = var.project
-    Service    = format("%s-%s-%s-%s", var.project, "svc", var.service, "tf")
+    Service    = format("%s-%s-%s-%s", var.project, "svc", var.service, var.component)
     Managed_By = "terraform"
   }
 }
