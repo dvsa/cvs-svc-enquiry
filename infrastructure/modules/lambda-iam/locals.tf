@@ -3,7 +3,7 @@ locals {
     format(
       "%s-%s-%s-%s-%s",
       var.project,
-      var.AWS_ENVIRONMENT,
+      terraform.workspace,
       var.component,
       var.module,
       var.name,
@@ -19,7 +19,7 @@ locals {
       var.project,
       data.aws_caller_identity.current.account_id,
       data.aws_region.current.name,
-      var.AWS_ENVIRONMENT,
+      terraform.workspace,
       var.component,
       var.module,
     ),

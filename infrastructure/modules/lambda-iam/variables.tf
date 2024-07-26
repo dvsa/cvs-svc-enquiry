@@ -67,11 +67,6 @@ variable "component" {
   default     = "tf"
 }
 
-variable "environment" {
-  type        = string
-  description = "The name of the Environment"
-}
-
 variable "module" {
   type        = string
   description = "The name of the module"

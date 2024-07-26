@@ -3,7 +3,6 @@ module "enquiry_lambda" {
   name            = var.service
   handler         = "src/handler.handler"
   description     = "${title(var.service)} Service"
-  environment     = terraform.workspace
   scheduled_tasks = var.scheduled_tasks
   schedule_hour   = var.schedule_hour
   lambda_triggers = {
