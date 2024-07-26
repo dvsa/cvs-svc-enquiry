@@ -1,47 +1,70 @@
 ## Environment Variables expected as TV_VAR_XXX values from pipeline
 variable "AWS_ACCOUNT" {
   type        = string
+  description = "The AWS Environment Type (prod or nonprod)"
+  default     = "nonprod"
+  validation  {
+    condition = contains(["nonprod", "prod"], var.AWS_ACCOUNT)
+    error_message = "Environment must be one of `nonprod` or `prod`"
+  }
+}
+
+variable "AWS_ACCOUNT_ID" {
+  type        = string
   description = "The AWS Account ID to deploy to"
 }
 
-variable "MGMT_ACCOUNT" {
+variable "MGMT_ACCOUNT_ID" {
   type        = string
   description = "The Management AWS Account ID"
 }
 
-variable "GITHUB_ENVIRONMENT" {
+variable "AWS_ENVIRONMENT" {
   type        = string
-  description = "GitHub Environment"
+  description = "AWS Environment (`feature`, `develop`, `integration`, `preprod`, `prod`)"
+  validation  {
+    condition = contains(["feature", "develop", "integration", "preprod", "prod"], var.AWS_ENVIRONMENT)
+    error_message = "Environment must be one of `feature`, `develop`, `integration`, `preprod` or `prod`"
+  }
 }
 
-## Standard Variables
-variable "aws_environment" {
+variable "TERRAFORM_ROLE" {
   type        = string
-  description = "The AWS Environment Type (prod or nonprod)"
-  default     = "nonprod"
+  description = "AWS Role Name for Terraform Activity"
 }
 
-variable "remote_state" {
+variable "REMOTE_STATE" {
   type        = string
-  description = "The Remote State file to acquire"
-  default     = "develop"
-}
-variable "region" {
-  type        = string
-  description = "The AWS Region"
-  default     = "eu-west-1"
+  description = "Remote State Environment to use for collecting externally managed resources"
 }
 
-variable "default_tags" {
-  type        = map(string)
-  description = "A map of default tags to apply to all taggable resources within the component"
-  default     = {}
+## Service Variables
+variable "service" {
+  type        = string
+  description = "Name of the API Service (e.g. `defects`, `enquiry`)"
 }
 
 variable "project" {
   type        = string
-  description = "The name of the tfscaffold project"
+  description = "The DVSA Project that this code belongs to"
   default     = "cvs"
+}
+
+variable "api_version" {
+  type        = string
+  description = "DVSA API Version to deploy Service Into"
+  default     = "v1"
+}
+
+variable "api_resources" {
+  type        = list(string)
+  description = "List of API Resources to create"
+}
+
+variable "default_region" {
+  type        = string
+  description = "Default AWS Region for resources"
+  default     = "eu-west-1"
 }
 
 variable "component" {
@@ -62,73 +85,33 @@ variable "sub_domain" {
   default     = "develop"
 }
 
-variable "app_config" {
-  type        = map(string)
-  description = "App Config Id Map"
-  default     = {
-    app_config_id  = "j7jocye"
-    vtx_profile_id = "t5s9wuc"
-    vtm_profile_id = "4j8oc9c"
-    vta_profile_id = "mlkqqmj"
-  }
+variable "scheduled_tasks" {
+  type        = list(string)
+  description = "List of Scheduled Tasks to create"
 }
 
 variable "schedule_day" {
   type        = map(string)
-  description = "Days on which to run Lambda on Schedule"
-  default     = {
-    evl = "MON-SAT"
-    tfl = "SUN"
-  }
+  description = "Collection of Days on which to run Lambda on Schedule per service. Key must match service name."
+  default     = {}
 }
 
 variable "schedule_hour" {
-  type        = map(number)
+  type        = number
   description = "Hours on which to run Lambda on Schedule"
-  default     = {
-    nonprod   = 19
-    prod      = 23
-  }
+  default     = null
+}
+
+variable "schedule_min" {
+  type        = number
+  description = "Minute Identifier on which to run Lambda on Schedule"
+  default     = 0
 }
 
 variable "api_spec_ver" {
   type        = string
   description = "The API Spec Version"
   default     = "0.0.1"
-}
-
-variable "environment" {
-  type        = string
-  description = "Environment Name (`feature` or workspace name)"
-  default     = "feature"
-}
-
-variable "sftp_vars" {
-  type        = map(string)
-  description = "Map of values for SFTP"
-  default     = {
-    EVL_SFTP_CONFIG = "feature/sftp_poc/evl_config"
-    EVL_SFTP_SEND   = "false"
-    EVL_SFTP_PATH   = "evl"
-    TFL_SFTP_CONFIG = "feature/sftp_poc/tfl_config"
-    TFL_SFTP_SEND   = "false"
-    TFL_SFTP_PATH   = "tfl"
-  }
-}
-
-variable "app_config_ids" {
-  type        = object({
-    app_config_id  = string
-    vtx_profile_id = string
-    vtm_profile_id = string
-    vta_profile_id = string
-  })
-  description = "Collection of App Config Identifiers"
-}
-
-variable "app_config_environment_id" {
-  type        = string
-  description = "The AppConfig Environment ID to use"
 }
 
 ## Deployment Flags
@@ -138,7 +121,7 @@ variable "enable_firehose" {
   default     = false
 }
 
-variable "enable_cw_alarms" {
+variable "enable_api_cw_alarms" {
   type        = bool
   description = "Should we enable CloudWatch Alarms"
   default     = false
@@ -148,30 +131,4 @@ variable "force_destroy" {
   type        = bool
   description = "Should we ensure resources are destroyed?"
   default     = true
-}
-
-variable "create_develop_sftp_server" {
-  type        = bool
-  description = "Should we create a Develop SFTP Server?"
-  default     = false
-}
-
-variable "include_option" {
-  type    = bool
-  default = true
-}
-
-variable "include_verb" {
-  type    = bool
-  default = true
-}
-
-variable "api_version" {
-  type        = string
-  description = "DVSA API Version to deploy Service Into"
-}
-
-variable "api_service_name" {
-  type        = string
-  description = "Name of the API Service (e.g. `defects`, `enquiry`)"
 }

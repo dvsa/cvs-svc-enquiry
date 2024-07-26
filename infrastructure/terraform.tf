@@ -17,12 +17,12 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = var.default_region
   assume_role {
-    role_arn = "arn:aws:iam::${var.AWS_ACCOUNT}:role/TerraformRole"
+    role_arn = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/${var.TERRAFORM_ROLE}"
   }
   default_tags {
-    tags = local.tags
+    tags = local.default_tags
   }
 }
 
@@ -31,21 +31,30 @@ provider "aws" {
   alias  = "us-east-1"
 
   assume_role {
-    role_arn = "arn:aws:iam::${var.AWS_ACCOUNT}:role/TerraformRole"
+    role_arn = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/${var.TERRAFORM_ROLE}"
   }
   default_tags {
-    tags = local.tags
+    tags = local.default_tags
   }
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = var.default_region
   alias  = "mgmt"
 
   assume_role {
-    role_arn = "arn:aws:iam::${var.MGMT_ACCOUNT}:role/TerraformRole"
+    role_arn = "arn:aws:iam::${var.MGMT_ACCOUNT_ID}:role/${var.TERRAFORM_ROLE}"
   }
   default_tags {
-    tags = local.tags
+    tags = local.default_tags
+  }
+}
+
+locals {
+  default_tags = {
+    Env        = terraform.workspace
+    Project    = var.project
+    Service    = format("%s-%s-%s-%s", var.project, "svc", var.service, "tf")
+    Managed_By = "terraform"
   }
 }

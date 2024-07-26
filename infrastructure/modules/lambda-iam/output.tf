@@ -18,3 +18,8 @@ output "role_name" {
   value       = aws_iam_role.main.name
   description = "The name of the role"
 }
+
+
+output "alarms" {
+  value = var.cloudwatch_alarms
+}

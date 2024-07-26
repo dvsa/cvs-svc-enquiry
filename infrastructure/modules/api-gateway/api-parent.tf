@@ -1,11 +1,7 @@
-# Root Path for the service on the parent Gateway (e.g. `/v1/enquiry`)
-data "aws_api_gateway_resource" "version" {
-  rest_api_id = var.parent_api
-  path        = "/${var.service_version}"
-}
+
 
 resource "aws_api_gateway_resource" "root" {
-  rest_api_id = var.parent_api
+  rest_api_id = data.aws_api_gateway_rest_api.parent.id
   parent_id   = data.aws_api_gateway_resource.version.id
   path_part   = var.api_service_name
 }
@@ -13,7 +9,7 @@ resource "aws_api_gateway_resource" "root" {
 # Service Resources on the parent Gateway (e.g. `/v1/enquiry/vehicle`)
 resource "aws_api_gateway_resource" "parent" {
   for_each    = toset(var.api_resources)
-  rest_api_id = var.parent_api
+  rest_api_id = data.aws_api_gateway_rest_api.parent.id
   parent_id   = aws_api_gateway_resource.root.id
   path_part   = each.value
 }
@@ -23,14 +19,14 @@ resource "aws_api_gateway_method" "parent" {
   authorization    = "CUSTOM"
   http_method      = "ANY"
   resource_id      = aws_api_gateway_resource.parent[each.key].id
-  rest_api_id      = var.parent_api
-  authorizer_id    = var.authorizer_id
+  rest_api_id      = data.aws_api_gateway_rest_api.parent.id
+  authorizer_id    = data.aws_api_gateway_authorizer.lambda_auth.id
   api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "parent" {
   for_each                = toset(var.api_resources)
-  rest_api_id             = var.parent_api
+  rest_api_id             = data.aws_api_gateway_rest_api.parent.id
   resource_id             = aws_api_gateway_resource.parent[each.key].id
   http_method             = "ANY"
   integration_http_method = "GET"
@@ -42,7 +38,7 @@ resource "aws_api_gateway_integration" "parent" {
 
 # Parent API Gateaay Deployment
 resource "aws_api_gateway_deployment" "parent" {
-  rest_api_id = var.parent_api
+  rest_api_id = data.aws_api_gateway_rest_api.parent.id
   triggers = {
     spec      = sha1(jsonencode([aws_api_gateway_method.parent[*]]))
     workspace = terraform.workspace
@@ -62,7 +58,7 @@ resource "terraform_data" "create_stage" {
   provisioner "local-exec" {
     environment = {
       STAGE = terraform.workspace
-      API   = var.parent_api
+      API   = data.aws_api_gateway_rest_api.parent.id
       DEPLOYMENT = aws_api_gateway_deployment.parent.id
     }
     command = "bash ${path.module}/scripts/create_gateway_stage.sh"

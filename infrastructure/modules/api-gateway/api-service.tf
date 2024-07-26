@@ -9,7 +9,6 @@ resource "aws_api_gateway_rest_api" "service" {
     region      = data.aws_region.current.name
     account     = data.aws_caller_identity.current.account_id
   })
-  tags               = var.default_tags
 }
 
 resource "aws_api_gateway_deployment" "service" {
@@ -38,7 +37,7 @@ resource "aws_api_gateway_stage" "service" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "api-5XX" {
-  count               = var.enable_cw_alarms ? 1 : 0
+  count               = var.enable_api_cw_alarms ? 1 : 0
   alarm_name          = "${terraform.workspace}-API-5XXErrors"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2

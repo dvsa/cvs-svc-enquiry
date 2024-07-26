@@ -1,38 +1,17 @@
-resource "aws_cloudwatch_metric_alarm" "lambda_timeouts" {
-  count               = local.is_main_env ? 1 : 0
-  alarm_name          = "${var.service_map.name}-${terraform.workspace}-Timeouts"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = var.timeout_alarm_evaluation_periods
-  threshold           = var.timeout_alarm_threshold
-  period              = var.timeout_alarm_period
-  unit                = "Count"
-
-  namespace   = "CVS"
-  metric_name = "Timeouts"
-  statistic   = "Maximum"
-  dimensions = {
-    Environment = terraform.workspace
-    Service     = "/aws/lambda/${var.service_map.name}"
-  }
-  lifecycle {
-    ignore_changes = [alarm_actions]
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  count               = local.is_main_env ? 1 : 0
-  alarm_name          = "${var.service_map.name}-${terraform.workspace}-Errors"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = var.errors_alarm_evaluation_periods
-  threshold           = var.errors_alarm_threshold
-  period              = var.errors_alarm_period
-  unit                = "Count"
-  namespace           = "AWS/Lambda"
-  metric_name         = "Errors"
-  statistic           = "Maximum"
-  dimensions = {
-    FunctionName = var.service_map.name
-  }
+resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
+  for_each            = toset([ for alarm in ["timeout", "errors", "deadletter"] : alarm if var.cloudwatch_alarms.enabled ])
+  alarm_name          = "${var.name}-${terraform.workspace}-${title(each.value)}"
+  alarm_description   = "Lambda ${each.value} alarm"
+  comparison_operator = var.cloudwatch_alarms[each.value].comparison_operator
+  evaluation_periods  = var.cloudwatch_alarms[each.value].evaluation_periods
+  threshold           = var.cloudwatch_alarms[each.value].threshold
+  period              = var.cloudwatch_alarms[each.value].period
+  unit                = var.cloudwatch_alarms[each.value].unit
+  namespace           = var.cloudwatch_alarms[each.value].namespace
+  metric_name         = var.cloudwatch_alarms[each.value].metric_name
+  statistic           = var.cloudwatch_alarms[each.value].statistic
+  dimensions          = var.cloudwatch_alarms[each.value].dimensions
+  treat_missing_data  = var.cloudwatch_alarms[each.value].treat_missing_data
   lifecycle {
     ignore_changes = [alarm_actions]
   }
