@@ -1,8 +1,15 @@
 # Web Access
 sub_domain = "preprod"
 
-# Scheduling - The hour that the task will run
-schedule_hour = 23
-
-# Scheduling - The minute that the task will run
-schedule_min  = 0
+scheduled_tasks = {
+  evl = {
+    day    = "MON-SAT"
+    hour   = 23
+    minute = 0
+  }
+  tfl = {
+    day    = "SUN"
+    hour   = 23
+    minute = 0
+  }
+}

@@ -3,19 +3,7 @@ module "enquiry_lambda" {
   name            = var.service
   handler         = "src/handler.handler"
   description     = "${title(var.service)} Service"
-  scheduled_tasks = {
-    evl = {
-      day    = "MON-SAT"
-      hour   = 0
-      minute = 0
-    }
-    tfl = {
-      day    = "SUN"
-      hour   = 0
-      minute = 0
-    }
-  }
-  #schedule_hour   = var.schedule_hour
+  scheduled_tasks = var.scheduled_tasks
   lambda_triggers = {
     for service in [
       "testResults",

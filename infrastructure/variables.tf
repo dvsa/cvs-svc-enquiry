@@ -69,6 +69,17 @@ variable "api_version" {
   default     = "v1"
 }
 
+# Create Scheduled Tasks
+variable "scheduled_tasks" {
+  type        = map(object({
+    day    = string
+    hour   = number
+    minute = number
+  }))
+  description = "Collection of Scheduled Tasks to create"
+  default     = {}
+}
+
 # AWS Settings
 variable "default_region" {
   type        = string

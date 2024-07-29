@@ -1,8 +1,15 @@
 # Web Access
 sub_domain = "develop"
 
-# Scheduling - The hour that the task will run
-schedule_hour = 19
-
-# Scheduling - The minute that the task will run
-schedule_min  = 0
+scheduled_tasks = {
+  evl = {
+    day    = "MON-SAT"
+    hour   = 19
+    minute = 0
+  }
+  tfl = {
+    day    = "SUN"
+    hour   = 19
+    minute = 0
+  }
+}
