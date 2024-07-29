@@ -69,11 +69,6 @@ variable "api_version" {
   default     = "v1"
 }
 
-variable "api_resources" {
-  type        = list(string)
-  description = "List of API Resources to create"
-}
-
 # AWS Settings
 variable "default_region" {
   type        = string
@@ -92,31 +87,6 @@ variable "sub_domain" {
   type        = string
   description = "The SubDomain to apply to the Application Domain"
   default     = "develop"
-}
-
-# Scheduled Tasks
-variable "scheduled_tasks" {
-  type        = list(string)
-  description = "List of Scheduled Tasks to create"
-  default     = null
-}
-
-variable "schedule_day" {
-  type        = map(string)
-  description = "Collection of Days on which to run Lambda on Schedule per service. Key must match service name."
-  default     = {}
-}
-
-variable "schedule_hour" {
-  type        = number
-  description = "Hours on which to run Lambda on Schedule"
-  default     = null
-}
-
-variable "schedule_min" {
-  type        = number
-  description = "Minute Identifier on which to run Lambda on Schedule"
-  default     = 0
 }
 
 ## Deployment Flags

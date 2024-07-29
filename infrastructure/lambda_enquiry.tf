@@ -3,10 +3,24 @@ module "enquiry_lambda" {
   name            = var.service
   handler         = "src/handler.handler"
   description     = "${title(var.service)} Service"
-  scheduled_tasks = var.scheduled_tasks
-  schedule_hour   = var.schedule_hour
+  scheduled_tasks = {
+    evl = {
+      day    = "MON-SAT"
+      hour   = 0
+      minute = 0
+    }
+    tfl = {
+      day    = "SUN"
+      hour   = 0
+      minute = 0
+    }
+  }
+  #schedule_hour   = var.schedule_hour
   lambda_triggers = {
-    for service in var.api_resources : service => { 
+    for service in [
+      "testResults",
+      "vehicle"
+    ] : service => { 
       "arn" = "${module.api_gateway.api_execution_arn}/*/*/${service}"
       "principal" = "apigateway.amazonaws.com"
     }

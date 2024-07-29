@@ -74,9 +74,13 @@ variable "module" {
 }
 
 variable "scheduled_tasks" {
-  type        = set(string)
-  description = "List of Scheduled Tasks to create"
-  default     = []
+  type        = map(object({
+    day    = string
+    hour   = number
+    minute = number
+  }))
+  description = "Collection of Scheduled Tasks to create"
+  default     = {}
 }
 
 variable "schedule_day" {
