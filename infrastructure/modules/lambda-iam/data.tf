@@ -1,5 +1,5 @@
 data "aws_api_gateway_rest_api" "remote_gateway" {
-  name = terraform.workspace
+  name = var.AWS_ENVIRONMENT
 }
 
 
@@ -9,7 +9,7 @@ data "aws_availability_zones" "current" {}
 
 data "aws_s3_objects" "service_hashes" {
   bucket = var.s3_bucket
-  prefix = "${local.bucket_prefix}/latestHash_${terraform.workspace}"
+  prefix = "${local.bucket_prefix}/latestHash_${var.AWS_ENVIRONMENT}"
 }
 
 data "aws_s3_object" "service_hash" {
@@ -35,7 +35,7 @@ data "aws_appconfig_environment" "environment" {
 
 data "terraform_remote_state" "current_or_dev" {
   backend   = "s3"
-  workspace = terraform.workspace
+  workspace = var.AWS_ENVIRONMENT
   config = {
     bucket         = "cvs-tf-environment"
     key            = "tf_state"
@@ -47,11 +47,11 @@ data "terraform_remote_state" "current_or_dev" {
 
 ## Firehost Data
 data "aws_kinesis_firehose_delivery_stream" "firehose_metrics" {
-  for_each = var.enable_firehose ? { (terraform.workspace) = terraform.workspace } : {}
+  for_each = var.enable_firehose ? { (var.AWS_ENVIRONMENT) = var.AWS_ENVIRONMENT } : {}
   name     = "metrics=${each.key}"
 }
 
 data "aws_iam_role" "firehose_metrics" {
-  for_each = var.enable_firehose ? { (terraform.workspace) = terraform.workspace } : {}
+  for_each = var.enable_firehose ? { (var.AWS_ENVIRONMENT) = var.AWS_ENVIRONMENT } : {}
   name     = "cvs-service-logs-firehose-delivery-${each.key}"
 }

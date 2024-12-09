@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
   for_each            = toset([ for alarm in ["timeout", "errors", "deadletter"] : alarm if var.cloudwatch_alarms.enabled ])
-  alarm_name          = "${var.name}-${terraform.workspace}-${title(each.value)}"
+  alarm_name          = "${var.name}-${var.AWS_ENVIRONMENT}-${title(each.value)}"
   alarm_description   = "Lambda ${each.value} alarm"
   comparison_operator = var.cloudwatch_alarms[each.value].comparison_operator
   evaluation_periods  = var.cloudwatch_alarms[each.value].evaluation_periods

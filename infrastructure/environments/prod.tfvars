@@ -1,5 +1,4 @@
-# Web Access
-sub_domain = "prod"
+AWS_ENVIRONMENT = "prod"
 
 scheduled_tasks = {
   evl = {
@@ -12,4 +11,8 @@ scheduled_tasks = {
     hour   = 23
     minute = 0
   }
+}
+
+cloudwatch_alarms = {
+  enabled = true
 }

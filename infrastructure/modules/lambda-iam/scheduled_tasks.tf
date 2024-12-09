@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_event_rule" "lambda_trigger" {
   for_each            = var.scheduled_tasks
-  name                = "${terraform.workspace}-trigger-${each.key}-feed-every-day"
+  name                = "${var.AWS_ENVIRONMENT}-trigger-${each.key}-feed-every-day"
   description         = "${each.value.day} at ${format("%02s%02s", tostring(each.value.hour), tostring(each.value.minute))}hrs"
   schedule_expression = "cron(${each.value.minute} ${each.value.hour} ? * ${each.value.day} *)"
 }

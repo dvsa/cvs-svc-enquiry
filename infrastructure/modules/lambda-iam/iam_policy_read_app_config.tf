@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "read_app_config" {
 
 resource "aws_iam_role_policy" "role-policy-attachment-app-config" {
   for_each = toset([ for environment in keys(data.aws_appconfig_environment.environment) : environment if var.read_from_app_config ])
-  name     = "${var.project}-${terraform.workspace}-${var.name}-read-app-config-${each.value}"
+  name     = "${var.DVSA_PROJECT}-${var.AWS_ENVIRONMENT}-${var.name}-read-app-config-${each.value}"
   role     = aws_iam_role.main.name
   policy   = data.aws_iam_policy_document.read_app_config[each.value].json
 }

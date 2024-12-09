@@ -1,5 +1,4 @@
-# Web Access
-sub_domain = "integration"
+AWS_ENVIRONMENT = "int"
 
 scheduled_tasks = {
   evl = {

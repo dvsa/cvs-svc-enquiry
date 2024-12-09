@@ -1,5 +1,4 @@
-# Web Access
-sub_domain = "develop"
+AWS_ENVIRONMENT = "dev"
 
 scheduled_tasks = {
   evl = {
