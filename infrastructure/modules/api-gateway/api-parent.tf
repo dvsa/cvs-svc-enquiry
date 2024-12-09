@@ -34,7 +34,7 @@ resource "aws_api_gateway_integration" "parent" {
   resource_id             = aws_api_gateway_resource.parent[each.key].id
   http_method             = "ANY"
   integration_http_method = "GET"
-  type                    = "HTTP"
+  type                    = "HTTP_PROXY"
   timeout_milliseconds    = 29000
   content_handling        = "CONVERT_TO_TEXT"
   uri                     = "${aws_api_gateway_stage.service.invoke_url}/${each.key}"
