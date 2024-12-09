@@ -50,6 +50,19 @@ variable "project" {
   default     = "cvs"
 }
 
+variable "component" {
+  type        = string
+  description = "The name of the tfscaffold component"
+  default     = "tf"
+}
+
+# API Configuration
+variable "api_spec_ver" {
+  type        = string
+  description = "The API Spec Version"
+  default     = "0.0.1"
+}
+
 variable "api_version" {
   type        = string
   description = "DVSA API Version to deploy Service Into"
@@ -61,18 +74,14 @@ variable "api_resources" {
   description = "List of API Resources to create"
 }
 
+# AWS Settings
 variable "default_region" {
   type        = string
   description = "Default AWS Region for resources"
   default     = "eu-west-1"
 }
 
-variable "component" {
-  type        = string
-  description = "The name of the tfscaffold component"
-  default     = "tf"
-}
-
+# Web Access
 variable "domain" {
   type        = string
   description = "The Application Domain"
@@ -85,9 +94,11 @@ variable "sub_domain" {
   default     = "develop"
 }
 
+# Scheduled Tasks
 variable "scheduled_tasks" {
   type        = list(string)
   description = "List of Scheduled Tasks to create"
+  default     = null
 }
 
 variable "schedule_day" {
@@ -106,12 +117,6 @@ variable "schedule_min" {
   type        = number
   description = "Minute Identifier on which to run Lambda on Schedule"
   default     = 0
-}
-
-variable "api_spec_ver" {
-  type        = string
-  description = "The API Spec Version"
-  default     = "0.0.1"
 }
 
 ## Deployment Flags
