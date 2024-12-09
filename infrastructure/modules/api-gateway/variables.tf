@@ -9,14 +9,10 @@ variable "service_version" {
   default     = null
 }
 
-variable "default_tags" {
-  type        = map(string)
-  description = "Tags to apply to resources"
-}
-
-variable "enable_cw_alarms" {
+variable "enable_api_cw_alarms" {
   type        = bool
   description = "Should CloudWatch Alarms be enabled?"
+  default     = false
 }
 
 variable "api_service_name" {
@@ -29,10 +25,6 @@ variable "api_resources" {
   description = "List of API Resources to create"
 }
 
-variable "authorizer_id" {
-  type        = string
-  description = "Environment specific Lambda Authorizer ID"
-}
 
 variable "lambda_uri" {
   type        = string
