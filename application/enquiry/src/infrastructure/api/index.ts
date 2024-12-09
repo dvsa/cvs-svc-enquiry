@@ -2,28 +2,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import express, { Request, Router } from 'express';
-import mysql from 'mysql2/promise';
 import moment from 'moment';
-import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
-import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
-import { getResultsDetails, getVehicleDetails, getFeedDetails } from '../../domain/enquiryService';
-import ParametersError from '../../errors/ParametersError';
-import ResultsEvent from '../../interfaces/ResultsEvent';
-import VehicleEvent from '../../interfaces/VehicleEvent';
-import EvlEvent from '../../interfaces/EvlEvent';
-import DatabaseService from '../databaseService';
-import SecretsManagerService from '../secretsManagerService';
-import NotFoundError from '../../errors/NotFoundError';
-import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
-import LocalSecretsManagerService from '../localSecretsManagerService';
+import mysql from 'mysql2/promise';
 import evlFeedQueryFunctionFactory from '../../app/evlFeedQueryFunctionFactory';
-import { uploadToS3 } from '../s3BucketService';
-import logger from '../../utils/logger';
+import testResultsQueryFunctionFactory from '../../app/testResultsQueryFunctionFactory';
 import tflFeedQueryFunctionFactory from '../../app/tflFeedQueryFunctionFactory';
-import { processTFLFeedData } from '../../utils/tflHelpers';
+import vehicleQueryFunctionFactory from '../../app/vehicleQueryFunctionFactory';
+import { getFeedDetails, getResultsDetails, getVehicleDetails } from '../../domain/enquiryService';
+import NotFoundError from '../../errors/NotFoundError';
+import ParametersError from '../../errors/ParametersError';
+import EvlEvent from '../../interfaces/EvlEvent';
 import { FeedName } from '../../interfaces/FeedTypes';
+import ResultsEvent from '../../interfaces/ResultsEvent';
+import SecretsManagerServiceInterface from '../../interfaces/SecretsManagerService';
+import VehicleEvent from '../../interfaces/VehicleEvent';
 import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../../interfaces/queryResults/tflFeedData';
+import logger from '../../utils/logger';
+import { processTFLFeedData } from '../../utils/tflHelpers';
+import DatabaseService from '../databaseService';
+import LocalSecretsManagerService from '../localSecretsManagerService';
+import { uploadToS3 } from '../s3BucketService';
+import SecretsManagerService from '../secretsManagerService';
 
 const app = express();
 const router: Router = express.Router();
@@ -216,6 +216,6 @@ router.all('*', (_request, res) => {
   res.status(404).send();
 });
 
-app.use('/*/enquiry/', router);
+app.use('/', router);
 
 export { app };

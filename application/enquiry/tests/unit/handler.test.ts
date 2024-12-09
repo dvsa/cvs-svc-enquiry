@@ -1,7 +1,7 @@
 import { APIGatewayEvent, Context } from 'aws-lambda';
+import Version from '../../local/data/version.json';
 import { handler } from '../../src/handler';
 import * as Utils from '../../src/utils';
-import Version from '../../local/data/version.json';
 
 describe('Application entry', () => {
   const OLD_ENV = process.env;
@@ -25,7 +25,7 @@ describe('Application entry', () => {
 
   describe('Handler', () => {
     it('should call the express wrapper', async () => {
-      event = { body: 'Test Body', path: '/v1/enquiry/' };
+      event = { body: 'Test Body', path: '/' };
 
       const response = await handler(event, context);
       expect(response.statusCode).toEqual(200);
@@ -35,7 +35,7 @@ describe('Application entry', () => {
     describe('when the service is running', () => {
       describe('without proxy', () => {
         it("should return a body response when the handler has event with the '/' as path", async () => {
-          event = { httpMethod: 'GET', path: '/v1/enquiry/' };
+          event = { httpMethod: 'GET', path: '/' };
 
           const response = await handler(event, context);
           const parsedBody = JSON.parse(response.body ?? '') as { ok: boolean };
@@ -61,7 +61,7 @@ describe('Application entry', () => {
         it("should call the service/lambda when the path contains '/version' and return the app version following the semver convention", async () => {
           event = {
             ...Version,
-            path: '/v1/enquiry/version',
+            path: '/version',
           };
 
           const response = await handler(event, context);

@@ -1,14 +1,14 @@
 import supertest from 'supertest';
-import { app } from '../../../../src/infrastructure/api';
 import * as enquiryService from '../../../../src/domain/enquiryService';
-import DatabaseService from '../../../../src/infrastructure/databaseService';
-import VehicleDetails from '../../../../src/interfaces/queryResults/technical/vehicleDetails';
-import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService';
-import ParametersError from '../../../../src/errors/ParametersError';
-import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
 import NotFoundError from '../../../../src/errors/NotFoundError';
-import EvlFeedData from '../../../../src/interfaces/queryResults/evlFeedData';
+import ParametersError from '../../../../src/errors/ParametersError';
+import { app } from '../../../../src/infrastructure/api';
+import DatabaseService from '../../../../src/infrastructure/databaseService';
 import * as upload from '../../../../src/infrastructure/s3BucketService';
+import DatabaseServiceInterface from '../../../../src/interfaces/DatabaseService';
+import EvlFeedData from '../../../../src/interfaces/queryResults/evlFeedData';
+import VehicleDetails from '../../../../src/interfaces/queryResults/technical/vehicleDetails';
+import TestResult from '../../../../src/interfaces/queryResults/test/testResult';
 import TflFeedData from '../../../../src/interfaces/queryResults/tflFeedData';
 
 // TODO Define Mock strategy
@@ -19,7 +19,7 @@ describe('API', () => {
 
   describe('GET', () => {
     it("should return '{ok: true}' when hitting '/' route", async () => {
-      const result = await supertest(app).get('/v1/enquiry/');
+      const result = await supertest(app).get('/');
       const resultContent = JSON.parse(result.text) as { ok: boolean };
 
       expect(result.status).toEqual(200);
@@ -28,7 +28,7 @@ describe('API', () => {
     });
 
     it(`should return '{version: ${process.env.API_VERSION}}' when hitting '/version' route`, async () => {
-      const result = await supertest(app).get('/v1/enquiry/version');
+      const result = await supertest(app).get('/version');
       const resultContent = JSON.parse(result.text) as { version: string };
 
       expect(result.status).toEqual(200);
@@ -37,7 +37,7 @@ describe('API', () => {
     });
 
     it('returns a 404 if the method is not supported', async () => {
-      const resultPost = await supertest(app).post('/v1/enquiry/not-a-route');
+      const resultPost = await supertest(app).post('/not-a-route');
 
       expect(resultPost.status).toEqual(404);
     });
@@ -53,7 +53,7 @@ describe('API', () => {
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockResolvedValue(vehicleDetails as VehicleDetails);
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as VehicleDetails;
 
         expect(resultContent.vin).toEqual('vin1');
@@ -62,7 +62,7 @@ describe('API', () => {
       it('returns the error message if there is an error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
 
         expect(result.text).toEqual('This is an error');
       });
@@ -70,7 +70,7 @@ describe('API', () => {
       it('sets the status to 400 for a parameters error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new ParametersError('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
 
         expect(result.status).toEqual(400);
       });
@@ -78,7 +78,7 @@ describe('API', () => {
       it('sets the status to 404 for a not found error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new NotFoundError());
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
 
         expect(result.status).toEqual(404);
       });
@@ -86,7 +86,7 @@ describe('API', () => {
       it('sets the status to 500 for a generic error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
 
         expect(result.status).toEqual(500);
       });
@@ -95,25 +95,25 @@ describe('API', () => {
         process.env.IS_OFFLINE = 'true';
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getVehicleDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/vehicle?vinNumber=123456789');
+        const result = await supertest(app).get('/vehicle?vinNumber=123456789');
 
         expect(result.status).toEqual(500);
       });
 
       it('returns a 405 if the method is not supported', async () => {
-        const resultPost = await supertest(app).post('/v1/enquiry/vehicle?vinNumber=123456789');
+        const resultPost = await supertest(app).post('/vehicle?vinNumber=123456789');
 
         expect(resultPost.status).toEqual(405);
 
-        const resultPut = await supertest(app).put('/v1/enquiry/vehicle?vinNumber=123456789');
+        const resultPut = await supertest(app).put('/vehicle?vinNumber=123456789');
 
         expect(resultPut.status).toEqual(405);
 
-        const resultPatch = await supertest(app).patch('/v1/enquiry/vehicle?vinNumber=123456789');
+        const resultPatch = await supertest(app).patch('/vehicle?vinNumber=123456789');
 
         expect(resultPatch.status).toEqual(405);
 
-        const resultDelete = await supertest(app).delete('/v1/enquiry/vehicle?vinNumber=123456789');
+        const resultDelete = await supertest(app).delete('/vehicle?vinNumber=123456789');
 
         expect(resultDelete.status).toEqual(405);
       });
@@ -126,7 +126,7 @@ describe('API', () => {
         } as TestResult;
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockResolvedValue([resultDetails]);
-        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+        const result = await supertest(app).get('/testResults?vinNumber=123456789');
         const resultContent = JSON.parse(result.text) as [TestResult];
 
         expect(resultContent[0].testStatus).toEqual('Success');
@@ -135,7 +135,7 @@ describe('API', () => {
       it('returns the error message if there is an error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+        const result = await supertest(app).get('/testResults?vinNumber=123456789');
 
         expect(result.text).toEqual('This is an error');
       });
@@ -143,7 +143,7 @@ describe('API', () => {
       it('sets the status to 400 for a parameters error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new ParametersError('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+        const result = await supertest(app).get('/testResults?vinNumber=123456789');
 
         expect(result.status).toEqual(400);
       });
@@ -151,7 +151,7 @@ describe('API', () => {
       it('sets the status to 404 for a not found error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new NotFoundError('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+        const result = await supertest(app).get('/testResults?vinNumber=123456789');
 
         expect(result.status).toEqual(404);
       });
@@ -159,25 +159,25 @@ describe('API', () => {
       it('sets the status to 500 for a generic error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getResultsDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/testResults?vinNumber=123456789');
+        const result = await supertest(app).get('/testResults?vinNumber=123456789');
 
         expect(result.status).toEqual(500);
       });
 
       it('returns a 405 if the method is not supported', async () => {
-        const resultPost = await supertest(app).post('/v1/enquiry/testResults?vinNumber=123456789');
+        const resultPost = await supertest(app).post('/testResults?vinNumber=123456789');
 
         expect(resultPost.status).toEqual(405);
 
-        const resultPut = await supertest(app).put('/v1/enquiry/testResults?vinNumber=123456789');
+        const resultPut = await supertest(app).put('/testResults?vinNumber=123456789');
 
         expect(resultPut.status).toEqual(405);
 
-        const resultPatch = await supertest(app).patch('/v1/enquiry/testResults?vinNumber=123456789');
+        const resultPatch = await supertest(app).patch('/testResults?vinNumber=123456789');
 
         expect(resultPatch.status).toEqual(405);
 
-        const resultDelete = await supertest(app).delete('/v1/enquiry/testResults?vinNumber=123456789');
+        const resultDelete = await supertest(app).delete('/testResults?vinNumber=123456789');
 
         expect(resultDelete.status).toEqual(405);
       });
@@ -193,14 +193,14 @@ describe('API', () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
         jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([evlFeedData]);
-        const result = await supertest(app).get('/v1/enquiry/evl');
+        const result = await supertest(app).get('/evl');
         expect(result.status).toEqual(200);
       });
 
       it('returns the error message if there is an error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/evl');
+        const result = await supertest(app).get('/evl');
 
         expect(result.text).toEqual('Error Generating EVL Feed Data: This is an error');
       });
@@ -208,7 +208,7 @@ describe('API', () => {
       it('sets the status to 400 for a parameters error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/evl');
+        const result = await supertest(app).get('/evl');
 
         expect(result.status).toEqual(400);
       });
@@ -216,7 +216,7 @@ describe('API', () => {
       it('sets the status to 404 for a not found error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/evl');
+        const result = await supertest(app).get('/evl');
 
         expect(result.status).toEqual(404);
       });
@@ -224,7 +224,7 @@ describe('API', () => {
       it('sets the status to 500 for a generic error', async () => {
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
         jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
-        const result = await supertest(app).get('/v1/enquiry/evl');
+        const result = await supertest(app).get('/evl');
 
         expect(result.status).toEqual(500);
       });
@@ -247,14 +247,14 @@ describe('API', () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([tflFeedData]);
-      const result = await supertest(app).get('/v1/enquiry/tfl');
+      const result = await supertest(app).get('/tfl');
       expect(result.status).toEqual(200);
     });
 
     it('returns the error message if there is an error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
-      const result = await supertest(app).get('/v1/enquiry/tfl');
+      const result = await supertest(app).get('/tfl');
 
       expect(result.text).toEqual('Error Generating TFL Feed Data: This is an error');
     });
@@ -262,7 +262,7 @@ describe('API', () => {
     it('sets the status to 400 for a parameters error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
-      const result = await supertest(app).get('/v1/enquiry/tfl');
+      const result = await supertest(app).get('/tfl');
 
       expect(result.status).toEqual(400);
     });
@@ -271,7 +271,7 @@ describe('API', () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
-      const result = await supertest(app).get('/v1/enquiry/tfl');
+      const result = await supertest(app).get('/tfl');
 
       expect(result.status).toEqual(200);
     });
@@ -279,7 +279,7 @@ describe('API', () => {
     it('sets the status to 500 for a generic error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
-      const result = await supertest(app).get('/v1/enquiry/tfl');
+      const result = await supertest(app).get('/tfl');
 
       expect(result.status).toEqual(500);
     });
