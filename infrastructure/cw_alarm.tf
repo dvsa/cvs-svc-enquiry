@@ -1,15 +1,15 @@
 locals {
-  service_name = "${local.csi}-enquiry-evl-push-lambda"
+  service_name = "${local.csi}-${var.api_service_name}-evl-push-lambda"
 }
 
-resource "aws_sqs_queue" "enquiry_evl_push_lambda" {
+resource "aws_sqs_queue" "evl_push_lambda" {
   name                      = "${local.service_name}-dlq"
   message_retention_seconds = 1209600
   tags                      = local.default_tags
   sqs_managed_sse_enabled   = true
 }
 
-resource "aws_cloudwatch_metric_alarm" "deadletter_alarm_enquiry_evl_push_lambda" {
+resource "aws_cloudwatch_metric_alarm" "deadletter_alarm_evl_push_lambda" {
   alarm_name          = "${local.service_name}-dlq-not-empty-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -18,15 +18,15 @@ resource "aws_cloudwatch_metric_alarm" "deadletter_alarm_enquiry_evl_push_lambda
   period              = "120"
   statistic           = "Sum"
   threshold           = "1"
-  alarm_description   = "Items are on the ${aws_sqs_queue.enquiry_evl_push_lambda.name} queue"
+  alarm_description   = "Items are on the ${aws_sqs_queue.evl_push_lambda.name} queue"
   treat_missing_data  = "notBreaching"
   tags                = local.default_tags
   dimensions = {
-    "QueueName" = aws_sqs_queue.enquiry_evl_push_lambda.name
+    "QueueName" = aws_sqs_queue.evl_push_lambda.name
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "enquiry_evl_push_lambda_errors" {
+resource "aws_cloudwatch_metric_alarm" "evl_push_lambda_errors" {
   alarm_name          = "${local.service_name}-errors-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
@@ -38,11 +38,11 @@ resource "aws_cloudwatch_metric_alarm" "enquiry_evl_push_lambda_errors" {
   metric_name = "Errors"
   statistic   = "Maximum"
   dimensions = {
-    FunctionName = module.enquiry_sftp_file_push.function_name
+    FunctionName = module.sftp_file_push.function_name
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "enquiry_evl_push_lambda_timeouts" {
+resource "aws_cloudwatch_metric_alarm" "evl_push_lambda_timeouts" {
   alarm_name          = "${local.service_name}-timeouts-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
@@ -55,6 +55,6 @@ resource "aws_cloudwatch_metric_alarm" "enquiry_evl_push_lambda_timeouts" {
   statistic   = "Maximum"
   dimensions = {
     Environment = terraform.workspace
-    Service     = "/aws/lambda/${module.enquiry_sftp_file_push.function_name}"
+    Service     = "/aws/lambda/${module.sftp_file_push.function_name}"
   }
 }

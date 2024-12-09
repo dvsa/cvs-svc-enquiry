@@ -1,10 +1,7 @@
 data "aws_api_gateway_rest_api" "remote_gateway" {
-  name = "cb2-11925"
+  name = terraform.workspace
 }
 
-output "gateway" {
-  value = data.aws_api_gateway_rest_api.remote_gateway
-}
 
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
@@ -36,7 +33,7 @@ data "aws_iam_policy_document" "fh_cw_assume" {
 
 data "terraform_remote_state" "current_or_dev" {
   backend   = "s3"
-  workspace = var.remote_state
+  workspace = terraform.workspace
   config = {
     bucket         = "cvs-tf-environment"
     key            = "tf_state"
@@ -58,12 +55,12 @@ data "aws_iam_role" "firehose_metrics" {
 }
 
 ## Secrets Data
-data "aws_secretsmanager_secret" "enquiry-api-key" {
-  name = "${var.GITHUB_ENVIRONMENT}/enquiry/api-key"
+data "aws_secretsmanager_secret" "api-key" {
+  name = "${var.GITHUB_ENVIRONMENT}/${var.api_service_name}/api-key"
 }
 
-data "aws_secretsmanager_secret_version" "enquiry-api-key" {
-  secret_id = data.aws_secretsmanager_secret.enquiry-api-key.id
+data "aws_secretsmanager_secret_version" "api-key" {
+  secret_id = data.aws_secretsmanager_secret.api-key.id
 }
 
 
@@ -71,6 +68,21 @@ data "aws_appconfig_environments" "app_config_environments" {
   application_id = var.app_config_ids["app_config_id"]
 }
 
+
+data "aws_api_gateway_authorizer" "lambda_auth" {
+  rest_api_id      = data.aws_api_gateway_rest_api.remote_gateway.id
+  authorizer_id    = data.terraform_remote_state.current_or_dev.outputs.lambda_authorizer_id
+}
 # output "app_env" {
 #   value = data.aws_appconfig_environments.app_config_environments
 # }
+
+## S3 Access Logging
+data "aws_kms_key" "access_logging_s3" {
+  key_id = "alias/s3-access-logging-${terraform.workspace}"
+}
+
+data "aws_s3_bucket" "access_logging" {
+  #checkov:skip=CKV_AWS_144:This bucket does not require cross region replication.
+  bucket = "cvs-s3-access-logs-${terraform.workspace}"
+}

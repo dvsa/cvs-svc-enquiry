@@ -1,4 +1,4 @@
-## Environment Variables
+## Environment Variables expected as TV_VAR_XXX values from pipeline
 variable "AWS_ACCOUNT" {
   type        = string
   description = "The AWS Account ID to deploy to"
@@ -72,8 +72,6 @@ variable "app_config" {
     vta_profile_id = "mlkqqmj"
   }
 }
-
-
 
 variable "schedule_day" {
   type        = map(string)
@@ -166,4 +164,14 @@ variable "include_option" {
 variable "include_verb" {
   type    = bool
   default = true
+}
+
+variable "api_version" {
+  type        = string
+  description = "DVSA API Version to deploy Service Into"
+}
+
+variable "api_service_name" {
+  type        = string
+  description = "Name of the API Service (e.g. `defects`, `enquiry`)"
 }

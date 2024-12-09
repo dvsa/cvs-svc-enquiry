@@ -29,12 +29,12 @@ locals {
   tags = {
     Env        = terraform.workspace
     Project    = "cvs"
-    Service    = "cvs-svc-enquiry-tf"
+    Service    = "cvs-svc-${var.api_service_name}-tf"
     Managed_By = "terraform"
   }
 
   domain = "${var.sub_domain}.${var.domain}"
-  default_tags = var.default_tags
+  default_tags = local.tags
 
   cfs_buckets   = ["csv", "documents"]
 
@@ -58,4 +58,9 @@ locals {
     "testResults",
     "vehicle"
   ])
+
+  scheduled_tasks = toset([
+    "evl", 
+    "tfl"
+  ]) 
 }

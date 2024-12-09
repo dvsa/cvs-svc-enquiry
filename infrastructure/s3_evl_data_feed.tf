@@ -1,41 +1,43 @@
-resource "aws_s3_bucket" "enquiry_document_feed" {
-  bucket = "cvs-enquiry-document-feed-${terraform.workspace}"
+
+## Document Feed
+resource "aws_s3_bucket" "document_feed" {
+  bucket = "cvs-${var.api_service_name}-document-feed-${terraform.workspace}"
 
   force_destroy = var.force_destroy
 
   tags = {
-    Name        = "cvs-enquiry-document-feed-${terraform.workspace}"
+    Name        = "cvs-${var.api_service_name}-document-feed-${terraform.workspace}"
     Environment = terraform.workspace
   }
 }
 
-resource "aws_s3_bucket_logging" "enquiry_document_feed" {
-  bucket        = aws_s3_bucket.enquiry_document_feed.id
+resource "aws_s3_bucket_logging" "document_feed" {
+  bucket        = aws_s3_bucket.document_feed.id
   target_bucket = data.aws_s3_bucket.access_logging.id
-  target_prefix = "${aws_s3_bucket.enquiry_document_feed.bucket}/"
+  target_prefix = "${aws_s3_bucket.document_feed.bucket}/"
 }
 
-resource "aws_s3_bucket_versioning" "enquiry_document_feed" {
-  bucket = aws_s3_bucket.enquiry_document_feed.id
+resource "aws_s3_bucket_versioning" "document_feed" {
+  bucket = aws_s3_bucket.document_feed.id
   versioning_configuration {
     status = "Suspended"
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "enable_acl_enquiry_document_feed" {
-  bucket = aws_s3_bucket.enquiry_document_feed.id
+resource "aws_s3_bucket_ownership_controls" "enable_acl_document_feed" {
+  bucket = aws_s3_bucket.document_feed.id
   rule {
     object_ownership = "ObjectWriter"
   }
 }
 
-resource "aws_s3_bucket_acl" "enquiry_document_feed" {
-  depends_on = [aws_s3_bucket_ownership_controls.enable_acl_enquiry_document_feed]
-  bucket     = aws_s3_bucket.enquiry_document_feed.id
+resource "aws_s3_bucket_acl" "document_feed" {
+  depends_on = [aws_s3_bucket_ownership_controls.enable_acl_document_feed]
+  bucket     = aws_s3_bucket.document_feed.id
   acl        = "private"
 }
 
-resource "aws_s3_bucket_public_access_block" "enquiry_document_feed" {
+resource "aws_s3_bucket_public_access_block" "document_feed" {
   bucket                  = data.aws_s3_bucket.access_logging.id
   block_public_acls       = true
   block_public_policy     = true
@@ -43,8 +45,8 @@ resource "aws_s3_bucket_public_access_block" "enquiry_document_feed" {
   restrict_public_buckets = true
 }
 
-# resource "aws_s3_bucket_server_side_encryption_configuration" "enquiry_document_feed" {
-#   bucket   = aws_s3_bucket.enquiry_document_feed.bucket
+# resource "aws_s3_bucket_server_side_encryption_configuration" "document_feed" {
+#   bucket   = aws_s3_bucket.document_feed.bucket
 #
 #   rule {
 #     apply_server_side_encryption_by_default {
@@ -53,12 +55,12 @@ resource "aws_s3_bucket_public_access_block" "enquiry_document_feed" {
 #   }
 # }
 
-resource "aws_s3_bucket_policy" "enquiry_document_feed" {
-  bucket = aws_s3_bucket.enquiry_document_feed.id
-  policy = data.aws_iam_policy_document.enquiry_document_feed_https.json
+resource "aws_s3_bucket_policy" "document_feed" {
+  bucket = aws_s3_bucket.document_feed.id
+  policy = data.aws_iam_policy_document.document_feed_https.json
 }
 
-data "aws_iam_policy_document" "enquiry_document_feed_https" {
+data "aws_iam_policy_document" "document_feed_https" {
   statement {
     effect = "Deny"
     principals {
@@ -70,8 +72,8 @@ data "aws_iam_policy_document" "enquiry_document_feed_https" {
     ]
 
     resources = [
-      "${aws_s3_bucket.enquiry_document_feed.arn}/*",
-      aws_s3_bucket.enquiry_document_feed.arn
+      "${aws_s3_bucket.document_feed.arn}/*",
+      aws_s3_bucket.document_feed.arn
     ]
 
     condition {
@@ -83,10 +85,10 @@ data "aws_iam_policy_document" "enquiry_document_feed_https" {
 }
 
 resource "aws_s3_bucket_notification" "feed_bucket_notification" {
-  bucket = aws_s3_bucket.enquiry_document_feed.id
+  bucket = aws_s3_bucket.document_feed.id
 
   lambda_function {
-    lambda_function_arn = module.enquiry_sftp_file_push.arn
+    lambda_function_arn = module.sftp_file_push.arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "EVL_GVT_"
     filter_suffix       = ".csv"
