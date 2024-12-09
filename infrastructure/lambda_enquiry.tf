@@ -14,7 +14,7 @@ module "enquiry_lambda" {
 
   additional_env_vars = {
     AWS_S3_BUCKET_NAME = module.document_feed.bucket_name
-    SECRET             = "${var.AWS_ACCOUNT}/rds-lambda-auth-ro/config"
+    SECRET             = "${var.AWS_ENVIRONMENT}/rds-lambda-auth-ro/config"
     SCHEMA_NAME        = replace(upper("CVSNOP${var.AWS_ENVIRONMENT}"), "-", "")
   }
 

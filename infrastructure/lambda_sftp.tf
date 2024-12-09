@@ -8,14 +8,14 @@ module "document_feed" {
       filter_prefix = "EVL_GVT_"
       filter_suffix = ".csv"
     }]
+
   sqs_notifications = {
     enabled       = true
-    arn           = "arn:aws:sqs:eu-west-1:${var.AWS_ACCOUNT_ID}:cert-gov-notify-${var.AWS_ENVIRONMENT}-queue"
+    arn           = "arn:aws:sqs:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:cert-gov-notify-${var.AWS_ENVIRONMENT}-queue"
     events        = "s3:ObjectCreated:*"
     filter_prefix = "VOSA-"
     filter_suffix = ".csv"
   }
-  
 }
 
 # SFTP Push Lambda
