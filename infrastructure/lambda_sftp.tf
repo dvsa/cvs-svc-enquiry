@@ -21,7 +21,6 @@ module "sftp_file_push" {
   source         = "./modules/lambda-iam"
   name           = "${var.service}-sftp-file-push"
   description    = "Push S3 data feed to SFTP ${terraform.workspace}"
-  environment    = terraform.workspace
   s3_prefix      = "${var.service}-evl-file-push"
   handler        = "handler/s3Event.handler"
   memory         = 5000
