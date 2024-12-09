@@ -54,8 +54,8 @@ locals {
   subnet_ids = data.terraform_remote_state.current_or_dev.outputs["private_subnets"]
   lambda_sgs = [data.terraform_remote_state.current_or_dev.outputs["lambda_sg"]]
 
-  api_resources = {
-    testResults = "ANY"
-    vehicle     = "ANY"
-  }
+  api_resources = toset([
+    "testResults",
+    "vehicle"
+  ])
 }
