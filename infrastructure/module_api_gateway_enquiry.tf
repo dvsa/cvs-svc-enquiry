@@ -4,6 +4,7 @@ module "api_gateway" {
   service_version  = "v1"
   default_tags     = local.tags
   enable_cw_alarms = false
+  api_doc          = "data_openapi_doc.yaml.tftpl"
   api_service_name = "enquiry"
   api_resources    = local.api_resources
   authorizer_id    = data.aws_api_gateway_authorizer.lambda_auth.id

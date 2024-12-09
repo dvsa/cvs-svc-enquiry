@@ -38,3 +38,8 @@ variable "lambda_uri" {
   type        = string
   description = "The URI to access the Lambda Function"
 }
+
+variable "api_doc" {
+  type        = string
+  description = "OpenAPI Document (in YAML format) for the API Gateway"
+}

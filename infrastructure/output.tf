@@ -15,5 +15,9 @@ output "api_deployment" {
 }
 
 output "api_resources" {
-  value = module.api_gateway.api_resources
+  value = keys(yamldecode(module.api_gateway.api_config.body).paths)
+}
+
+output "api_execution_arn" {
+  value = module.api_gateway.api_execution_arn
 }
