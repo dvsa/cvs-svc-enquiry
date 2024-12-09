@@ -4,7 +4,7 @@
   "team": "",
   "documentation": "",
   "language": "node",
-  "terraform": false,
+  "terraform": true,
   "monorepo": false,
   "dynamo_tables": []
 }

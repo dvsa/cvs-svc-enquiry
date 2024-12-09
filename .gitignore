@@ -46,3 +46,13 @@ reports
 
 # Idea specific hidden files
 .idea/**
+
+# Terraform Files
+**/.tfstate*
+**/.terraform/*
+**/.terraform-lock.hcl
+**/.terraform.lock.hcl
+**/*.tfplan
+
+# Local variables/secrets
+**/local.auto.tfvars*
