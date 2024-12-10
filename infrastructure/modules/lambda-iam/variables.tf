@@ -1,6 +1,37 @@
+# Terraform Environment Information
+variable "environment" {
+  type        = string
+  description = "Environment Name to pass into resources (optional)"
+  default     = null
+}
+
+variable "management_env" {
+  type        = string
+  description = "Name of the Management Environment"
+  default     = "mgmt"
+}
+
+variable "parent_environment" {
+  type        = string
+  description = "Parent Environment Name (if required)"
+  default     = null
+}
+
+variable "region" {
+  type        = string
+  description = "The AWS Region to deploy services to"
+  default     = "eu-west-1"
+}
+
 variable "name" {
   type        = string
   description = "Name of the Lambda"
+}
+
+variable "project" {
+  type        = string
+  description = "The DVSA Project that services are for"
+  default     = "cvs"
 }
 
 variable "handler" {
@@ -53,18 +84,6 @@ variable "concurrent_executions" {
   type        = number
   description = "Lambda concurrency"
   default     = null
-}
-
-variable "project" {
-  type        = string
-  description = "The name of Project"
-  default     = "cvs"
-}
-
-variable "component" {
-  type        = string
-  description = "The name of the Component"
-  default     = "tf"
 }
 
 variable "module" {

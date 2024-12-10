@@ -64,6 +64,19 @@ provider "aws" {
 }
 
 
+# Acquire the parent (core) config
+data "terraform_remote_state" "core" {
+  backend   = "s3"
+  workspace = coalesce(var.parent_environment, var.AWS_ENVIRONMENT)
+  config = {
+    bucket               = "cvs-tf-state-${var.AWS_REGION}"
+    dynamodb_table       = "cvs-tf-state-${var.AWS_REGION}"
+    region               = var.AWS_REGION
+    key                  = "cvs-tf-core"
+    workspace_key_prefix = local.aws_account_name
+  }
+}
+
 locals {
   name = {
     # Create default naming convention for CloudWatch Logs
@@ -84,6 +97,9 @@ locals {
 
   # Process inbound json string TF_VAR_AWS_ACCOUNTS
   aws_accounts      = jsondecode(var.AWS_ACCOUNTS)
+  aws_account_id    = local.aws_accounts[var.AWS_ENVIRONMENT].id
+  aws_account_name  = local.aws_accounts[var.AWS_ENVIRONMENT].name
   aws_account_ids   = { for name in local.aws_account_names : name => one(flatten(distinct([for account in local.aws_accounts : account.id if account.name == name]))) }
   aws_account_names = distinct([for name, account in local.aws_accounts : account.name if name != terraform.workspace])
 }
+

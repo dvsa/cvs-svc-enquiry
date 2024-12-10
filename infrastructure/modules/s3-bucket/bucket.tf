@@ -1,10 +1,6 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket = var.bucket_name
+  bucket = local.bucket_name
   force_destroy = var.force_destroy
-  tags = {
-    Name        = var.bucket_name
-    Environment = var.AWS_ENVIRONMENT
-  }
 }
 
 resource "aws_s3_bucket_policy" "bucket" {
@@ -80,4 +76,12 @@ resource "aws_s3_bucket_notification" "feed_bucket_notification" {
       filter_suffix = topic.value.filter_suffix
     }
   }
+}
+
+locals {
+    # Don't want to assume the environment, so there is a variable to overwrite this
+  environment = coalesce(var.environment, terraform.workspace)
+
+  # Format Service Name
+  bucket_name = format(local.name.resource, var.name)
 }

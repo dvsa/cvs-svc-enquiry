@@ -1,7 +1,9 @@
 # Document Feed Bucket
 module "document_feed" {
   source  = "./modules/s3-bucket"
-  bucket_name = format(local.name.resource, "document-feed")
+  name = "document-feed"
+  region = var.AWS_REGION
+  force_destroy  = var.force_destroy
   lambda_notifications = [{
       arn           = module.sftp_file_push.arn
       events        = "s3:ObjectCreated:*"
@@ -11,7 +13,7 @@ module "document_feed" {
 
   sqs_notifications = {
     enabled       = true
-    arn           = "arn:aws:sqs:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:cert-gov-notify-${var.AWS_ENVIRONMENT}-queue"
+    arn           = "arn:aws:sqs:${var.AWS_REGION}:${local.aws_account_id}:cert-gov-notify-${var.AWS_ENVIRONMENT}-queue"
     events        = "s3:ObjectCreated:*"
     filter_prefix = "VOSA-"
     filter_suffix = ".csv"
@@ -21,8 +23,9 @@ module "document_feed" {
 # SFTP Push Lambda
 module "sftp_file_push" {
   source         = "./modules/lambda-iam"
-  name           = format(local.name.resource, "sftp-file-push")
+  name           = "sftp-file-push"
   description    = "Push S3 data feed to SFTP ${var.AWS_ENVIRONMENT}"
+  region = var.AWS_REGION
   s3_prefix      = "${var.DVSA_SERVICE}-evl-file-push"
   handler        = "handler/s3Event.handler"
   memory         = 5000

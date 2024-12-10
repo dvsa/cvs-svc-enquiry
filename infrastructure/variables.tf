@@ -4,16 +4,6 @@ variable "AWS_REGION" {
   description = "AWS Region in which to deploy resources"
 }
 
-variable "AWS_ACCOUNT" {
-  type        = string
-  description = "The AWS Environment Type (prod or nonprod)"
-  default     = "nonprod"
-  validation  {
-    condition = contains(["nonprod", "prod"], var.AWS_ACCOUNT)
-    error_message = "Environment must be one of `nonprod` or `prod`"
-  }
-}
-
 variable "AWS_ACCOUNTS" {
   type        = string
   description = "JSON Encoded AWS Account information"

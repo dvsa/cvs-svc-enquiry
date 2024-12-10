@@ -1,4 +1,4 @@
-variable "bucket_name" {
+variable "name" {
   type        = string
   description = "Name of the bucket to create (must be unique across all of AWS S3"
 }
@@ -88,4 +88,35 @@ variable "sns_notifications" {
   })
   description = "Collection of SNS Configuration for an S3 Bucket Notification"
   default = null
+}
+
+# Terraform Environment Information
+variable "environment" {
+  type        = string
+  description = "Environment Name to pass into resources (optional)"
+  default     = null
+}
+
+variable "management_env" {
+  type        = string
+  description = "Name of the Management Environment"
+  default     = "mgmt"
+}
+
+variable "parent_environment" {
+  type        = string
+  description = "Parent Environment Name (if required)"
+  default     = null
+}
+
+variable "region" {
+  type        = string
+  description = "The AWS Region to deploy services to"
+  default     = "eu-west-1"
+}
+
+variable "project" {
+  type        = string
+  description = "The DVSA Project that services are for"
+  default     = "cvs"
 }

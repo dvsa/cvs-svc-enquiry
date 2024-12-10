@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "service" {
-  function_name = "${var.name}-${var.AWS_ENVIRONMENT}"
+  function_name = "${var.name}-${local.environment}"
   s3_bucket     = data.aws_s3_object.service.bucket
   s3_key        = data.aws_s3_object.service.key
 
@@ -10,7 +10,7 @@ resource "aws_lambda_function" "service" {
   handler                        = var.handler
   runtime                        = var.runtime
   role                           = aws_iam_role.main.arn
-  description                    = "${var.description} ${var.AWS_ENVIRONMENT}"
+  description                    = "${var.description} ${local.environment}"
   memory_size                    = var.memory
   timeout                        = var.timeout
   reserved_concurrent_executions = var.concurrent_executions
@@ -47,22 +47,20 @@ resource "aws_lambda_function" "service" {
 
 resource "aws_sqs_queue" "dead_letter" {
   count                     = var.dead_letter_required ? 1 : 0
-  name                      = "${var.DVSA_PROJECT}-${var.AWS_ENVIRONMENT}-${var.name}-dlq"
+  name                      = "${var.project}-${local.environment}-${var.name}-dlq"
   message_retention_seconds = var.dead_letter_retention
-  tags                      = local.tags
   sqs_managed_sse_enabled   = var.dead_letter_managed_sse
 }
 
 resource "aws_cloudwatch_log_group" "logs" {
-  name              = "/aws/${var.module}/${var.name}-${var.AWS_ENVIRONMENT}"
+  name              = "/aws/${var.module}/${var.name}-${local.environment}"
   retention_in_days = var.log_retention_days
-  tags              = local.tags
 }
 
 ## SQS Policies
 resource "aws_iam_policy" "push_sqs_message" {
   count       = var.dead_letter_required ? 1 : 0
-  name        = "${var.DVSA_PROJECT}-${var.AWS_ENVIRONMENT}-${var.name}-send-sqs-message-dlq"
+  name        = "${var.project}-${local.environment}-${var.name}-send-sqs-message-dlq"
   description = "${replace(title(var.name), "-", " ")} EVL File Send SQS Message to DLQ"
   policy      = templatefile("${path.module}/data/iam_sqs_send.json.tftpl", { arn = aws_sqs_queue.dead_letter[count.index].arn })
 }
@@ -71,4 +69,12 @@ resource "aws_iam_role_policy_attachment" "allow_evl_push_lambda_send_message" {
   count      = var.dead_letter_required ? 1 : 0
   role       = aws_iam_role.main.name
   policy_arn = aws_iam_policy.push_sqs_message[count.index].arn
+}
+
+locals {
+  # Don't want to assume the environment, so there is a variable to overwrite this
+  environment = coalesce(var.environment, terraform.workspace)
+
+  # Format Service Name
+  service_name = format(local.name.resource, var.name)
 }

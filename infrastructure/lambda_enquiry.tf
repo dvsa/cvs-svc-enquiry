@@ -2,18 +2,19 @@
 module "enquiry_lambda" {
   source          = "./modules/lambda-iam"
   name            = var.DVSA_SERVICE
+  region = var.AWS_REGION
   handler         = "src/handler.handler"
   description     = "${title(var.DVSA_SERVICE)} Service"
   scheduled_tasks = var.scheduled_tasks
   lambda_triggers = {
-    for service in local.services : service => { 
+    for service in var.lambda_services : service => { 
       "arn"       = "${module.api_gateway.api_execution_arn}/*/*/${service}"
       "principal" = "apigateway.amazonaws.com"
     }
   }
 
   additional_env_vars = {
-    AWS_S3_BUCKET_NAME = module.document_feed.bucket_name
+    AWS_S3_BUCKET_NAME = module.document_feed.bucket_id
     SECRET             = "${var.AWS_ENVIRONMENT}/rds-lambda-auth-ro/config"
     SCHEMA_NAME        = replace(upper("CVSNOP${var.AWS_ENVIRONMENT}"), "-", "")
   }
@@ -23,7 +24,7 @@ module "enquiry_lambda" {
     timeout = {
       dimensions = {
         Environment = var.AWS_ENVIRONMENT
-        Service     = format(local.name.cloudwatch, var.DVSA_SERVICE)
+        Service     = format(local.name.cloudwatch, "lambda", var.DVSA_SERVICE)
       }
     }
     errors = {
@@ -37,11 +38,12 @@ module "enquiry_lambda" {
 # Enquiry Service API
 module "api_gateway" {
   source            = "git::https://github.com/dvsa/cvs-tf-modules//api_gateway?ref=feature/CB2-14857"  
-  service_name      = var.DVSA_SERVICE
+  name      = var.DVSA_SERVICE
   environment       = var.AWS_ENVIRONMENT
+  region            = var.AWS_REGION
   service_version   = var.api_version
   api_doc           = "${path.root}/data/openapi_doc.yaml.tftpl"
-  api_resources     = local.services
+  api_resources     = var.lambda_services
 
   # Create Cloudwatch Alarms either by using the default config (var.cloudwatch_alarms) or 
   #   create a custom definition to replace required values
@@ -50,3 +52,4 @@ module "api_gateway" {
     "5XX" = var.cloudwatch_alarms
   }
 }
+
