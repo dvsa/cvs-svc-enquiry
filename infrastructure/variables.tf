@@ -66,7 +66,7 @@ variable "cloudwatch_alarms" {
     unit               = optional(string, "Count")
     statistic          = optional(string, "Maximum")
   })
-  description = "Congifuration for Cloudwatch Alarms"
+  description = "Configuration for Cloudwatch Alarms"
   default     = {}
 }
 
