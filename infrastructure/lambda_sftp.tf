@@ -25,7 +25,8 @@ module "sftp_file_push" {
   source         = "./modules/lambda-iam"
   name           = "sftp-file-push"
   description    = "Push S3 data feed to SFTP ${var.AWS_ENVIRONMENT}"
-  region = var.AWS_REGION
+  account        = local.aws_account_name
+  region         = var.AWS_REGION
   s3_prefix      = "${var.DVSA_SERVICE}-evl-file-push"
   handler        = "handler/s3Event.handler"
   memory         = 5000

@@ -5,6 +5,11 @@ variable "environment" {
   default     = null
 }
 
+variable "account" {
+  type        = string
+  description = "Name of the AWS Account to create resources within"
+}
+
 variable "management_env" {
   type        = string
   description = "Name of the Management Environment"

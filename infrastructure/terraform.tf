@@ -63,20 +63,6 @@ provider "aws" {
   }
 }
 
-
-# Acquire the parent (core) config
-data "terraform_remote_state" "core" {
-  backend   = "s3"
-  workspace = coalesce(var.parent_environment, var.AWS_ENVIRONMENT)
-  config = {
-    bucket               = "cvs-tf-state-${var.AWS_REGION}"
-    dynamodb_table       = "cvs-tf-state-${var.AWS_REGION}"
-    region               = var.AWS_REGION
-    key                  = "cvs-tf-core"
-    workspace_key_prefix = local.aws_account_name
-  }
-}
-
 locals {
   name = {
     # Create default naming convention for CloudWatch Logs

@@ -2,7 +2,8 @@
 module "enquiry_lambda" {
   source          = "./modules/lambda-iam"
   name            = var.DVSA_SERVICE
-  region = var.AWS_REGION
+  account         = local.aws_account_name
+  region          = var.AWS_REGION
   handler         = "src/handler.handler"
   description     = "${title(var.DVSA_SERVICE)} Service"
   scheduled_tasks = var.scheduled_tasks
@@ -38,8 +39,9 @@ module "enquiry_lambda" {
 # Enquiry Service API
 module "api_gateway" {
   source            = "git::https://github.com/dvsa/cvs-tf-modules//api_gateway?ref=feature/CB2-14857"  
-  name      = var.DVSA_SERVICE
+  name              = var.DVSA_SERVICE
   environment       = var.AWS_ENVIRONMENT
+  account           = local.aws_account_name
   region            = var.AWS_REGION
   service_version   = var.api_version
   api_doc           = "${path.root}/data/openapi_doc.yaml.tftpl"

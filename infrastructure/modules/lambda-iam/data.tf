@@ -1,16 +1,3 @@
-# Acquire the parent (core) config
-data "terraform_remote_state" "core" {
-  backend   = "s3"
-  workspace = coalesce(var.parent_environment, local.environment)
-  config = {
-    bucket               = "cvs-tf-state-${var.region}"
-    dynamodb_table       = "cvs-tf-state-${var.region}"
-    region               = var.region
-    key                  = "cvs-tf-core"
-    workspace_key_prefix = "nonprod"
-  }
-}
-
 data "aws_api_gateway_rest_api" "remote_gateway" {
   name = data.terraform_remote_state.core.outputs.api_gateway_name
 }
