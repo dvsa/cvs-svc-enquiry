@@ -24,7 +24,7 @@ paths:
                 $ref: "#/components/schemas/EmptySchema"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:enquiry-${environment}/invocations"
+        uri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:enquiry-${environment}/invocations"
         responses:
           default:
             statusCode: "200"
@@ -53,7 +53,7 @@ paths:
                 $ref: "#/components/schemas/EmptySchema"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:enquiry-${environment}/invocations"
+        uri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:enquiry-${environment}/invocations"
         responses:
           default:
             statusCode: "200"
