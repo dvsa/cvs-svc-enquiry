@@ -2,6 +2,7 @@
 module "document_feed" {
   source  = "git::https://github.com/dvsa/cvs-tf-modules//s3_bucket?ref=feature/CB2-14857"  
   name = "document-feed"
+  account        = local.aws_account_name
   region = var.AWS_REGION
   force_destroy  = var.force_destroy
   lambda_notifications = [{
