@@ -1,6 +1,6 @@
 # Document Feed Bucket
 module "document_feed" {
-  source  = "./modules/s3-bucket"
+  source  = "git::https://github.com/dvsa/cvs-tf-modules//s3_bucket?ref=feature/CB2-14857"  
   name = "document-feed"
   region = var.AWS_REGION
   force_destroy  = var.force_destroy
@@ -22,7 +22,7 @@ module "document_feed" {
 
 # SFTP Push Lambda
 module "sftp_file_push" {
-  source         = "./modules/lambda-iam"
+  source         = "git::https://github.com/dvsa/cvs-tf-modules//service_lambda?ref=feature/CB2-14857"  
   name           = "sftp-file-push"
   description    = "Push S3 data feed to SFTP ${var.AWS_ENVIRONMENT}"
   account        = local.aws_account_name

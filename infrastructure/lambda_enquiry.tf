@@ -1,6 +1,6 @@
 # Enquiry Service Lambda
 module "enquiry_lambda" {
-  source          = "./modules/lambda-iam"
+  source          = "git::https://github.com/dvsa/cvs-tf-modules//service_lambda?ref=feature/CB2-14857"
   name            = var.DVSA_SERVICE
   account         = local.aws_account_name
   region          = var.AWS_REGION
