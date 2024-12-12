@@ -90,7 +90,7 @@ locals {
   aws_account_names = distinct([for name, account in local.aws_accounts : account.name if name != terraform.workspace])
 }
 
-# Required Variables
+# Required Variables that can be set within tfvars files
 
 # Core Variables expected as TV_VAR_XXX values from pipeline
 variable "AWS_REGION" {
