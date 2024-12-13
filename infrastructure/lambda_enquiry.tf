@@ -59,7 +59,3 @@ module "api_gateway" {
     "5XX" = var.cloudwatch_alarms
   }
 }
-
-output "config" {
-  value = module.enquiry_lambda.config
-}
