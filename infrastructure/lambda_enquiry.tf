@@ -2,11 +2,15 @@
 module "enquiry_lambda" {
   source          = "git::https://github.com/dvsa/cvs-tf-modules//service_lambda?ref=feature/CB2-14857"
   name            = var.DVSA_SERVICE
-  account         = local.aws_account_name
   region          = var.AWS_REGION
   handler         = "src/handler.handler"
   description     = "${title(var.DVSA_SERVICE)} Service"
   scheduled_tasks = var.scheduled_tasks
+  appconfig_id    = local.appconfig_id
+
+  subnet_ids         = local.subnet_ids
+  security_group_ids = local.security_group_ids
+
   lambda_triggers = {
     for service in var.lambda_services : service => { 
       "arn"       = "${module.api_gateway.api_execution_arn}/*/*/${service}"
@@ -41,7 +45,8 @@ module "api_gateway" {
   source            = "git::https://github.com/dvsa/cvs-tf-modules//api_gateway?ref=feature/CB2-14857"  
   name              = var.DVSA_SERVICE
   environment       = var.AWS_ENVIRONMENT
-  account           = local.aws_account_name
+  api_parent_name   = local.api_parent_name
+  api_authorizer_id = local.api_authorizer_id
   region            = var.AWS_REGION
   service_version   = var.api_version
   api_doc           = "${path.root}/data/openapi_doc.yaml.tftpl"
@@ -55,3 +60,6 @@ module "api_gateway" {
   }
 }
 
+output "config" {
+  value = module.enquiry_lambda.config
+}

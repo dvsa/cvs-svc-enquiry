@@ -63,6 +63,19 @@ provider "aws" {
   }
 }
 
+# Acquire the parent (core) config
+data "terraform_remote_state" "core" {
+  backend   = "s3"
+  workspace = coalesce(var.parent_environment, var.AWS_ENVIRONMENT)
+  config = {
+    bucket               = "cvs-tf-state-${var.AWS_REGION}"
+    dynamodb_table       = "cvs-tf-state-${var.AWS_REGION}"
+    region               = var.AWS_REGION
+    key                  = "cvs-tf-core"
+    workspace_key_prefix = local.aws_account_name
+  }
+}
+
 # Local Variables that require calculations
 locals {
   name = {
@@ -88,6 +101,13 @@ locals {
   aws_account_name  = local.aws_accounts[var.AWS_ENVIRONMENT].name
   aws_account_ids   = { for name in local.aws_account_names : name => one(flatten(distinct([for account in local.aws_accounts : account.id if account.name == name]))) }
   aws_account_names = distinct([for name, account in local.aws_accounts : account.name if name != terraform.workspace])
+
+  # Simplify Data Resources
+  api_parent_name    = data.terraform_remote_state.core.outputs.api_gateway_name
+  api_authorizer_id  = data.terraform_remote_state.core.outputs.api_authorizer_id
+  subnet_ids         = [ for subnet in data.terraform_remote_state.core.outputs.private_subnets : subnet.id ]
+  security_group_ids = try(tolist(data.terraform_remote_state.core.outputs.lambda_security_group_id), tolist([data.terraform_remote_state.core.outputs.lambda_security_group_id]))
+  appconfig_id       = data.terraform_remote_state.core.outputs.appconfig_application_id
 }
 
 # Required Variables that can be set within tfvars files
