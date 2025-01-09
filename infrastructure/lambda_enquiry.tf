@@ -12,7 +12,7 @@ module "enquiry_lambda" {
   security_group_ids = local.security_group_ids
 
   lambda_triggers = {
-    for service in var.lambda_services : service => { 
+    for service in var.lambda_services : service => {
       "arn"       = "${module.api_gateway.api_execution_arn}/*/*/${service}"
       "principal" = "apigateway.amazonaws.com"
     }
@@ -42,7 +42,7 @@ module "enquiry_lambda" {
 
 # Enquiry Service API
 module "api_gateway" {
-  source            = "git::https://github.com/dvsa/cvs-tf-modules//api_gateway?ref=feature/CB2-14857"  
+  source            = "git::https://github.com/dvsa/cvs-tf-modules//api_gateway?ref=feature/CB2-14857"
   name              = var.DVSA_SERVICE
   environment       = var.AWS_ENVIRONMENT
   api_parent_name   = local.api_parent_name
@@ -61,8 +61,8 @@ module "api_gateway" {
 }
 
 module "enquiry_config" {
-  for_each = var.create_appconfig_profile ? toset([var.DVSA_SERVICE]) : []
-  source = "git::https://github.com/dvsa/cvs-tf-modules//app_config?ref=feature/CB2-14860"
+  for_each     = var.create_appconfig_profile ? toset([var.DVSA_SERVICE]) : []
+  source       = "git::https://github.com/dvsa/cvs-tf-modules//app_config?ref=feature/CB2-14860"
   appconfig_id = data.terraform_remote_state.core.outputs.appconfig_application_id
   name         = each.key
   description  = "Enquiry Service"

@@ -105,9 +105,9 @@ locals {
   # Simplify Data Resources
   #api_parent_name    = data.terraform_remote_state.core.outputs.api_gateway_name
   #api_authorizer_id  = data.terraform_remote_state.core.outputs.api_authorizer_id
-  subnet_ids         = [ for subnet in data.terraform_remote_state.core.outputs.private_subnets : subnet.id ]
+  subnet_ids = [for subnet in data.terraform_remote_state.core.outputs.private_subnets : subnet.id]
   #security_group_ids = try(tolist(data.terraform_remote_state.core.outputs.lambda_security_group_id), tolist([data.terraform_remote_state.core.outputs.lambda_security_group_id]))
-  
+
   # AppConfig
   appconfig_name = format("%s-%s-%s", var.DVSA_PROJECT, local.aws_account_name, var.AWS_REGION)
 }
@@ -173,7 +173,7 @@ variable "api_version" {
 
 # Cloudwatch Alarms
 variable "cloudwatch_alarms" {
-  type        = object({
+  type = object({
     enabled            = optional(bool, false)
     operator           = optional(string, "GreaterThanOrEqualToThreshold")
     evaluation_periods = optional(number, 2)
@@ -188,7 +188,7 @@ variable "cloudwatch_alarms" {
 
 # Create Scheduled Tasks
 variable "scheduled_tasks" {
-  type        = map(object({
+  type = map(object({
     day    = string
     hour   = number
     minute = number
