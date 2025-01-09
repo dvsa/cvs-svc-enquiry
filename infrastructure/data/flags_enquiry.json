@@ -1,0 +1,35 @@
+{
+  "flags": {
+    "foo": {
+      "name": "foo"
+    },
+    "bar": {
+      "name": "bar",
+      "attributes": {
+        "someAttribute": {
+          "constraints": {
+            "type": "string",
+            "required": true
+          }
+        },
+        "someOtherAttribute": {
+          "constraints": {
+            "type": "number",
+            "required": true
+          }
+        }
+      }
+    }
+  },
+  "values": {
+    "foo": {
+      "enabled": "true"
+    },
+    "bar": {
+      "enabled": "true",
+      "someAttribute": "Hello World",
+      "someOtherAttribute": 123
+    }
+  },
+  "version": "1"
+}

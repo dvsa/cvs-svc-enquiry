@@ -59,3 +59,15 @@ module "api_gateway" {
     "5XX" = var.cloudwatch_alarms
   }
 }
+
+module "enquiry_config" {
+  for_each = var.create_appconfig_profile ? toset([var.DVSA_SERVICE]) : []
+  source = "git::https://github.com/dvsa/cvs-tf-modules//app_config?ref=feature/CB2-14860"
+  appconfig_id = data.terraform_remote_state.core.outputs.appconfig_application_id
+  name         = each.key
+  description  = "Enquiry Service"
+}
+
+output "configuration_profile_id" {
+  value = try(module.enquiry_config.configuration_profile_id, null)
+}

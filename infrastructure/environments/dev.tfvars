@@ -12,3 +12,5 @@ scheduled_tasks = {
     minute = 0
   }
 }
+
+create_appconfig_profile = true

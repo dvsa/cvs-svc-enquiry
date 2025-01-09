@@ -6,7 +6,7 @@ terraform {
     bucket         = "cvs-tf-state-eu-west-2"
     dynamodb_table = "cvs-tf-state-eu-west-2"
     region         = "eu-west-2"
-    key            = "cvs-enquiry"
+    key            = "cvs-svc-enquiry"
   }
 
   required_providers {
@@ -103,11 +103,13 @@ locals {
   aws_account_names = distinct([for name, account in local.aws_accounts : account.name if name != terraform.workspace])
 
   # Simplify Data Resources
-  api_parent_name    = data.terraform_remote_state.core.outputs.api_gateway_name
-  api_authorizer_id  = data.terraform_remote_state.core.outputs.api_authorizer_id
+  #api_parent_name    = data.terraform_remote_state.core.outputs.api_gateway_name
+  #api_authorizer_id  = data.terraform_remote_state.core.outputs.api_authorizer_id
   subnet_ids         = [ for subnet in data.terraform_remote_state.core.outputs.private_subnets : subnet.id ]
-  security_group_ids = try(tolist(data.terraform_remote_state.core.outputs.lambda_security_group_id), tolist([data.terraform_remote_state.core.outputs.lambda_security_group_id]))
-  appconfig_id       = data.terraform_remote_state.core.outputs.appconfig_application_id
+  #security_group_ids = try(tolist(data.terraform_remote_state.core.outputs.lambda_security_group_id), tolist([data.terraform_remote_state.core.outputs.lambda_security_group_id]))
+  
+  # AppConfig
+  appconfig_name = format("%s-%s-%s", var.DVSA_PROJECT, local.aws_account_name, var.AWS_REGION)
 }
 
 # Required Variables that can be set within tfvars files
@@ -200,6 +202,18 @@ variable "scheduled_tasks" {
 variable "lambda_services" {
   type        = list(string)
   description = "List of Services hosted within the Lambda"
+}
+
+# AppConfig Service
+variable "create_appconfig_profile" {
+  type        = bool
+  description = "Create an AppConfig Profile"
+  default     = false
+}
+variable "appconfig_location" {
+  type        = string
+  description = "Location URI for AppConfig (default: hosted)"
+  default     = "hosted"
 }
 
 ## Deployment Flags
