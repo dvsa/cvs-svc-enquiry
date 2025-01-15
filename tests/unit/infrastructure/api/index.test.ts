@@ -191,7 +191,7 @@ describe('API', () => {
           vrm_trm: '123',
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
         jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([evlFeedData]);
         const result = await supertest(app).get('/v1/enquiry/evl');
         expect(result.status).toEqual(200);
@@ -245,7 +245,7 @@ describe('API', () => {
         IssuedBy: 'some person',
       };
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([tflFeedData]);
       const result = await supertest(app).get('/v1/enquiry/tfl');
       expect(result.status).toEqual(200);
@@ -269,7 +269,7 @@ describe('API', () => {
 
     it('sets the status to 404 for a not found error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
