@@ -12,5 +12,3 @@ SELECT
 FROM vw_dvla_ants
 WHERE test_date >= STR_TO_DATE(?, '%d/%m/%Y %T')
 ORDER BY test_date ASC;`;
-
-//TODO use as??

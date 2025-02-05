@@ -229,7 +229,7 @@ router.get('/ants', (_req, res) => {
       const processedResult = result.map((entry) => processAntsFeedData(entry));
       const antsFeedProcessedData: string = processedResult
         .map(
-          (entry) => `${entry.vrm_trm},${entry.make},${entry.model}, ${entry.wheelplan},${entry.test_date}.${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
+          (entry) => `${entry.vrm_trm},${entry.make},${entry.model}, ${entry.wheelplan},${moment(entry.test_date).format('DD-MM-YYYY')},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${moment(entry.tech_record_date).format('DD-MM-YYYY')}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
