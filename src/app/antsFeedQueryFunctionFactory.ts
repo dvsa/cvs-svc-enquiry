@@ -5,6 +5,6 @@ import { getFeed } from "./databaseService";
 import AntsFeedData from "../interfaces/queryResults/antsFeedData";
 
 export default (): ((databaseService: DatabaseService, feedName: FeedName) => Promise<AntsFeedData[]>) => {
-  logger.debug('redirecting to getTflFeed using tfl factory');
+  logger.debug('redirecting to getAntsFeed using ants factory');
   return getFeed as (databaseService: DatabaseService, feedName: FeedName) => Promise<AntsFeedData[]>;
 };

@@ -1,7 +1,6 @@
 import AntsFeedData from "../interfaces/queryResults/antsFeedData";
 import { escapeString } from "./tflHelpers";
 
-//TODO check logic for process
 export function processAntsFeedData(data: AntsFeedData): AntsFeedData {
   return Object.assign(
     {},
