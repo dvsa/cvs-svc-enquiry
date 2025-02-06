@@ -418,7 +418,6 @@ describe('Database Service', () => {
 
       expect(mockDbService.get).toHaveBeenCalledWith(TFL_QUERY, ['1/10/2025 12:0:0']);
       expect(result).toHaveLength(1);
-      console.log(result);
     });
 
     it('correctly retrieves ANTS feed data', async () => {
@@ -433,7 +432,6 @@ describe('Database Service', () => {
 
       expect(mockDbService.get).toHaveBeenCalledWith(ANTS_QUERY, ['1/10/2025 12:0:0']);
       expect(result).toHaveLength(1);
-      console.log(result);
     });
   });
 });
