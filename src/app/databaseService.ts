@@ -302,6 +302,8 @@ export {
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
   getFeed,
+  getLastTFLFileDate,
+  getLastAntsFileData
 };
 
 interface VehicleQueryResult extends RowDataPacket {
