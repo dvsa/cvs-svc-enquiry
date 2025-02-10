@@ -1,15 +1,22 @@
 import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import {
-  getTestResultsByVin,
+  getFeed,
+  getLastAntsFileData,
+  getLastTFLFileDate,
   getTestResultsByTestId,
+  getTestResultsByVin,
   getTestResultsByVrm,
   getVehicleDetailsByTrailerId,
   getVehicleDetailsByVin,
-  getVehicleDetailsByVrm,
+  getVehicleDetailsByVrm
 } from '../../../src/app/databaseService';
 import * as technicalQueries from '../../../src/app/queries/technicalRecord';
 import * as testQueries from '../../../src/app/queries/testResults';
 import { QueryOutput } from '../../../src/interfaces/DatabaseService';
+import * as s3BucketService from '../../../src/infrastructure/s3BucketService';
+import { TFL_QUERY } from "../../../src/app/queries/tflQuery";
+import { ANTS_QUERY } from "../../../src/app/queries/antsQuery";
+import { FeedName } from "../../../src/interfaces/FeedTypes";
 
 describe('Database Service', () => {
   describe('Get vehicle details', () => {
@@ -366,6 +373,65 @@ describe('Database Service', () => {
       expect(response[0].defects).toHaveLength(2);
       expect(response[0].customDefect?.[0].defectName).toEqual('Custom defect');
       expect(response[0].defects?.[1].defect?.imDescription).toEqual('Test defect 2');
+    });
+  });
+
+  describe('get TFL Data', () => {
+    it('correctly retrieves the last ANTS file date', async () => {
+      const mockReadAndUpsert = jest.spyOn(s3BucketService, 'readAndUpsert').mockResolvedValue('2025-10-01T12:00:00Z');
+      const result = await getLastTFLFileDate();
+
+      expect(mockReadAndUpsert).toHaveBeenCalledWith(
+        'TFL_LATEST_VALID_FROM_DATE.txt',
+        expect.any(String),
+        expect.any(String),
+      );
+      expect(result).toEqual('1/10/2025 12:0:0');
+    });
+  });
+
+  describe('get ANTS Data', () => {
+    it('correctly retrieves the last ANTS file date', async () => {
+      const mockReadAndUpsert = jest.spyOn(s3BucketService, 'readAndUpsert').mockResolvedValue('2025-10-01T12:00:00Z');
+      const result = await getLastAntsFileData();
+
+      expect(mockReadAndUpsert).toHaveBeenCalledWith(
+        'ANTS_LATEST_VALID_FROM_DATE.txt',
+        expect.any(String),
+        expect.any(String),
+      );
+      expect(result).toEqual('1/10/2025 12:0:0');
+    });
+  });
+
+  describe('get Feed', () => {
+    it('correctly retrieves TFL feed data', async () => {
+      const mockDbService = {
+        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[
+            { tflData: 'TFL123' } as RowDataPacket], []]),
+      };
+
+      jest.spyOn(s3BucketService, 'readAndUpsert').mockResolvedValue('2025-10-01T12:00:00Z');
+
+      const result = await getFeed(mockDbService, FeedName.TFL);
+
+      expect(mockDbService.get).toHaveBeenCalledWith(TFL_QUERY, ['1/10/2025 12:0:0']);
+      expect(result).toHaveLength(1);
+    });
+
+    it('correctly retrieves ANTS feed data', async () => {
+      const mockDbService = {
+        get: jest.fn<Promise<[RowDataPacket[], FieldPacket[]]>, [query: string, params: string[]]>()
+          .mockResolvedValueOnce([[{ antsData: 'ANTS123' } as RowDataPacket], []]),
+      };
+
+      jest.spyOn(s3BucketService, 'readAndUpsert').mockResolvedValue('2025-10-01T12:00:00Z');
+
+      const result = await getFeed(mockDbService, FeedName.ANTS);
+
+      expect(mockDbService.get).toHaveBeenCalledWith(ANTS_QUERY, ['1/10/2025 12:0:0']);
+      expect(result).toHaveLength(1);
     });
   });
 });
