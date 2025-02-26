@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import AWS from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import express, { Request, Router } from 'express';
 import mysql from 'mysql2/promise';
 import moment from 'moment';
@@ -24,6 +24,9 @@ import { processTFLFeedData } from '../../utils/tflHelpers';
 import { FeedName } from '../../interfaces/FeedTypes';
 import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../../interfaces/queryResults/tflFeedData';
+import AntsFeedData from "../../interfaces/queryResults/antsFeedData";
+import { processAntsFeedData } from "../../utils/antsHelpers";
+import antsFeedQueryFunctionFactory from "../../app/antsFeedQueryFunctionFactory";
 
 const app = express();
 const router: Router = express.Router();
@@ -53,7 +56,7 @@ router.get(
       if (process.env.IS_OFFLINE === 'true') {
         secretsManager = new LocalSecretsManagerService();
       } else {
-        secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+        secretsManager = new SecretsManagerService(new SecretsManager());
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -91,7 +94,7 @@ router.get(
     if (process.env.IS_OFFLINE === 'true') {
       secretsManager = new LocalSecretsManagerService();
     } else {
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
 
     DatabaseService.build(secretsManager, mysql)
@@ -125,23 +128,22 @@ router.get(
       secretsManager = new LocalSecretsManagerService();
     } else {
       logger.debug('configuring aws secret manager');
-      secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+      secretsManager = new SecretsManagerService(new SecretsManager());
     }
     const fileName = `EVL_GVT_${moment(Date.now()).format('YYYYMMDD')}.csv`;
     logger.debug(`creating file for EVL feed called: ${fileName}`);
     DatabaseService.build(secretsManager, mysql)
       .then((dbService) => getFeedDetails(evlFeedQueryFunctionFactory, FeedName.EVL, dbService, request.query))
-      .then((result: EvlFeedData[]) => {
+      .then(async (result: EvlFeedData[]) => {
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
-            (entry) =>
-              `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+            (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
           )
           .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
-        uploadToS3(evlFeedProcessedData, fileName, () => {
+        await uploadToS3(evlFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
@@ -168,11 +170,11 @@ router.get('/tfl', (_req, res) => {
     secretsManager = new LocalSecretsManagerService();
   } else {
     logger.debug('configuring aws secret manager');
-    secretsManager = new SecretsManagerService(new AWS.SecretsManager());
+    secretsManager = new SecretsManagerService(new SecretsManager());
   }
   DatabaseService.build(secretsManager, mysql)
     .then((dbService) => getFeedDetails(tflFeedQueryFunctionFactory, FeedName.TFL, dbService))
-    .then((result: TflFeedData[]) => {
+    .then(async (result: TflFeedData[]) => {
       const numberOfRows = result.length;
       const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-${numberOfRows}-01-01.csv`;
       logger.debug(`creating file for TFL feed called: ${fileName}`);
@@ -180,24 +182,23 @@ router.get('/tfl', (_req, res) => {
       const processedResult = result.map((entry) => processTFLFeedData(entry));
       const tflFeedProcessedData: string = processedResult
         .map(
-          (entry) =>
-            `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
+          (entry) => `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
-      uploadToS3(tflFeedProcessedData, fileName, () => {
+      await uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
         res.status(200);
         res.contentType('json').send();
       });
     })
-    .catch((e: Error) => {
+    .catch(async (e: Error) => {
       if (e instanceof ParametersError) {
         res.status(400);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
-        uploadToS3(' , ,', fileName, () => {
+        await uploadToS3(' , ,', fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
@@ -205,6 +206,53 @@ router.get('/tfl', (_req, res) => {
       } else {
         res.status(500);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
+      }
+      logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
+    });
+});
+
+router.get('/ants', (_req, res) => {
+  let secretsManager: SecretsManagerServiceInterface;
+  if (process.env.IS_OFFLINE === 'true') {
+    logger.debug('configuring local secret manager');
+    secretsManager = new LocalSecretsManagerService();
+  } else {
+    logger.debug('configuring aws secret manager');
+    secretsManager = new SecretsManagerService(new SecretsManager());
+  }
+  DatabaseService.build(secretsManager, mysql)
+    .then((dbService) => getFeedDetails(antsFeedQueryFunctionFactory, FeedName.ANTS, dbService))
+    .then(async (result: AntsFeedData[]) => {
+      const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`;
+      logger.debug(`creating file for ANTS feed called: ${fileName}`);
+      logger.info('Generating ANTS File Data');
+      const processedResult = result.map((entry) => processAntsFeedData(entry));
+      const antsFeedProcessedData: string = processedResult
+        .map(
+          (entry) => `${entry.vrm_trm},${entry.make},${entry.model}, ${entry.wheelplan},${moment(entry.test_date).format('DD-MM-YYYY')},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${moment(entry.tech_record_date).format('DD-MM-YYYY')}`,
+        )
+        .join('\n');
+      logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
+      await uploadToS3(antsFeedProcessedData, fileName, () => {
+        logger.info(`Successfully uploaded ${fileName} to S3`);
+        res.status(200);
+        res.contentType('json').send();
+      });
+    })
+    .catch(async (e: Error) => {
+      if (e instanceof ParametersError) {
+        res.status(400);
+        res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+      } else if (e instanceof NotFoundError) {
+        const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`; // TODO agree default filename
+        await uploadToS3(' , ,', fileName, () => {
+          logger.info(`Successfully uploaded ${fileName} to S3`);
+          res.status(200);
+          res.contentType('json').send();
+        });
+      } else {
+        res.status(500);
+        res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
