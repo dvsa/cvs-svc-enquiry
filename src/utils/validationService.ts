@@ -46,7 +46,10 @@ const validateResultsEvent = (event: ResultsEvent): boolean => {
     || (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.testnumber !== undefined)
     || (event.VehicleRegMark !== undefined && event.trailerId !== undefined && event.testnumber !== undefined)
     || (event.vinNumber !== undefined && event.trailerId !== undefined && event.testnumber !== undefined)
-    || (event.VehicleRegMark !== undefined && event.vinNumber !== undefined && event.trailerId !== undefined && event.testnumber !== undefined)
+    || (event.VehicleRegMark !== undefined
+      && event.vinNumber !== undefined
+      && event.trailerId !== undefined
+      && event.testnumber !== undefined)
   ) {
     throw new ParametersError('Too many parameters defined');
   }

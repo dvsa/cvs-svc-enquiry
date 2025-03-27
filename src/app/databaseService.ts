@@ -22,6 +22,8 @@ import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import { TFL_QUERY } from './queries/tflQuery';
 import { FeedName } from '../interfaces/FeedTypes';
 import { readAndUpsert } from '../infrastructure/s3BucketService';
+import AntsFeedData from "../interfaces/queryResults/antsFeedData";
+import { ANTS_QUERY } from "./queries/antsQuery";
 
 async function getTechnicalRecordDetails(
   technicalRecordQueryResult: TechnicalRecordQueryResult,
@@ -56,9 +58,9 @@ async function getVehicleDetails(vehicleDetailsQueryResult: QueryOutput, databas
   const vehicleDetailsResult = vehicleDetailsQueryResult[0][0] as VehicleQueryResult;
 
   if (
-    vehicleDetailsResult === undefined ||
-    vehicleDetailsResult.id === undefined ||
-    vehicleDetailsResult.result === undefined
+    vehicleDetailsResult === undefined
+    || vehicleDetailsResult.id === undefined
+    || vehicleDetailsResult.result === undefined
   ) {
     throw new NotFoundError('Vehicle was not found');
   }
@@ -137,9 +139,9 @@ async function getTestResultDetails(
   const testResultQueryResult = queryResult[0][0] as TestResultQueryResult;
 
   if (
-    testResultQueryResult === undefined ||
-    testResultQueryResult.id === undefined ||
-    testResultQueryResult.result === undefined
+    testResultQueryResult === undefined
+    || testResultQueryResult.id === undefined
+    || testResultQueryResult.result === undefined
   ) {
     throw new NotFoundError('Test not found');
   }
@@ -220,9 +222,12 @@ function getEvlFeedByVrmDetails(queryResult: QueryOutput): EvlFeedData {
   return evlFeedQueryResult;
 }
 
-function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] {
-  const feedQueryResults: EvlFeedData[] | TflFeedData[] =
-    feedName === FeedName.EVL ? (queryResult[0][1] as EvlFeedData[]) : (queryResult[0] as TflFeedData[]);
+function getFeedDetails(queryResult: QueryOutput, feedName: FeedName): EvlFeedData[] | TflFeedData[] | AntsFeedData[] {
+  const feedQueryResults: EvlFeedData[] | TflFeedData[] | AntsFeedData[] =
+    feedName === FeedName.EVL ? (queryResult[0] as EvlFeedData[])
+      : feedName === FeedName.TFL
+      ? (queryResult[0] as TflFeedData[])
+        : (queryResult[0] as AntsFeedData[]);
   if (feedQueryResults === undefined || feedQueryResults.length === 0) {
     throw new NotFoundError('No tests found');
   }
@@ -242,6 +247,7 @@ async function getEvlFeedByVrm(databaseService: DatabaseServiceInterface, event:
 const getQueryMap: { [key in FeedName]: string } = {
   EVL: EVL_QUERY,
   TFL: TFL_QUERY,
+  ANTS: ANTS_QUERY,
 };
 
 async function getLastTFLFileDate(): Promise<string> {
@@ -255,15 +261,30 @@ async function getLastTFLFileDate(): Promise<string> {
   }/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
 }
 
+async function getLastAntsFileData(): Promise<string> {
+  const fileName = 'ANTS_LATEST_VALID_FROM_DATE.txt';
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setUTCDate(new Date().getUTCDate() - 14);
+  const latestDate = await readAndUpsert(fileName, new Date().toISOString(), twoWeeksAgo.toISOString());
+  const date = new Date(latestDate);
+  return `${date.getUTCDate()}/${
+    date.getUTCMonth() + 1
+  }/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+}
+
 async function getFeed(
   databaseService: DatabaseServiceInterface,
   feedName: FeedName,
-): Promise<EvlFeedData[] | TflFeedData[]> {
+): Promise<EvlFeedData[] | TflFeedData[] | AntsFeedData[]> {
   logger.info(`Using get${feedName}Feed`);
   // eslint-disable-next-line security/detect-object-injection
   const query = getQueryMap[feedName];
   logger.debug(`calling database with ${feedName} query ${query}`);
-  const parameter = feedName === FeedName.TFL ? [await getLastTFLFileDate()] : [];
+  const parameter = feedName === FeedName.TFL
+    ? [await getLastTFLFileDate()]
+    : feedName === FeedName.ANTS
+      ? [await getLastAntsFileData()]
+      : [];
   const queryResult = await databaseService.get(query, parameter);
   const result = getFeedDetails(queryResult, feedName);
   logger.debug(`result from database: ${JSON.stringify(result)}`);
@@ -281,6 +302,8 @@ export {
   getEvlFeedByVrm,
   getEvlFeedByVrmDetails,
   getFeed,
+  getLastTFLFileDate,
+  getLastAntsFileData
 };
 
 interface VehicleQueryResult extends RowDataPacket {
