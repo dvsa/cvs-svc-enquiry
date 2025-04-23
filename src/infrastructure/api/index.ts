@@ -220,18 +220,28 @@ router.get('/ants', (_req, res) => {
     logger.debug('configuring aws secret manager');
     secretsManager = new SecretsManagerService(new SecretsManager());
   }
+
+  const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`;
+  logger.debug(`creating file for ANTS feed called: ${fileName}`);
+  logger.info('Generating ANTS File Data');
+
+  const columnHeaders = ['VRN', 'Make', 'Model', 'Wheel plan', 'Date of plating', 'Gross weight (pre)', 'Gross weight (post)', 'DOE Ref', 'Tech Record Date'];
+  let antsFeedProcessedData: string = columnHeaders.join(',');
+
   DatabaseService.build(secretsManager, mysql)
     .then((dbService) => getFeedDetails(antsFeedQueryFunctionFactory, FeedName.ANTS, dbService))
     .then(async (result: AntsFeedData[]) => {
-      const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`;
-      logger.debug(`creating file for ANTS feed called: ${fileName}`);
-      logger.info('Generating ANTS File Data');
-      const processedResult = result.map((entry) => processAntsFeedData(entry));
-      const antsFeedProcessedData: string = processedResult
-        .map(
-          (entry) => `${entry.vrm_trm},${entry.make},${entry.model}, ${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
-        )
-        .join('\n');
+      if (result.length > 0) {
+        const processedResult = result.map((entry) => processAntsFeedData(entry));
+        antsFeedProcessedData += '\n' + processedResult
+          .map(
+            (entry) => `${entry.vrm_trm},${entry.make},${entry.model},${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
+            )
+          .join('\n');
+      } else {
+        logger.warn('No data found for ANTS feed. Generating file with only column headers.');
+      }
+
       logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
       await uploadToS3(antsFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
@@ -244,8 +254,7 @@ router.get('/ants', (_req, res) => {
         res.status(400);
         res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
-        const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`; // TODO agree default filename
-        await uploadToS3(' , ,', fileName, () => {
+        await uploadToS3(antsFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
