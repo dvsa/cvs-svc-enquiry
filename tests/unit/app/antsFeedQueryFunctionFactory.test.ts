@@ -1,7 +1,7 @@
-import queryFunctionFactory from '../../../src/app/tflFeedQueryFunctionFactory';
-import * as dbFunctions from '../../../src/app/databaseService';
-import DatabaseService from '../../../src/infrastructure/databaseService';
-import { FeedName } from '../../../src/interfaces/FeedTypes';
+import queryFunctionFactory from '../../../src/app/antsFeedQueryFunctionFactory';
+import * as dbFunctions from "../../../src/app/databaseService";
+import DatabaseService from "../../../src/infrastructure/databaseService";
+import { FeedName } from "../../../src/interfaces/FeedTypes";
 
 jest.mock('../../../src/app/databaseService');
 jest.mock('../../../src/infrastructure/databaseService');
@@ -15,6 +15,6 @@ describe('Query Function Factory', () => {
 
     const func = queryFunctionFactory();
 
-    expect(func(dbServiceMock, FeedName.TFL)).toEqual('Success');
+    expect(func(dbServiceMock, FeedName.ANTS)).toEqual('Success');
   });
 });
