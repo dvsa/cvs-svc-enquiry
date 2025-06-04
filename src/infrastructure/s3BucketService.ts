@@ -11,9 +11,12 @@ export async function uploadToS3(processedData: string, fileName: string, callba
   const s3: S3Client = configureS3();
   const params = { Bucket: process.env.AWS_S3_BUCKET_NAME ?? '', Key: fileName, Body: processedData };
   try {
+    logger.info('ENQ_FEED_FILE_PUSH_INITIATED', { fileName });
     logger.info(`uploading ${fileName} to S3`);
     await s3.send(new PutObjectCommand(params));
+    logger.info('ENQ_FEED_FILE_PUSH_SUCCESSFUL', { fileName });
   } catch (err) {
+    logger.info('ENQ_FEED_FILE_PUSH_FAILED', { fileName });
     logger.error(err);
   }
   callback();

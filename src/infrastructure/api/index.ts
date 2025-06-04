@@ -122,6 +122,8 @@ router.get(
     request: Request<Record<string, unknown>, string | Record<string, unknown>, Record<string, unknown>, EvlEvent>,
     res,
   ) => {
+    logger.info('ENQ_FEED_JOB_INITIATED', { request: request.url });
+
     let secretsManager: SecretsManagerServiceInterface;
     if (process.env.IS_OFFLINE === 'true') {
       logger.debug('configuring local secret manager');
@@ -145,11 +147,14 @@ router.get(
 
         await uploadToS3(evlFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
+          logger.info('ENQ_FEED_JOB_SUCCESSFUL', { request: request.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
       })
       .catch((e: Error) => {
+        logger.debug('ENQ_FEED_JOB_FAILED', { request: request.url, failure: e.message });
+
         if (e instanceof ParametersError) {
           res.status(400);
         } else if (e instanceof NotFoundError) {
@@ -164,6 +169,8 @@ router.get(
 );
 
 router.get('/tfl', (_req, res) => {
+  logger.info('ENQ_FEED_JOB_INITIATED', { request: _req.url });
+
   let secretsManager: SecretsManagerServiceInterface;
   if (process.env.IS_OFFLINE === 'true') {
     logger.debug('configuring local secret manager');
@@ -188,22 +195,26 @@ router.get('/tfl', (_req, res) => {
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
       await uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
+        logger.info('ENQ_FEED_JOB_SUCCESSFUL', { request: _req.url, fileName });
         res.status(200);
         res.contentType('json').send();
       });
     })
     .catch(async (e: Error) => {
       if (e instanceof ParametersError) {
+        logger.debug('ENQ_FEED_JOB_FAILED', { request: _req.url, failure: e.message });
         res.status(400);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
         await uploadToS3(' , ,', fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
+          logger.info('ENQ_FEED_JOB_SUCCESSFUL', { request: _req.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
       } else {
+        logger.debug('ENQ_FEED_JOB_FAILED', { request: _req.url, failure: e.message });
         res.status(500);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       }
@@ -212,6 +223,8 @@ router.get('/tfl', (_req, res) => {
 });
 
 router.get('/ants', (_req, res) => {
+  logger.info('ENQ_FEED_JOB_INITIATED', { request: _req.url });
+
   let secretsManager: SecretsManagerServiceInterface;
   if (process.env.IS_OFFLINE === 'true') {
     logger.debug('configuring local secret manager');
@@ -245,21 +258,25 @@ router.get('/ants', (_req, res) => {
       logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
       await uploadToS3(antsFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
+        logger.info('ENQ_FEED_JOB_SUCCESSFUL', { request: _req.url, fileName });
         res.status(200);
         res.contentType('json').send();
       });
     })
     .catch(async (e: Error) => {
       if (e instanceof ParametersError) {
+        logger.debug('ENQ_FEED_JOB_FAILED', { request: _req.url, failure: e.message });
         res.status(400);
         res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         await uploadToS3(antsFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
+          logger.info('ENQ_FEED_JOB_SUCCESSFUL', { request: _req.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
       } else {
+        logger.debug('ENQ_FEED_JOB_FAILED', { request: _req.url, failure: e.message });
         res.status(500);
         res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       }
