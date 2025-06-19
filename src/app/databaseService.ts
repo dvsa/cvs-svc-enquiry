@@ -285,18 +285,10 @@ async function getFeed(
     : feedName === FeedName.ANTS
       ? [await getLastAntsFileData()]
       : [];
-
-  logger.info('ENQ_UPDATE_NOP_INITIATED', { feedName });
-  try {
-    const queryResult = await databaseService.get(query, parameter);
-    logger.info('ENQ_UPDATE_NOP_SUCCESSFUL', { feedName });
-    const result = getFeedDetails(queryResult, feedName);
-    logger.debug(`result from database: ${JSON.stringify(result)}`);
-    return result;
-  } catch (err) {
-    logger.info('ENQ_UPDATE_NOP_FAILED', { feedName });
-    throw err;
-  }
+  const queryResult = await databaseService.get(query, parameter);
+  const result = getFeedDetails(queryResult, feedName);
+  logger.debug(`result from database: ${JSON.stringify(result)}`);
+  return result;
 }
 
 export {
