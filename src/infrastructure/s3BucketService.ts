@@ -6,6 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import logger from '../utils/logger';
 import { Readable } from "stream";
+import { EventLogging } from '../utils/EventLogging.enum';
 
 export async function uploadToS3(processedData: string, fileName: string, callback: () => void): Promise<void> {
   const s3: S3Client = configureS3();
@@ -14,7 +15,7 @@ export async function uploadToS3(processedData: string, fileName: string, callba
     logger.info(`uploading ${fileName} to S3`);
     await s3.send(new PutObjectCommand(params));
   } catch (err) {
-    logger.error(err);
+    logger.info(EventLogging.ANTS_FEED_FAILURE, { failure: err });
   }
   callback();
 }
