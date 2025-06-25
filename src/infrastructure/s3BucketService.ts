@@ -14,7 +14,7 @@ export async function uploadToS3(processedData: string, fileName: string, callba
     logger.info(`uploading ${fileName} to S3`);
     await s3.send(new PutObjectCommand(params));
   } catch (err) {
-    throw err;
+    logger.error(err);
   }
   callback();
 }

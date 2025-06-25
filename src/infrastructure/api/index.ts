@@ -24,9 +24,9 @@ import { processTFLFeedData } from '../../utils/tflHelpers';
 import { FeedName } from '../../interfaces/FeedTypes';
 import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../../interfaces/queryResults/tflFeedData';
-import AntsFeedData from "../../interfaces/queryResults/antsFeedData";
-import { processAntsFeedData } from "../../utils/antsHelpers";
-import antsFeedQueryFunctionFactory from "../../app/antsFeedQueryFunctionFactory";
+import AntsFeedData from '../../interfaces/queryResults/antsFeedData';
+import { processAntsFeedData } from '../../utils/antsHelpers';
+import antsFeedQueryFunctionFactory from '../../app/antsFeedQueryFunctionFactory';
 import { EventLogging } from '../../utils/EventLogging.enum';
 
 const app = express();
@@ -141,14 +141,14 @@ router.get(
         logger.info('Generating EVL File Data');
         const evlFeedProcessedData: string = result
           .map(
-            (entry) => `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
+            (entry) =>
+              `${entry.vrm_trm},${entry.certificateNumber},${moment(entry.testExpiryDate).format('DD-MMM-YYYY')}`,
           )
           .join('\n');
         logger.debug(`\nData captured for file generation: ${evlFeedProcessedData} \n\n`);
 
         await uploadToS3(evlFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
-          logger.info(EventLogging.EVL_FEED_SUCCESS, { request: request.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
@@ -166,6 +166,7 @@ router.get(
         logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
         res.send(`Error Generating EVL Feed Data: ${e.message}`);
       });
+    logger.info(EventLogging.EVL_FEED_SUCCESS, { request: request.url, fileName: fileName });
   },
 );
 
@@ -190,37 +191,36 @@ router.get('/tfl', (_req, res) => {
       const processedResult = result.map((entry) => processTFLFeedData(entry));
       const tflFeedProcessedData: string = processedResult
         .map(
-          (entry) => `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
+          (entry) =>
+            `${entry.VRM},${entry.VIN},${entry.SerialNumberOfCertificate},${entry.CertificationModificationType},${entry.TestStatus},${entry.PMEuropeanEmissionClassificationCode},${entry.ValidFromDate},${entry.ExpiryDate},${entry.IssuedBy},${entry.IssueDate}`,
         )
         .join('\n');
       logger.debug(`\nData captured for file generation: ${tflFeedProcessedData} \n\n`);
       await uploadToS3(tflFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
-        logger.info(EventLogging.TFL_FEED_SUCCESS, { request: _req.url, fileName });
         res.status(200);
         res.contentType('json').send();
       });
     })
     .catch(async (e: Error) => {
+      logger.info(EventLogging.TFL_FEED_FAILURE, { request: _req.url, failure: e.message });
       if (e instanceof ParametersError) {
-        logger.info(EventLogging.TFL_FEED_FAILURE, { request: _req.url, failure: e.message });
         res.status(400);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         const fileName = `VOSA-${moment(Date.now()).format('YYYY-MM-DD')}-G1-0-01-01.csv`;
         await uploadToS3(' , ,', fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
-          logger.info(EventLogging.TFL_FEED_SUCCESS, { request: _req.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
       } else {
-        logger.info(EventLogging.TFL_FEED_FAILURE, { request: _req.url, failure: e.message });
         res.status(500);
         res.send(`Error Generating TFL Feed Data: ${e.message}`);
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
+  logger.info(EventLogging.TFL_FEED_SUCCESS, { request: _req.url });
 });
 
 router.get('/ants', (_req, res) => {
@@ -239,7 +239,17 @@ router.get('/ants', (_req, res) => {
   logger.debug(`creating file for ANTS feed called: ${fileName}`);
   logger.info('Generating ANTS File Data');
 
-  const columnHeaders = ['VRN', 'Make', 'Model', 'Wheel plan', 'Date of plating', 'Gross weight (pre)', 'Gross weight (post)', 'DOE Ref', 'Tech Record Date'];
+  const columnHeaders = [
+    'VRN',
+    'Make',
+    'Model',
+    'Wheel plan',
+    'Date of plating',
+    'Gross weight (pre)',
+    'Gross weight (post)',
+    'DOE Ref',
+    'Tech Record Date',
+  ];
   let antsFeedProcessedData: string = columnHeaders.join(',');
 
   DatabaseService.build(secretsManager, mysql)
@@ -247,11 +257,14 @@ router.get('/ants', (_req, res) => {
     .then(async (result: AntsFeedData[]) => {
       if (result.length > 0) {
         const processedResult = result.map((entry) => processAntsFeedData(entry));
-        antsFeedProcessedData += '\n' + processedResult
-          .map(
-            (entry) => `${entry.vrm_trm},${entry.make},${entry.model},${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
+        antsFeedProcessedData +=
+          '\n' +
+          processedResult
+            .map(
+              (entry) =>
+                `${entry.vrm_trm},${entry.make},${entry.model},${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
             )
-          .join('\n');
+            .join('\n');
       } else {
         logger.warn('No data found for ANTS feed. Generating file with only column headers.');
       }
@@ -259,30 +272,29 @@ router.get('/ants', (_req, res) => {
       logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
       await uploadToS3(antsFeedProcessedData, fileName, () => {
         logger.info(`Successfully uploaded ${fileName} to S3`);
-        logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
         res.status(200);
         res.contentType('json').send();
       });
+      logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
     })
     .catch(async (e: Error) => {
+      logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
       if (e instanceof ParametersError) {
-        logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
         res.status(400);
         res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       } else if (e instanceof NotFoundError) {
         await uploadToS3(antsFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
-          logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
           res.status(200);
           res.contentType('json').send();
         });
       } else {
-        logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
         res.status(500);
         res.send(`Error Generating ANTS Feed Data: ${e.message}`);
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
+  logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
 });
 
 router.all(/testResults|vehicle/, (_request, res) => {
