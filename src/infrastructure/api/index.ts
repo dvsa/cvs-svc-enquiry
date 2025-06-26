@@ -152,6 +152,7 @@ router.get(
           res.status(200);
           res.contentType('json').send();
         });
+        logger.info(EventLogging.EVL_FEED_SUCCESS, { request: request.url, fileName: fileName });
       })
       .catch((e: Error) => {
         logger.info(EventLogging.EVL_FEED_FAILURE, { request: request.url, failure: e.message });
@@ -166,7 +167,6 @@ router.get(
         logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
         res.send(`Error Generating EVL Feed Data: ${e.message}`);
       });
-    logger.info(EventLogging.EVL_FEED_SUCCESS, { request: request.url, fileName: fileName });
   },
 );
 
@@ -201,6 +201,7 @@ router.get('/tfl', (_req, res) => {
         res.status(200);
         res.contentType('json').send();
       });
+      logger.info(EventLogging.TFL_FEED_SUCCESS, { request: _req.url });
     })
     .catch(async (e: Error) => {
       logger.info(EventLogging.TFL_FEED_FAILURE, { request: _req.url, failure: e.message });
@@ -220,7 +221,6 @@ router.get('/tfl', (_req, res) => {
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
-  logger.info(EventLogging.TFL_FEED_SUCCESS, { request: _req.url });
 });
 
 router.get('/ants', (_req, res) => {
@@ -294,7 +294,6 @@ router.get('/ants', (_req, res) => {
       }
       logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
-  logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
 });
 
 router.all(/testResults|vehicle/, (_request, res) => {
