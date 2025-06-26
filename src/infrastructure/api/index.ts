@@ -278,21 +278,24 @@ router.get('/ants', (_req, res) => {
       logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
     })
     .catch(async (e: Error) => {
-      logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
-      if (e instanceof ParametersError) {
-        res.status(400);
-        res.send(`Error Generating ANTS Feed Data: ${e.message}`);
-      } else if (e instanceof NotFoundError) {
+      if (e instanceof NotFoundError) {
         await uploadToS3(antsFeedProcessedData, fileName, () => {
           logger.info(`Successfully uploaded ${fileName} to S3`);
           res.status(200);
           res.contentType('json').send();
+          logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
         });
       } else {
-        res.status(500);
-        res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+        logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
+        if (e instanceof ParametersError) {
+          res.status(400);
+          res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+        } else {
+          res.status(500);
+          res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+        }
+        logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
       }
-      logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
     });
 });
 
