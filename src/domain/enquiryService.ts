@@ -12,6 +12,8 @@ import EvlFeedData from '../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../interfaces/queryResults/tflFeedData';
 import tflFeedQueryFunctionFactory from '../app/tflFeedQueryFunctionFactory';
 import { FeedName } from '../interfaces/FeedTypes';
+import antsFeedQueryFunctionFactory from "../app/antsFeedQueryFunctionFactory";
+import AntsFeedData from "../interfaces/queryResults/antsFeedData";
 
 const getVehicleDetails = async (
   event: VehicleEvent,
@@ -35,11 +37,11 @@ const getResultsDetails = async (
 };
 
 const getFeedDetails = async (
-  queryFuncFactory: typeof evlFeedQueryFunctionFactory | typeof tflFeedQueryFunctionFactory,
+  queryFuncFactory: typeof evlFeedQueryFunctionFactory | typeof tflFeedQueryFunctionFactory | typeof antsFeedQueryFunctionFactory,
   feedName: FeedName,
   dbService: DatabaseService,
   event: EvlEvent = null,
-): Promise<EvlFeedData[] | TflFeedData[]> => {
+): Promise<EvlFeedData[] | TflFeedData[] | AntsFeedData[]> => {
   const query = queryFuncFactory(event);
   return query(dbService, feedName, event);
 };
