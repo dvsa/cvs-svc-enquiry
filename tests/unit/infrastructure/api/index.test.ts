@@ -10,6 +10,7 @@ import NotFoundError from '../../../../src/errors/NotFoundError';
 import EvlFeedData from '../../../../src/interfaces/queryResults/evlFeedData';
 import * as upload from '../../../../src/infrastructure/s3BucketService';
 import TflFeedData from '../../../../src/interfaces/queryResults/tflFeedData';
+import AntsFeedData from "../../../../src/interfaces/queryResults/antsFeedData";
 
 // TODO Define Mock strategy
 describe('API', () => {
@@ -191,7 +192,7 @@ describe('API', () => {
           vrm_trm: '123',
         };
         DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+        jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
         jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([evlFeedData]);
         const result = await supertest(app).get('/v1/enquiry/evl');
         expect(result.status).toEqual(200);
@@ -245,7 +246,7 @@ describe('API', () => {
         IssuedBy: 'some person',
       };
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([tflFeedData]);
       const result = await supertest(app).get('/v1/enquiry/tfl');
       expect(result.status).toEqual(200);
@@ -269,7 +270,7 @@ describe('API', () => {
 
     it('sets the status to 404 for a not found error', async () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
-      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => callback());
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
 
@@ -280,6 +281,62 @@ describe('API', () => {
       DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
       jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
       const result = await supertest(app).get('/v1/enquiry/tfl');
+
+      expect(result.status).toEqual(500);
+    });
+  });
+
+  describe('ANTS Feed', () => {
+    it('returns the db query result if there are no errors', async () => {
+      const antsFeedData: AntsFeedData = {
+        vrm_trm: 'abc123',
+        make: 'make',
+        model: 'model',
+        wheelplan: 'wheelplan',
+        test_date: '2025-02-01',
+        // @ts-ignore
+        weight_before_test: 1000,
+        // @ts-ignore
+        weight_after_test: 1500,
+        DOE_reference: 'reference',
+        tech_record_date: '2025-01-01'
+      };
+      DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockResolvedValue([antsFeedData]);
+      const result = await supertest(app).get('/v1/enquiry/ants');
+      expect(result.status).toEqual(200);
+    });
+
+    it('returns the error message if there is an error', async () => {
+      DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
+      const result = await supertest(app).get('/v1/enquiry/ants');
+
+      expect(result.text).toEqual('Error Generating ANTS Feed Data: This is an error');
+    });
+
+    it('sets the status to 400 for a parameters error', async () => {
+      DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new ParametersError('This is an error'));
+      const result = await supertest(app).get('/v1/enquiry/ants');
+
+      expect(result.status).toEqual(400);
+    });
+
+    it('sets the status to 404 for a not found error', async () => {
+      DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(upload, 'uploadToS3').mockImplementation((_data, _fileName, callback) => new Promise((resolve) => resolve(callback())));
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new NotFoundError('This is an error'));
+      const result = await supertest(app).get('/v1/enquiry/ants');
+
+      expect(result.status).toEqual(200);
+    });
+
+    it('sets the status to 500 for a generic error', async () => {
+      DatabaseService.build = jest.fn().mockResolvedValue({} as DatabaseServiceInterface);
+      jest.spyOn(enquiryService, 'getFeedDetails').mockRejectedValue(new Error('This is an error'));
+      const result = await supertest(app).get('/v1/enquiry/ants');
 
       expect(result.status).toEqual(500);
     });
