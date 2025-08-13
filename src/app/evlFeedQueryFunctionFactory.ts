@@ -9,7 +9,8 @@ export default (
   event: EvlEvent,
 ):
   | ((databaseService: DatabaseService, event: EvlEvent) => Promise<EvlFeedData[]>)
-  | ((databaseService: DatabaseService, feedName: FeedName, event: EvlEvent) => Promise<EvlFeedData[]>) => {
+  | ((databaseService: DatabaseService, feedName: FeedName, event: EvlEvent) => Promise<EvlFeedData[]>
+  ) => {
   if (event.vrm_trm) {
     logger.debug('redirecting to getEVLFeedByVrm using evl factory');
     return getEvlFeedByVrm;
