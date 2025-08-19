@@ -24,9 +24,9 @@ import { processTFLFeedData } from '../../utils/tflHelpers';
 import { FeedName } from '../../interfaces/FeedTypes';
 import EvlFeedData from '../../interfaces/queryResults/evlFeedData';
 import TflFeedData from '../../interfaces/queryResults/tflFeedData';
-import AntsFeedData from '../../interfaces/queryResults/antsFeedData';
-import { processAntsFeedData } from '../../utils/antsHelpers';
-import antsFeedQueryFunctionFactory from '../../app/antsFeedQueryFunctionFactory';
+// import AntsFeedData from '../../interfaces/queryResults/antsFeedData';
+// import { processAntsFeedData } from '../../utils/antsHelpers';
+// import antsFeedQueryFunctionFactory from '../../app/antsFeedQueryFunctionFactory';
 import { EventLogging } from '../../utils/EventLogging.enum';
 
 const app = express();
@@ -223,81 +223,82 @@ router.get('/tfl', (_req, res) => {
     });
 });
 
-router.get('/ants', (_req, res) => {
-  logger.info(EventLogging.ANTS_FEED_INIT, { request: _req.url });
-
-  let secretsManager: SecretsManagerServiceInterface;
-  if (process.env.IS_OFFLINE === 'true') {
-    logger.debug('configuring local secret manager');
-    secretsManager = new LocalSecretsManagerService();
-  } else {
-    logger.debug('configuring aws secret manager');
-    secretsManager = new SecretsManagerService(new SecretsManager());
-  }
-
-  const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`;
-  logger.debug(`creating file for ANTS feed called: ${fileName}`);
-  logger.info('Generating ANTS File Data');
-
-  const columnHeaders = [
-    'VRN',
-    'Make',
-    'Model',
-    'Wheel plan',
-    'Date of plating',
-    'Gross weight (pre)',
-    'Gross weight (post)',
-    'DOE Ref',
-    'Tech Record Date',
-  ];
-  let antsFeedProcessedData: string = columnHeaders.join(',');
-
-  DatabaseService.build(secretsManager, mysql)
-    .then((dbService) => getFeedDetails(antsFeedQueryFunctionFactory, FeedName.ANTS, dbService))
-    .then(async (result: AntsFeedData[]) => {
-      if (result.length > 0) {
-        const processedResult = result.map((entry) => processAntsFeedData(entry));
-        antsFeedProcessedData +=
-          '\n' +
-          processedResult
-            .map(
-              (entry) =>
-                `${entry.vrm_trm},${entry.make},${entry.model},${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
-            )
-            .join('\n');
-      } else {
-        logger.warn('No data found for ANTS feed. Generating file with only column headers.');
-      }
-
-      logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
-      await uploadToS3(antsFeedProcessedData, fileName, () => {
-        logger.info(`Successfully uploaded ${fileName} to S3`);
-        res.status(200);
-        res.contentType('json').send();
-      });
-      logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
-    })
-    .catch(async (e: Error) => {
-      if (e instanceof NotFoundError) {
-        await uploadToS3(antsFeedProcessedData, fileName, () => {
-          logger.info(`Successfully uploaded ${fileName} to S3`);
-          res.status(200);
-          res.contentType('json').send();
-          logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
-        });
-      } else {
-        logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
-        if (e instanceof ParametersError) {
-          res.status(400);
-          res.send(`Error Generating ANTS Feed Data: ${e.message}`);
-        } else {
-          res.status(500);
-          res.send(`Error Generating ANTS Feed Data: ${e.message}`);
-        }
-        logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
-      }
-    });
-});
+//
+// router.get('/ants', (_req, res) => {
+//   logger.info(EventLogging.ANTS_FEED_INIT, { request: _req.url });
+//
+//   let secretsManager: SecretsManagerServiceInterface;
+//   if (process.env.IS_OFFLINE === 'true') {
+//     logger.debug('configuring local secret manager');
+//     secretsManager = new LocalSecretsManagerService();
+//   } else {
+//     logger.debug('configuring aws secret manager');
+//     secretsManager = new SecretsManagerService(new SecretsManager());
+//   }
+//
+//   const fileName = `ANTS_vehicle_weight_changes_${moment(Date.now()).format('YYYY-MM-DD')}.csv`;
+//   logger.debug(`creating file for ANTS feed called: ${fileName}`);
+//   logger.info('Generating ANTS File Data');
+//
+//   const columnHeaders = [
+//     'VRN',
+//     'Make',
+//     'Model',
+//     'Wheel plan',
+//     'Date of plating',
+//     'Gross weight (pre)',
+//     'Gross weight (post)',
+//     'DOE Ref',
+//     'Tech Record Date',
+//   ];
+//   let antsFeedProcessedData: string = columnHeaders.join(',');
+//
+//   DatabaseService.build(secretsManager, mysql)
+//     .then((dbService) => getFeedDetails(antsFeedQueryFunctionFactory, FeedName.ANTS, dbService))
+//     .then(async (result: AntsFeedData[]) => {
+//       if (result.length > 0) {
+//         const processedResult = result.map((entry) => processAntsFeedData(entry));
+//         antsFeedProcessedData +=
+//           '\n' +
+//           processedResult
+//             .map(
+//               (entry) =>
+//                 `${entry.vrm_trm},${entry.make},${entry.model},${entry.wheelplan},${entry.test_date},${entry.weight_before_test},${entry.weight_after_test},${entry.DOE_reference},${entry.tech_record_date}`,
+//             )
+//             .join('\n');
+//       } else {
+//         logger.warn('No data found for ANTS feed. Generating file with only column headers.');
+//       }
+//
+//       logger.debug(`\nData captured for file generation: ${antsFeedProcessedData} \n\n`);
+//       await uploadToS3(antsFeedProcessedData, fileName, () => {
+//         logger.info(`Successfully uploaded ${fileName} to S3`);
+//         res.status(200);
+//         res.contentType('json').send();
+//       });
+//       logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
+//     })
+//     .catch(async (e: Error) => {
+//       if (e instanceof NotFoundError) {
+//         await uploadToS3(antsFeedProcessedData, fileName, () => {
+//           logger.info(`Successfully uploaded ${fileName} to S3`);
+//           res.status(200);
+//           res.contentType('json').send();
+//           logger.info(EventLogging.ANTS_FEED_SUCCESS, { request: _req.url, fileName });
+//         });
+//       } else {
+//         logger.info(EventLogging.ANTS_FEED_FAILURE, { request: _req.url, failure: e.message });
+//         if (e instanceof ParametersError) {
+//           res.status(400);
+//           res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+//         } else {
+//           res.status(500);
+//           res.send(`Error Generating ANTS Feed Data: ${e.message}`);
+//         }
+//         logger.error(`Error occurred with message ${e.message}. Stack Trace: ${e.stack}`);
+//       }
+//     });
+// });
 
 router.all(/testResults|vehicle/, (_request, res) => {
   res.status(405).send();
